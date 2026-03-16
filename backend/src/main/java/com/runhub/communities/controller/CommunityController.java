@@ -1,6 +1,7 @@
 package com.runhub.communities.controller;
 
 import com.runhub.communities.dto.*;
+import com.runhub.communities.dto.DriveFolderDto;
 import com.runhub.communities.service.CommunityService;
 import com.runhub.feed.dto.CreatePostRequest;
 import com.runhub.feed.dto.PostDto;
@@ -120,8 +121,19 @@ public class CommunityController {
 
     // ── Drive Sync ────────────────────────────────────────────────────────────
 
+    @GetMapping("/{id}/drive/folders")
+    public List<DriveFolderDto> getDriveFolders(@PathVariable Long id,
+                                                @AuthenticationPrincipal User user) {
+        return communityService.getDriveFolders(id, user);
+    }
+
     @PostMapping("/{id}/drive/sync")
-    public PostDto syncDrive(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    public PostDto syncDrive(@PathVariable Long id,
+                             @RequestBody(required = false) Map<String, String> body,
+                             @AuthenticationPrincipal User user) {
+        if (body != null && body.containsKey("folderId")) {
+            return communityService.syncDrivePhotos(id, body.get("folderId"), body.get("folderName"), user);
+        }
         return communityService.syncDrivePhotos(id, user);
     }
 

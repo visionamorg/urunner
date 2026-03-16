@@ -1,6 +1,7 @@
 package com.runhub.communities.service;
 
 import com.runhub.communities.dto.*;
+import com.runhub.communities.dto.DriveFolderDto;
 import com.runhub.communities.mapper.CommunityMapper;
 import com.runhub.communities.model.Community;
 import com.runhub.communities.model.CommunityInvite;
@@ -275,6 +276,32 @@ public class CommunityService {
     }
 
     // ── Drive Sync ───────────────────────────────────────────────────────────
+
+    public List<DriveFolderDto> getDriveFolders(Long communityId, User user) {
+        Community community = findById(communityId);
+        requireAdmin(communityId, user, community);
+
+        if (community.getDriveFolderId() == null || community.getDriveFolderId().isBlank())
+            throw new BadRequestException("No Google Drive folder configured. Set one in Settings first.");
+
+        return googleDriveService.getSubFolders(community.getDriveFolderId());
+    }
+
+    @Transactional
+    public PostDto syncDrivePhotos(Long communityId, String subFolderId, String eventName, User user) {
+        Community community = findById(communityId);
+        requireAdmin(communityId, user, community);
+
+        if (community.getDriveFolderId() == null || community.getDriveFolderId().isBlank())
+            throw new BadRequestException("No Google Drive folder configured. Set one in Settings first.");
+
+        List<String> imageUrls = googleDriveService.getImagesFromFolder(subFolderId);
+        if (imageUrls.isEmpty())
+            throw new BadRequestException("No images found in the folder: " + eventName);
+
+        String caption = "📸 " + eventName;
+        return feedService.createPhotoPost(communityId, imageUrls, caption, user);
+    }
 
     @Transactional
     public PostDto syncDrivePhotos(Long communityId, User user) {

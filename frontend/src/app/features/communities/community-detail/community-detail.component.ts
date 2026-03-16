@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { CommunityService } from '../../../core/services/community.service';
 import { FeedService } from '../../../core/services/feed.service';
-import { Community, CommunityMember, InviteDto } from '../../../core/models/community.model';
+import { Community, CommunityMember, InviteDto, DriveFolderDto } from '../../../core/models/community.model';
 import { Post, Comment } from '../../../core/models/post.model';
 
 @Component({
@@ -28,6 +28,13 @@ export class CommunityDetailComponent implements OnInit {
 
   showComments: { [postId: number]: boolean } = {};
   commentInput: { [postId: number]: string } = {};
+
+  // Drive folder picker
+  driveFolders: DriveFolderDto[] = [];
+  showDrivePicker = false;
+  loadingFolders = false;
+  syncingFolderId: string | null = null;
+  driveError = '';
 
   // Invite state
   inviteUsername = '';
@@ -266,21 +273,52 @@ export class CommunityDetailComponent implements OnInit {
     });
   }
 
-  syncDrive(): void {
-    if (!this.community) return;
-    this.syncing = true;
-    this.communityService.syncDrive(this.communityId).subscribe({
+  openDrivePicker(): void {
+    if (!this.community?.driveFolderId) {
+      this.driveError = 'Set a Google Drive Folder ID in Settings first.';
+      return;
+    }
+    this.driveError = '';
+    this.showDrivePicker = true;
+    this.loadingFolders = true;
+    this.driveFolders = [];
+
+    this.communityService.getDriveFolders(this.communityId).subscribe({
+      next: (folders) => {
+        this.driveFolders = folders;
+        this.loadingFolders = false;
+        if (folders.length === 0) {
+          this.driveError = 'No event folders found inside the configured Drive folder.';
+        }
+      },
+      error: (err) => {
+        this.driveError = err.error?.message || 'Failed to load Drive folders';
+        this.loadingFolders = false;
+      }
+    });
+  }
+
+  syncFolder(folder: DriveFolderDto): void {
+    this.syncingFolderId = folder.id;
+    this.driveError = '';
+
+    this.communityService.syncDrive(this.communityId, folder.id, folder.name).subscribe({
       next: (post) => {
         this.posts.unshift(post);
-        this.syncing = false;
+        this.syncingFolderId = null;
+        this.showDrivePicker = false;
         this.activeTab = 'feed';
       },
       error: (err) => {
-        console.error(err);
-        this.syncing = false;
-        alert(err.error?.message || 'Failed to sync Drive photos');
+        this.driveError = err.error?.message || 'Failed to sync photos from ' + folder.name;
+        this.syncingFolderId = null;
       }
     });
+  }
+
+  closeDrivePicker(): void {
+    this.showDrivePicker = false;
+    this.driveError = '';
   }
 
   updateCommunity(): void {

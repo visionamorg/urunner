@@ -46,14 +46,9 @@
           <div class="flex items-center gap-2 flex-shrink-0">
             @if (community.isAdmin) {
               <button
-                (click)="syncDrive()"
-                [disabled]="syncing || !community.driveFolderId"
-                class="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors inline-flex items-center gap-2">
-                @if (syncing) {
-                  <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                } @else {
-                  <span class="material-icons text-base">cloud_sync</span>
-                }
+                (click)="openDrivePicker()"
+                class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors inline-flex items-center gap-2">
+                <span class="material-icons text-base">cloud_sync</span>
                 Sync Drive
               </button>
             }
@@ -510,15 +505,11 @@
             and automatically create a Photo Album post in this community's feed.
           </p>
           <button
-            (click)="syncDrive()"
-            [disabled]="syncing || !community.driveFolderId"
+            (click)="openDrivePicker()"
+            [disabled]="!community.driveFolderId"
             class="bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors inline-flex items-center gap-2">
-            @if (syncing) {
-              <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-            } @else {
-              <span class="material-icons text-base">cloud_sync</span>
-            }
-            Sync Drive Photos
+            <span class="material-icons text-base">cloud_sync</span>
+            Browse & Sync Drive Folders
           </button>
           @if (!community.driveFolderId) {
             <p class="text-slate-500 text-xs mt-2">Set a Google Drive Folder ID in Community Settings to enable syncing.</p>
@@ -529,4 +520,85 @@
     }
 
   </div>
+
+  <!-- ==================== DRIVE FOLDER PICKER MODAL ==================== -->
+  @if (showDrivePicker) {
+    <!-- Backdrop -->
+    <div class="fixed inset-0 bg-black/70 z-40" (click)="closeDrivePicker()"></div>
+
+    <!-- Modal -->
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="bg-brand-card border border-brand-border rounded-2xl w-full max-w-lg shadow-2xl animate-fade-in">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between p-6 border-b border-brand-border">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-blue-600/20 flex items-center justify-center">
+              <span class="material-icons text-blue-400">folder</span>
+            </div>
+            <div>
+              <h2 class="text-white font-bold text-lg">Select Event Folder</h2>
+              <p class="text-slate-500 text-xs">Pick a folder to sync its photos as a community post</p>
+            </div>
+          </div>
+          <button (click)="closeDrivePicker()" class="text-slate-500 hover:text-white transition-colors">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6">
+
+          @if (driveError) {
+            <div class="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl mb-4">
+              {{ driveError }}
+            </div>
+          }
+
+          @if (loadingFolders) {
+            <div class="flex flex-col items-center justify-center py-12 gap-3">
+              <div class="animate-spin rounded-full h-10 w-10 border-2 border-blue-500 border-t-transparent"></div>
+              <p class="text-slate-400 text-sm">Loading folders from Google Drive...</p>
+            </div>
+          } @else if (driveFolders.length === 0 && !driveError) {
+            <div class="flex flex-col items-center justify-center py-12 gap-3 text-center">
+              <span class="material-icons text-slate-600 text-5xl">folder_off</span>
+              <p class="text-slate-400">No event folders found.</p>
+              <p class="text-slate-600 text-sm">Make sure your Drive folder contains subfolders named after events.</p>
+            </div>
+          } @else {
+            <div class="space-y-3 max-h-80 overflow-y-auto pr-1">
+              @for (folder of driveFolders; track folder.id) {
+                <button
+                  (click)="syncFolder(folder)"
+                  [disabled]="syncingFolderId !== null"
+                  class="w-full flex items-center gap-4 p-4 bg-brand-surface border border-brand-border hover:border-blue-500/50 rounded-xl transition-all disabled:opacity-50 text-left group">
+                  <div class="w-12 h-12 rounded-xl bg-blue-600/15 flex items-center justify-center flex-shrink-0">
+                    @if (syncingFolderId === folder.id) {
+                      <div class="animate-spin rounded-full h-5 w-5 border-2 border-blue-400 border-t-transparent"></div>
+                    } @else {
+                      <span class="material-icons text-blue-400 text-2xl">photo_library</span>
+                    }
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-white font-semibold text-sm truncate">{{ folder.name }}</p>
+                    <p class="text-slate-500 text-xs mt-0.5">
+                      @if (folder.imageCount > 0) {
+                        {{ folder.imageCount }} photo{{ folder.imageCount !== 1 ? 's' : '' }}
+                      } @else {
+                        No photos found
+                      }
+                    </p>
+                  </div>
+                  <span class="material-icons text-slate-600 group-hover:text-blue-400 transition-colors flex-shrink-0">chevron_right</span>
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+      </div>
+    </div>
+  }
+
 }

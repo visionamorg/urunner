@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Community, CommunityMember, CreateCommunityRequest, InviteDto } from '../models/community.model';
+import { Community, CommunityMember, CreateCommunityRequest, InviteDto, DriveFolderDto } from '../models/community.model';
 import { Post, PageResponse } from '../models/post.model';
 
 @Injectable({ providedIn: 'root' })
@@ -49,8 +49,13 @@ export class CommunityService {
     return this.http.post<Post>(`/api/communities/${id}/feed`, data);
   }
 
-  syncDrive(id: number): Observable<Post> {
-    return this.http.post<Post>(`/api/communities/${id}/drive/sync`, {});
+  getDriveFolders(id: number): Observable<DriveFolderDto[]> {
+    return this.http.get<DriveFolderDto[]>(`/api/communities/${id}/drive/folders`);
+  }
+
+  syncDrive(id: number, folderId?: string, folderName?: string): Observable<Post> {
+    const body = folderId ? { folderId, folderName } : {};
+    return this.http.post<Post>(`/api/communities/${id}/drive/sync`, body);
   }
 
   // ── Admin: Member Management ──────────────────────────────────────────────

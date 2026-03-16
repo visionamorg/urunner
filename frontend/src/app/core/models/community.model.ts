@@ -16,6 +16,12 @@ export interface Community {
   pendingInviteCount?: number;
 }
 
+export interface DriveFolderDto {
+  id: string;
+  name: string;
+  imageCount: number;
+}
+
 export interface InviteDto {
   id: number;
   communityId: number;
