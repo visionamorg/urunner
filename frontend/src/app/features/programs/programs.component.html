@@ -1,0 +1,82 @@
+<div class="page-header">
+  <h1>Training Programs</h1>
+</div>
+
+@if (myProgress.length > 0) {
+  <mat-card style="margin-bottom:20px">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon style="vertical-align:middle;color:#FF6F00;margin-right:8px">fitness_center</mat-icon>
+        My Active Programs
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content style="padding:16px">
+      @for (p of myProgress; track p.id) {
+        @if (p.status === 'ACTIVE') {
+          <div class="progress-item">
+            <div class="progress-info">
+              <div class="progress-name">{{ p.programName }}</div>
+              <div class="progress-meta">
+                <span class="level-chip level-{{p.programLevel}}">{{ p.programLevel }}</span>
+                Week {{ Math.ceil((p.completedSessions + 1) / 7) }} of {{ p.durationWeeks }}
+              </div>
+            </div>
+            <div class="progress-bar-wrap">
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="progressPercent(p)"></div>
+              </div>
+              <span class="progress-pct">{{ progressPercent(p) }}%</span>
+            </div>
+          </div>
+        }
+      }
+    </mat-card-content>
+  </mat-card>
+}
+
+@if (loading) {
+  <div style="display:flex;justify-content:center;padding:40px"><mat-spinner></mat-spinner></div>
+} @else {
+  <div class="card-grid">
+    @for (program of programs; track program.id) {
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>{{ program.name }}</mat-card-title>
+          <mat-card-subtitle>
+            <span class="level-chip level-{{program.level}}">{{ program.level }}</span>
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content style="padding:0 16px 8px">
+          <p style="color:#555;font-size:0.875rem;margin-bottom:12px">{{ program.description }}</p>
+          <div class="program-stats">
+            <div class="prog-stat">
+              <mat-icon>schedule</mat-icon>
+              <span>{{ program.durationWeeks }} weeks</span>
+            </div>
+            <div class="prog-stat">
+              <mat-icon>directions_run</mat-icon>
+              <span>{{ program.targetDistanceKm }}km goal</span>
+            </div>
+            <div class="prog-stat">
+              <mat-icon>checklist</mat-icon>
+              <span>{{ program.sessionsCount }} sessions</span>
+            </div>
+          </div>
+        </mat-card-content>
+        <mat-card-actions style="padding:8px 16px">
+          @if (isEnrolled(program.id)) {
+            <button mat-stroked-button color="primary" disabled>
+              <mat-icon>check</mat-icon>
+              Enrolled
+            </button>
+          } @else {
+            <button mat-raised-button color="primary" (click)="startProgram(program.id)">
+              <mat-icon>play_arrow</mat-icon>
+              Start Program
+            </button>
+          }
+        </mat-card-actions>
+      </mat-card>
+    }
+  </div>
+}

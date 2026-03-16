@@ -1,0 +1,79 @@
+package com.runhub.running.service;
+
+import com.runhub.running.dto.ActivityDto;
+import com.runhub.running.dto.ActivityStatsDto;
+import com.runhub.running.dto.CreateActivityRequest;
+import com.runhub.running.mapper.ActivityMapper;
+import com.runhub.running.model.RunningActivity;
+import com.runhub.running.repository.ActivityRepository;
+import com.runhub.users.model.User;
+import com.runhub.users.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class ActivityService {
+
+    private final ActivityRepository activityRepository;
+    private final ActivityMapper activityMapper;
+    private final UserService userService;
+
+    public List<ActivityDto> getAllActivities() {
+        return activityRepository.findAllByOrderByActivityDateDesc()
+                .stream().map(activityMapper::toDto).toList();
+    }
+
+    public List<ActivityDto> getUserActivities(String email) {
+        User user = userService.getUserEntityByEmail(email);
+        return activityRepository.findByUserIdOrderByActivityDateDesc(user.getId())
+                .stream().map(activityMapper::toDto).toList();
+    }
+
+    @Transactional
+    public ActivityDto createActivity(String email, CreateActivityRequest request) {
+        User user = userService.getUserEntityByEmail(email);
+        RunningActivity activity = RunningActivity.builder()
+                .user(user)
+                .title(request.getTitle())
+                .distanceKm(request.getDistanceKm())
+                .durationMinutes(request.getDurationMinutes())
+                .activityDate(request.getActivityDate() != null ? request.getActivityDate() : LocalDate.now())
+                .location(request.getLocation())
+                .notes(request.getNotes())
+                .build();
+        return activityMapper.toDto(activityRepository.save(activity));
+    }
+
+    public ActivityStatsDto getUserStats(String email) {
+        User user = userService.getUserEntityByEmail(email);
+        Long userId = user.getId();
+
+        Double totalDist = activityRepository.sumDistanceByUserId(userId);
+        Long totalRuns = activityRepository.countByUserId(userId);
+        Long totalDuration = activityRepository.sumDurationByUserId(userId);
+
+        LocalDate now = LocalDate.now();
+        LocalDate weekStart = now.minusDays(7);
+        LocalDate monthStart = now.minusDays(30);
+
+        Double weeklyDist = activityRepository.sumDistanceByUserIdAndDateRange(userId, weekStart, now);
+        Double monthlyDist = activityRepository.sumDistanceByUserIdAndDateRange(userId, monthStart, now);
+
+        double avgPace = (totalDist != null && totalDist > 0 && totalDuration != null)
+                ? totalDuration.doubleValue() / totalDist : 0;
+
+        return ActivityStatsDto.builder()
+                .totalDistanceKm(totalDist)
+                .totalRuns(totalRuns)
+                .totalDurationMinutes(totalDuration)
+                .avgPaceMinPerKm(avgPace)
+                .weeklyDistanceKm(weeklyDist)
+                .monthlyDistanceKm(monthlyDist)
+                .build();
+    }
+}

@@ -1,0 +1,124 @@
+<div class="page-header">
+  <h1>My Activities</h1>
+  <button mat-raised-button color="primary" (click)="showForm = !showForm">
+    <mat-icon>add</mat-icon>
+    Log Run
+  </button>
+</div>
+
+<!-- Stats -->
+@if (stats) {
+  <div class="stats-grid">
+    <mat-card class="stat-card">
+      <div class="stat-value">{{ stats.totalDistanceKm?.toFixed(1) }}</div>
+      <div class="stat-label">Total KM</div>
+    </mat-card>
+    <mat-card class="stat-card">
+      <div class="stat-value">{{ stats.weeklyDistanceKm?.toFixed(1) }}</div>
+      <div class="stat-label">Weekly KM</div>
+    </mat-card>
+    <mat-card class="stat-card">
+      <div class="stat-value">{{ stats.monthlyDistanceKm?.toFixed(1) }}</div>
+      <div class="stat-label">Monthly KM</div>
+    </mat-card>
+    <mat-card class="stat-card">
+      <div class="stat-value">{{ stats.totalRuns }}</div>
+      <div class="stat-label">Total Runs</div>
+    </mat-card>
+  </div>
+}
+
+<!-- Log Activity Form -->
+@if (showForm) {
+  <mat-card class="form-card">
+    <mat-card-header>
+      <mat-card-title>Log New Run</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Title</mat-label>
+            <input matInput formControlName="title" placeholder="Morning Run">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Date</mat-label>
+            <input matInput type="date" formControlName="activityDate">
+          </mat-form-field>
+        </div>
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Distance (km)</mat-label>
+            <input matInput type="number" step="0.1" formControlName="distanceKm">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Duration (minutes)</mat-label>
+            <input matInput type="number" formControlName="durationMinutes">
+          </mat-form-field>
+        </div>
+        <mat-form-field appearance="outline">
+          <mat-label>Location (optional)</mat-label>
+          <input matInput formControlName="location" placeholder="City Park">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Notes (optional)</mat-label>
+          <textarea matInput formControlName="notes" rows="2"></textarea>
+        </mat-form-field>
+        <div class="form-actions">
+          <button mat-button type="button" (click)="showForm = false">Cancel</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="submitting || form.invalid">
+            Save Activity
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+}
+
+<!-- Activities List -->
+@if (loading) {
+  <div style="display:flex;justify-content:center;padding:40px">
+    <mat-spinner></mat-spinner>
+  </div>
+} @else {
+  @if (activities.length === 0) {
+    <mat-card>
+      <mat-card-content style="text-align:center;padding:40px;color:#aaa">
+        <mat-icon style="font-size:48px;width:48px;height:48px">directions_run</mat-icon>
+        <p>No activities yet. Log your first run!</p>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    @for (activity of activities; track activity.id) {
+      <mat-card class="activity-list-item">
+        <mat-card-content>
+          <div class="activity-row">
+            <div class="activity-icon"><mat-icon>directions_run</mat-icon></div>
+            <div class="activity-info">
+              <div class="activity-title">{{ activity.title }}</div>
+              <div class="activity-meta">
+                {{ activity.activityDate | date:'MMMM d, yyyy' }}
+                @if (activity.location) { · {{ activity.location }} }
+              </div>
+            </div>
+            <div class="activity-stats">
+              <div class="stat-item">
+                <span class="stat-val">{{ activity.distanceKm.toFixed(2) }}</span>
+                <span class="stat-unit">km</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-val">{{ formatDuration(activity.durationMinutes) }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-val">{{ formatPace(activity.paceMinPerKm) }}</span>
+              </div>
+            </div>
+          </div>
+          @if (activity.notes) {
+            <div class="activity-notes">{{ activity.notes }}</div>
+          }
+        </mat-card-content>
+      </mat-card>
+    }
+  }
+}

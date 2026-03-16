@@ -1,0 +1,61 @@
+<div class="page-header">
+  <h1>Communities</h1>
+  <button mat-raised-button color="primary" (click)="showForm = !showForm">
+    <mat-icon>add</mat-icon>
+    Create Community
+  </button>
+</div>
+
+@if (showForm) {
+  <mat-card style="margin-bottom:20px">
+    <mat-card-header><mat-card-title>New Community</mat-card-title></mat-card-header>
+    <mat-card-content style="padding:16px">
+      <form [formGroup]="form" (ngSubmit)="onCreate()">
+        <mat-form-field appearance="outline" style="width:100%">
+          <mat-label>Community Name</mat-label>
+          <input matInput formControlName="name">
+        </mat-form-field>
+        <mat-form-field appearance="outline" style="width:100%">
+          <mat-label>Description</mat-label>
+          <textarea matInput formControlName="description" rows="3"></textarea>
+        </mat-form-field>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button mat-button type="button" (click)="showForm = false">Cancel</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Create</button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+}
+
+@if (loading) {
+  <div style="display:flex;justify-content:center;padding:40px"><mat-spinner></mat-spinner></div>
+} @else {
+  <div class="card-grid">
+    @for (community of communities; track community.id) {
+      <mat-card class="community-card">
+        <mat-card-header>
+          <div class="community-avatar" matCardAvatar>
+            {{ community.name.substring(0,2).toUpperCase() }}
+          </div>
+          <mat-card-title>{{ community.name }}</mat-card-title>
+          <mat-card-subtitle>
+            <mat-icon style="font-size:14px;vertical-align:middle">group</mat-icon>
+            {{ community.memberCount }} members
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p style="color:#555;font-size:0.875rem;margin:0">{{ community.description }}</p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-raised-button color="primary" (click)="joinCommunity(community.id)">
+            <mat-icon>person_add</mat-icon>
+            Join
+          </button>
+          <span class="spacer"></span>
+          <span style="font-size:0.75rem;color:#888">by {{ community.creatorUsername }}</span>
+        </mat-card-actions>
+      </mat-card>
+    }
+  </div>
+}

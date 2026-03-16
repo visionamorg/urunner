@@ -1,0 +1,120 @@
+@if (loading) {
+  <div style="display:flex;justify-content:center;padding:60px">
+    <mat-spinner></mat-spinner>
+  </div>
+} @else {
+  <div class="page-header">
+    <h1>Welcome back, {{ currentUser?.username }}! 👋</h1>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <mat-card class="stat-card">
+      <div class="stat-value">{{ stats?.totalDistanceKm?.toFixed(1) || 0 }}</div>
+      <div class="stat-label">Total KM</div>
+    </mat-card>
+    <mat-card class="stat-card">
+      <div class="stat-value">{{ stats?.weeklyDistanceKm?.toFixed(1) || 0 }}</div>
+      <div class="stat-label">This Week KM</div>
+    </mat-card>
+    <mat-card class="stat-card">
+      <div class="stat-value">{{ stats?.monthlyDistanceKm?.toFixed(1) || 0 }}</div>
+      <div class="stat-label">This Month KM</div>
+    </mat-card>
+    <mat-card class="stat-card">
+      <div class="stat-value">{{ stats?.totalRuns || 0 }}</div>
+      <div class="stat-label">Total Runs</div>
+    </mat-card>
+  </div>
+
+  <div class="dashboard-grid">
+    <!-- Recent Activities -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon style="vertical-align:middle;margin-right:8px;color:#1565C0">directions_run</mat-icon>
+          Recent Activities
+        </mat-card-title>
+        <span class="spacer"></span>
+        <a mat-button routerLink="/activities" color="primary">View All</a>
+      </mat-card-header>
+      <mat-card-content>
+        @if (recentActivities.length === 0) {
+          <div class="empty-state">
+            <mat-icon>directions_run</mat-icon>
+            <p>No activities yet. <a routerLink="/activities">Log your first run!</a></p>
+          </div>
+        }
+        @for (activity of recentActivities; track activity.id) {
+          <div class="activity-item">
+            <div class="activity-icon"><mat-icon>directions_run</mat-icon></div>
+            <div class="activity-details">
+              <div class="activity-title">{{ activity.title }}</div>
+              <div class="activity-meta">{{ activity.activityDate | date:'MMM d' }} · {{ formatDuration(activity.durationMinutes) }} · {{ formatPace(activity.paceMinPerKm) }}</div>
+            </div>
+            <div class="activity-distance">{{ activity.distanceKm.toFixed(1) }} km</div>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Upcoming Events -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon style="vertical-align:middle;margin-right:8px;color:#FF6F00">event</mat-icon>
+          Upcoming Events
+        </mat-card-title>
+        <span class="spacer"></span>
+        <a mat-button routerLink="/events" color="primary">View All</a>
+      </mat-card-header>
+      <mat-card-content>
+        @if (upcomingEvents.length === 0) {
+          <div class="empty-state">
+            <mat-icon>event</mat-icon>
+            <p>No upcoming events. <a routerLink="/events">Browse events!</a></p>
+          </div>
+        }
+        @for (event of upcomingEvents; track event.id) {
+          <div class="event-item">
+            <div class="event-date">
+              <div class="date-day">{{ event.eventDate | date:'d' }}</div>
+              <div class="date-month">{{ event.eventDate | date:'MMM' }}</div>
+            </div>
+            <div class="event-details">
+              <div class="event-name">{{ event.name }}</div>
+              <div class="event-meta">{{ event.location }} · {{ event.distanceKm }}km</div>
+            </div>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Weekly Rankings -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon style="vertical-align:middle;margin-right:8px;color:#FF6F00">leaderboard</mat-icon>
+          Weekly Leaders
+        </mat-card-title>
+        <span class="spacer"></span>
+        <a mat-button routerLink="/rankings" color="primary">Full Rankings</a>
+      </mat-card-header>
+      <mat-card-content>
+        @for (r of topRankings; track r.rank) {
+          <div class="ranking-row" [class.top-1]="r.rank === 1" [class.top-2]="r.rank === 2" [class.top-3]="r.rank === 3">
+            <div class="rank-number">
+              @if (r.rank === 1) { 🥇 }
+              @else if (r.rank === 2) { 🥈 }
+              @else if (r.rank === 3) { 🥉 }
+              @else { {{ r.rank }} }
+            </div>
+            <div class="rank-avatar">{{ r.username.substring(0,2).toUpperCase() }}</div>
+            <div class="rank-name">{{ r.username }}</div>
+            <div class="rank-distance">{{ r.totalDistanceKm?.toFixed(1) }} km</div>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+  </div>
+}

@@ -1,0 +1,133 @@
+@if (loading) {
+  <div style="display:flex;justify-content:center;padding:60px"><mat-spinner></mat-spinner></div>
+} @else if (user) {
+  <div class="profile-grid">
+    <!-- Profile Card -->
+    <mat-card class="profile-card">
+      <mat-card-content style="padding:24px;text-align:center">
+        <div class="profile-avatar">{{ user.username.substring(0,2).toUpperCase() }}</div>
+        <h2 style="margin:12px 0 4px">{{ user.firstName }} {{ user.lastName }}</h2>
+        <div style="color:#888;font-size:0.875rem">&#64;{{ user.username }}</div>
+        <div class="role-badge">{{ user.role }}</div>
+
+        <!-- Provider badge -->
+        @if (user.authProvider && user.authProvider !== 'LOCAL') {
+          <div class="provider-badge" [ngClass]="user.authProvider.toLowerCase()">
+            <mat-icon style="font-size:14px;height:14px;width:14px">link</mat-icon>
+            Connected via {{ user.authProvider | titlecase }}
+          </div>
+        }
+
+        @if (user.bio) {
+          <p style="margin-top:12px;color:#555;font-size:0.875rem">{{ user.bio }}</p>
+        }
+
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap">
+          <button mat-stroked-button (click)="editMode = !editMode">
+            <mat-icon>edit</mat-icon>
+            Edit Profile
+          </button>
+
+          <!-- Sync button for connected providers -->
+          @if (authUser?.provider && authUser?.provider !== 'LOCAL') {
+            <button mat-raised-button
+              [style.background]="authUser?.provider === 'STRAVA' ? '#fc4c02' : '#007cc1'"
+              style="color:#fff"
+              [disabled]="syncing"
+              (click)="syncActivities()">
+              @if (syncing) {
+                <mat-spinner diameter="16" style="display:inline-block;margin-right:6px"></mat-spinner>
+              } @else {
+                <mat-icon>sync</mat-icon>
+              }
+              Sync {{ authUser?.provider | titlecase }} Activities
+            </button>
+          }
+
+          <!-- Connect buttons for LOCAL users -->
+          @if (!authUser?.provider || authUser?.provider === 'LOCAL') {
+            <button class="oauth-btn strava-btn" type="button" (click)="connectStrava()" style="padding:6px 12px;font-size:0.8rem">
+              Connect Strava
+            </button>
+            <button class="oauth-btn garmin-btn" type="button" (click)="connectGarmin()" style="padding:6px 12px;font-size:0.8rem">
+              Connect Garmin
+            </button>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Stats -->
+    @if (stats) {
+      <mat-card>
+        <mat-card-header><mat-card-title>Running Stats</mat-card-title></mat-card-header>
+        <mat-card-content style="padding:16px">
+          <div class="stats-grid">
+            <div class="stat-card" style="padding:12px">
+              <div class="stat-value">{{ stats.totalDistanceKm?.toFixed(0) }}</div>
+              <div class="stat-label">Total KM</div>
+            </div>
+            <div class="stat-card" style="padding:12px">
+              <div class="stat-value">{{ stats.totalRuns }}</div>
+              <div class="stat-label">Total Runs</div>
+            </div>
+            <div class="stat-card" style="padding:12px">
+              <div class="stat-value">{{ stats.weeklyDistanceKm?.toFixed(1) }}</div>
+              <div class="stat-label">Weekly KM</div>
+            </div>
+            <div class="stat-card" style="padding:12px">
+              <div class="stat-value">{{ stats.monthlyDistanceKm?.toFixed(1) }}</div>
+              <div class="stat-label">Monthly KM</div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    }
+
+    <!-- Badges -->
+    @if (badges.length > 0) {
+      <mat-card>
+        <mat-card-header><mat-card-title>Badges ({{ badges.length }})</mat-card-title></mat-card-header>
+        <mat-card-content style="padding:16px">
+          <div class="badge-grid">
+            @for (badge of badges; track badge.badgeId) {
+              <div class="badge-card" [title]="badge.badgeDescription">
+                <div class="badge-icon">{{ badge.badgeIconUrl || '🏅' }}</div>
+                <div class="badge-name">{{ badge.badgeName }}</div>
+              </div>
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+
+  <!-- Edit Form -->
+  @if (editMode) {
+    <mat-card style="margin-top:16px;max-width:500px">
+      <mat-card-header><mat-card-title>Edit Profile</mat-card-title></mat-card-header>
+      <mat-card-content style="padding:16px">
+        <form [formGroup]="form" (ngSubmit)="save()">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <mat-form-field appearance="outline">
+              <mat-label>First Name</mat-label>
+              <input matInput formControlName="firstName">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Last Name</mat-label>
+              <input matInput formControlName="lastName">
+            </mat-form-field>
+          </div>
+          <mat-form-field appearance="outline" style="width:100%">
+            <mat-label>Bio</mat-label>
+            <textarea matInput formControlName="bio" rows="3" placeholder="Tell us about your running journey..."></textarea>
+          </mat-form-field>
+          <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button mat-button type="button" (click)="editMode = false">Cancel</button>
+            <button mat-raised-button color="primary" type="submit">Save</button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  }
+}

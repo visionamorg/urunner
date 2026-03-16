@@ -1,0 +1,39 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Activity, ActivityStats, CreateActivityRequest } from '../models/activity.model';
+
+export interface SyncResult {
+  imported: number;
+  skipped: number;
+  message: string;
+}
+
+@Injectable({ providedIn: 'root' })
+export class ActivityService {
+  constructor(private http: HttpClient) {}
+
+  getAll(): Observable<Activity[]> {
+    return this.http.get<Activity[]>('/api/activities');
+  }
+
+  getMyActivities(): Observable<Activity[]> {
+    return this.http.get<Activity[]>('/api/activities/user');
+  }
+
+  createActivity(data: CreateActivityRequest): Observable<Activity> {
+    return this.http.post<Activity>('/api/activities', data);
+  }
+
+  getMyStats(): Observable<ActivityStats> {
+    return this.http.get<ActivityStats>('/api/activities/stats');
+  }
+
+  syncStrava(): Observable<SyncResult> {
+    return this.http.post<SyncResult>('/api/sync/strava', {});
+  }
+
+  syncGarmin(): Observable<SyncResult> {
+    return this.http.post<SyncResult>('/api/sync/garmin', {});
+  }
+}

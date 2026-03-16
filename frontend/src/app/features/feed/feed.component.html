@@ -1,0 +1,52 @@
+<div class="page-header">
+  <h1>Community Feed</h1>
+</div>
+
+<!-- Create Post -->
+<mat-card style="margin-bottom:16px">
+  <mat-card-content style="padding:16px">
+    <form [formGroup]="postForm" (ngSubmit)="createPost()">
+      <mat-form-field appearance="outline" style="width:100%">
+        <mat-label>Share your run or thoughts...</mat-label>
+        <textarea matInput formControlName="content" rows="3"></textarea>
+      </mat-form-field>
+      <div style="display:flex;justify-content:flex-end">
+        <button mat-raised-button color="primary" type="submit" [disabled]="postForm.invalid">
+          <mat-icon>send</mat-icon>
+          Post
+        </button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>
+
+@if (loading) {
+  <div style="display:flex;justify-content:center;padding:40px"><mat-spinner></mat-spinner></div>
+}
+
+@for (post of posts; track post.id) {
+  <mat-card class="post-card">
+    <mat-card-content style="padding:16px">
+      <div class="post-header">
+        <div class="avatar">{{ getInitials(post.authorUsername) }}</div>
+        <div class="post-meta">
+          <div class="author-name">{{ post.authorUsername }}</div>
+          <div class="post-date">{{ timeAgo(post.createdAt) }}</div>
+        </div>
+      </div>
+
+      <p style="margin:0 0 12px;line-height:1.6">{{ post.content }}</p>
+
+      <div class="post-actions">
+        <button mat-button [class.liked]="post.likedByCurrentUser" (click)="toggleLike(post)">
+          <mat-icon>{{ post.likedByCurrentUser ? 'favorite' : 'favorite_border' }}</mat-icon>
+          {{ post.likesCount }}
+        </button>
+        <button mat-button>
+          <mat-icon>chat_bubble_outline</mat-icon>
+          {{ post.commentsCount }}
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+}

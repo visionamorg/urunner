@@ -1,0 +1,67 @@
+<div class="page-header">
+  <h1>Rankings</h1>
+</div>
+
+@if (loading) {
+  <div style="display:flex;justify-content:center;padding:40px"><mat-spinner></mat-spinner></div>
+} @else {
+  <mat-tab-group>
+    <mat-tab label="This Week">
+      <ng-template matTabContent>
+        <div class="rankings-list">
+          @for (r of weeklyRankings; track r.rank) {
+            <div class="ranking-row"
+                 [class.top-1]="r.rank===1"
+                 [class.top-2]="r.rank===2"
+                 [class.top-3]="r.rank===3"
+                 [class.current-user]="isCurrentUser(r.userId)">
+              <div class="rank-number">{{ getMedalEmoji(r.rank) }}</div>
+              <div class="rank-avatar">{{ r.username.substring(0,2).toUpperCase() }}</div>
+              <div class="rank-name">
+                {{ r.username }}
+                @if (isCurrentUser(r.userId)) { <span class="you-badge">You</span> }
+              </div>
+              <div class="rank-distance">{{ r.totalDistanceKm?.toFixed(1) }} km</div>
+              <div class="rank-runs">{{ r.totalRuns }} runs</div>
+            </div>
+          }
+          @if (weeklyRankings.length === 0) {
+            <div style="text-align:center;padding:40px;color:#aaa">No runs logged this week</div>
+          }
+        </div>
+      </ng-template>
+    </mat-tab>
+
+    <mat-tab label="This Month">
+      <ng-template matTabContent>
+        <div class="rankings-list">
+          @for (r of monthlyRankings; track r.rank) {
+            <div class="ranking-row" [class.top-1]="r.rank===1" [class.top-2]="r.rank===2" [class.top-3]="r.rank===3" [class.current-user]="isCurrentUser(r.userId)">
+              <div class="rank-number">{{ getMedalEmoji(r.rank) }}</div>
+              <div class="rank-avatar">{{ r.username.substring(0,2).toUpperCase() }}</div>
+              <div class="rank-name">{{ r.username }} @if (isCurrentUser(r.userId)) { <span class="you-badge">You</span> }</div>
+              <div class="rank-distance">{{ r.totalDistanceKm?.toFixed(1) }} km</div>
+              <div class="rank-runs">{{ r.totalRuns }} runs</div>
+            </div>
+          }
+        </div>
+      </ng-template>
+    </mat-tab>
+
+    <mat-tab label="All Time">
+      <ng-template matTabContent>
+        <div class="rankings-list">
+          @for (r of allTimeRankings; track r.rank) {
+            <div class="ranking-row" [class.top-1]="r.rank===1" [class.top-2]="r.rank===2" [class.top-3]="r.rank===3" [class.current-user]="isCurrentUser(r.userId)">
+              <div class="rank-number">{{ getMedalEmoji(r.rank) }}</div>
+              <div class="rank-avatar">{{ r.username.substring(0,2).toUpperCase() }}</div>
+              <div class="rank-name">{{ r.username }} @if (isCurrentUser(r.userId)) { <span class="you-badge">You</span> }</div>
+              <div class="rank-distance">{{ r.totalDistanceKm?.toFixed(1) }} km</div>
+              <div class="rank-runs">{{ r.totalRuns }} runs</div>
+            </div>
+          }
+        </div>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+}

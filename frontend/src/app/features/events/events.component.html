@@ -1,0 +1,56 @@
+<div class="page-header">
+  <h1>Running Events</h1>
+</div>
+
+@if (loading) {
+  <div style="display:flex;justify-content:center;padding:40px"><mat-spinner></mat-spinner></div>
+} @else {
+  <div class="card-grid">
+    @for (event of events; track event.id) {
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>{{ event.name }}</mat-card-title>
+          <mat-card-subtitle>
+            <mat-icon style="font-size:14px;vertical-align:middle">calendar_today</mat-icon>
+            {{ event.eventDate | date:'MMMM d, yyyy h:mm a' }}
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p style="color:#555;font-size:0.875rem;margin-bottom:12px">{{ event.description }}</p>
+
+          <div class="event-details">
+            <div class="detail-item">
+              <mat-icon>location_on</mat-icon>
+              <span>{{ event.location }}</span>
+            </div>
+            @if (event.distanceKm) {
+              <div class="detail-item">
+                <mat-icon>directions_run</mat-icon>
+                <span>{{ event.distanceKm }} km</span>
+              </div>
+            }
+            <div class="detail-item">
+              <mat-icon>people</mat-icon>
+              <span>{{ event.participantCount }}{{ event.maxParticipants ? '/' + event.maxParticipants : '' }} registered</span>
+            </div>
+            <div class="detail-item">
+              <mat-icon>attach_money</mat-icon>
+              <span>{{ event.price === 0 ? 'Free' : '$' + event.price }}</span>
+            </div>
+          </div>
+        </mat-card-content>
+        <mat-card-actions>
+          @if (isUpcoming(event.eventDate)) {
+            <button mat-raised-button color="primary" (click)="register(event.id)">
+              Register
+            </button>
+          } @else {
+            <span style="font-size:0.8rem;color:#888;padding:8px">Past Event</span>
+          }
+          <span class="spacer"></span>
+          <span style="font-size:0.75rem;color:#888">by {{ event.organizerUsername }}</span>
+        </mat-card-actions>
+      </mat-card>
+    }
+  </div>
+}

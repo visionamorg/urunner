@@ -1,0 +1,25 @@
+# Environment variables — NEVER commit this
+.env
+
+# Backend build artifacts
+backend/target/
+backend/.mvn/
+backend/*.jar
+
+# Frontend build artifacts
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker volumes
+postgres_data/

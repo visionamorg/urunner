@@ -1,0 +1,50 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav class="sidenav" mode="side" opened>
+
+    <!-- Logo -->
+    <div class="logo-section">
+      <mat-icon>directions_run</mat-icon>
+      <span>RunHub</span>
+    </div>
+
+    <!-- Navigation -->
+    <mat-nav-list class="sidebar-nav">
+      @for (item of navItems; track item.path) {
+        <a mat-list-item
+           [routerLink]="item.path"
+           routerLinkActive="active">
+          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+          <span matListItemTitle>{{ item.label }}</span>
+        </a>
+      }
+    </mat-nav-list>
+
+    <!-- Footer -->
+    <div class="sidebar-footer">
+      <button (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Logout</span>
+      </button>
+    </div>
+
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <!-- Toolbar -->
+    <mat-toolbar class="top-toolbar">
+      <span>RunHub</span>
+      <span class="spacer"></span>
+      @if (currentUser) {
+        <div class="user-chip">
+          <mat-icon style="font-size:18px;width:18px;height:18px">directions_run</mat-icon>
+          {{ currentUser.username }}
+        </div>
+      }
+    </mat-toolbar>
+
+    <!-- Page content -->
+    <div class="main-content">
+      <router-outlet />
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
