@@ -13,6 +13,8 @@ export interface Post {
   commentsCount: number;
   liked: boolean;
   likedByCurrentUser: boolean;
+  pinned: boolean;
+  deleted?: boolean;
   createdAt: string;
   comments?: Comment[];
 }

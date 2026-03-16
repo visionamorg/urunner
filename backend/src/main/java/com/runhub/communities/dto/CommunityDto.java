@@ -20,4 +20,5 @@ public class CommunityDto {
     private boolean joined;
     private String role;
     private boolean isAdmin;
+    private int pendingInviteCount;
 }

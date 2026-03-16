@@ -49,7 +49,19 @@ public class Post {
     @Builder.Default
     private Integer commentsCount = 0;
 
+    @Column(name = "deleted", nullable = false)
+    @Builder.Default
+    private boolean deleted = false;
+
+    @Column(name = "pinned", nullable = false)
+    @Builder.Default
+    private boolean pinned = false;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    public Long getCommunityId() {
+        return community != null ? community.getId() : null;
+    }
 }

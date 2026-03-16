@@ -13,6 +13,21 @@ export interface Community {
   role?: string;
   isAdmin: boolean;
   createdAt: string;
+  pendingInviteCount?: number;
+}
+
+export interface InviteDto {
+  id: number;
+  communityId: number;
+  communityName: string;
+  communityImageUrl?: string;
+  invitedUserId: number;
+  invitedUsername: string;
+  invitedByUsername: string;
+  token: string;
+  status: string;
+  createdAt: string;
+  expiresAt: string;
 }
 
 export interface CommunityMember {

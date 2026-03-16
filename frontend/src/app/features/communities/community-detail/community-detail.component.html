@@ -8,7 +8,6 @@
 
     <!-- Header / Cover Section -->
     <div class="relative rounded-2xl overflow-hidden mb-6">
-      <!-- Cover image or gradient -->
       @if (community.coverUrl) {
         <div class="h-48 sm:h-64 w-full bg-cover bg-center" [style.backgroundImage]="'url(' + community.coverUrl + ')'">
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
@@ -19,7 +18,6 @@
         </div>
       }
 
-      <!-- Overlay content -->
       <div class="absolute bottom-0 left-0 right-0 p-6">
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
@@ -35,13 +33,21 @@
                   Joined
                 </span>
               }
+              @if (community.isAdmin && community.pendingInviteCount && community.pendingInviteCount > 0) {
+                <button
+                  (click)="activeTab = 'invites'"
+                  class="bg-blue-500/20 border border-blue-500/40 text-blue-400 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1">
+                  <span class="material-icons text-xs">mail</span>
+                  {{ community.pendingInviteCount }} pending
+                </button>
+              }
             </div>
           </div>
           <div class="flex items-center gap-2 flex-shrink-0">
             @if (community.isAdmin) {
               <button
                 (click)="syncDrive()"
-                [disabled]="syncing"
+                [disabled]="syncing || !community.driveFolderId"
                 class="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors inline-flex items-center gap-2">
                 @if (syncing) {
                   <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
@@ -65,29 +71,42 @@
     </div>
 
     <!-- Tab Bar -->
-    <div class="flex items-center gap-1 mb-6 bg-brand-surface border border-brand-border rounded-2xl p-1">
+    <div class="flex items-center gap-1 mb-6 bg-brand-surface border border-brand-border rounded-2xl p-1 overflow-x-auto">
       <button
         (click)="activeTab = 'feed'"
         [class]="activeTab === 'feed'
-          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-orange-500/20 text-orange-400 font-semibold text-sm transition-all'
-          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-slate-400 hover:text-slate-200 font-medium text-sm transition-all'">
+          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-orange-500/20 text-orange-400 font-semibold text-sm transition-all whitespace-nowrap'
+          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-slate-400 hover:text-slate-200 font-medium text-sm transition-all whitespace-nowrap'">
         <span class="material-icons text-base">dynamic_feed</span>
         Feed
       </button>
       <button
         (click)="activeTab = 'members'"
         [class]="activeTab === 'members'
-          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-orange-500/20 text-orange-400 font-semibold text-sm transition-all'
-          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-slate-400 hover:text-slate-200 font-medium text-sm transition-all'">
+          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-orange-500/20 text-orange-400 font-semibold text-sm transition-all whitespace-nowrap'
+          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-slate-400 hover:text-slate-200 font-medium text-sm transition-all whitespace-nowrap'">
         <span class="material-icons text-base">group</span>
         Members
       </button>
       @if (community.isAdmin) {
         <button
+          (click)="activeTab = 'invites'; loadInvites()"
+          [class]="activeTab === 'invites'
+            ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-orange-500/20 text-orange-400 font-semibold text-sm transition-all whitespace-nowrap'
+            : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-slate-400 hover:text-slate-200 font-medium text-sm transition-all whitespace-nowrap'">
+          <span class="material-icons text-base">mail</span>
+          Invites
+          @if (community.pendingInviteCount && community.pendingInviteCount > 0) {
+            <span class="bg-orange-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+              {{ community.pendingInviteCount }}
+            </span>
+          }
+        </button>
+        <button
           (click)="activeTab = 'settings'"
           [class]="activeTab === 'settings'
-            ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-orange-500/20 text-orange-400 font-semibold text-sm transition-all'
-            : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-slate-400 hover:text-slate-200 font-medium text-sm transition-all'">
+            ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-orange-500/20 text-orange-400 font-semibold text-sm transition-all whitespace-nowrap'
+            : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-slate-400 hover:text-slate-200 font-medium text-sm transition-all whitespace-nowrap'">
           <span class="material-icons text-base">settings</span>
           Settings
         </button>
@@ -133,18 +152,43 @@
             </div>
           </div>
         } @else {
-          <!-- Posts List -->
           @for (post of posts; track post.id) {
-            <div class="card space-y-4">
+            <div class="card space-y-4" [class]="post.pinned ? 'border-orange-500/40 bg-orange-500/5' : ''">
               <!-- Post Header -->
               <div class="flex items-start gap-3">
                 <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                   {{ post.authorInitials || getInitials(post.authorUsername) }}
                 </div>
                 <div class="flex-1 min-w-0">
-                  <p class="text-white font-semibold text-sm">{{ post.authorUsername }}</p>
+                  <div class="flex items-center gap-2">
+                    <p class="text-white font-semibold text-sm">{{ post.authorUsername }}</p>
+                    @if (post.pinned) {
+                      <span class="flex items-center gap-1 text-orange-400 text-xs">
+                        <span class="material-icons text-xs">push_pin</span>
+                        Pinned
+                      </span>
+                    }
+                  </div>
                   <p class="text-slate-500 text-xs">{{ timeAgo(post.createdAt) }}</p>
                 </div>
+                <!-- Admin Post Controls -->
+                @if (community.isAdmin) {
+                  <div class="flex items-center gap-1 flex-shrink-0">
+                    <button
+                      (click)="pinPost(post)"
+                      class="p-1.5 rounded-lg transition-colors"
+                      [class]="post.pinned ? 'text-orange-400 bg-orange-500/10 hover:bg-orange-500/20' : 'text-slate-500 hover:text-orange-400 hover:bg-orange-500/10'"
+                      title="{{ post.pinned ? 'Unpin post' : 'Pin post' }}">
+                      <span class="material-icons text-sm">push_pin</span>
+                    </button>
+                    <button
+                      (click)="deletePost(post.id)"
+                      class="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                      title="Delete post">
+                      <span class="material-icons text-sm">delete</span>
+                    </button>
+                  </div>
+                }
               </div>
 
               <!-- Post Content -->
@@ -156,55 +200,30 @@
               @if (post.postType === 'PHOTO_ALBUM' && post.photoUrls && post.photoUrls.length > 0) {
                 <div class="rounded-xl overflow-hidden">
                   @if (post.photoUrls.length === 1) {
-                    <!-- Single photo: full width -->
                     <img
                       [src]="post.photoUrls[0]"
                       alt="Post photo"
                       class="w-full max-h-96 object-cover rounded-xl cursor-pointer hover:opacity-95 transition-opacity"
                     />
                   } @else if (post.photoUrls.length === 2) {
-                    <!-- 2 photos: equal columns -->
                     <div class="grid grid-cols-2 gap-1">
                       @for (url of post.photoUrls; track url) {
-                        <img
-                          [src]="url"
-                          alt="Post photo"
-                          class="w-full h-48 object-cover cursor-pointer hover:opacity-95 transition-opacity rounded-xl"
-                        />
+                        <img [src]="url" alt="Post photo" class="w-full h-48 object-cover cursor-pointer hover:opacity-95 transition-opacity rounded-xl" />
                       }
                     </div>
                   } @else if (post.photoUrls.length === 3) {
-                    <!-- 3 photos: left large + right 2 stacked -->
                     <div class="grid grid-cols-2 gap-1">
-                      <img
-                        [src]="post.photoUrls[0]"
-                        alt="Post photo"
-                        class="w-full h-64 object-cover cursor-pointer hover:opacity-95 transition-opacity rounded-xl row-span-2"
-                      />
+                      <img [src]="post.photoUrls[0]" alt="Post photo" class="w-full h-64 object-cover cursor-pointer hover:opacity-95 transition-opacity rounded-xl row-span-2" />
                       <div class="flex flex-col gap-1">
-                        <img
-                          [src]="post.photoUrls[1]"
-                          alt="Post photo"
-                          class="w-full h-[calc(128px-2px)] object-cover cursor-pointer hover:opacity-95 transition-opacity rounded-xl"
-                        />
-                        <img
-                          [src]="post.photoUrls[2]"
-                          alt="Post photo"
-                          class="w-full h-[calc(128px-2px)] object-cover cursor-pointer hover:opacity-95 transition-opacity rounded-xl"
-                        />
+                        <img [src]="post.photoUrls[1]" alt="Post photo" class="w-full h-[calc(128px-2px)] object-cover cursor-pointer hover:opacity-95 transition-opacity rounded-xl" />
+                        <img [src]="post.photoUrls[2]" alt="Post photo" class="w-full h-[calc(128px-2px)] object-cover cursor-pointer hover:opacity-95 transition-opacity rounded-xl" />
                       </div>
                     </div>
                   } @else {
-                    <!-- 4+ photos: 2x2 grid with overflow count -->
                     <div class="grid grid-cols-2 gap-1">
                       @for (url of post.photoUrls.slice(0, 4); track url; let i = $index) {
                         <div class="relative">
-                          <img
-                            [src]="url"
-                            alt="Post photo"
-                            class="w-full h-40 object-cover cursor-pointer hover:opacity-95 transition-opacity rounded-xl"
-                          />
-                          <!-- Overlay for 4th image if more photos exist -->
+                          <img [src]="url" alt="Post photo" class="w-full h-40 object-cover cursor-pointer hover:opacity-95 transition-opacity rounded-xl" />
                           @if (i === 3 && post.photoUrls.length > 4) {
                             <div class="absolute inset-0 bg-black/60 flex items-center justify-center rounded-xl cursor-pointer">
                               <span class="text-white text-2xl font-black">+{{ post.photoUrls.length - 4 }}</span>
@@ -237,7 +256,6 @@
               <!-- Comments Section -->
               @if (showComments[post.id]) {
                 <div class="space-y-3 pt-2 border-t border-brand-border">
-                  <!-- Existing comments -->
                   @if (post.comments && post.comments.length > 0) {
                     @for (comment of post.comments; track comment.id) {
                       <div class="flex items-start gap-2.5">
@@ -256,7 +274,6 @@
                   } @else {
                     <p class="text-slate-600 text-xs text-center py-2">No comments yet. Be the first!</p>
                   }
-                  <!-- Comment Input -->
                   <div class="flex items-center gap-2 mt-3">
                     <input
                       type="text"
@@ -301,16 +318,128 @@
                   <p class="text-white font-semibold text-sm truncate">{{ member.firstName }} {{ member.lastName }}</p>
                   <p class="text-slate-500 text-xs">&#64;{{ member.username }}</p>
                 </div>
-                <!-- Role badge -->
-                <span
-                  class="text-xs font-semibold px-2.5 py-1 rounded-full border"
-                  [class]="getRoleBadgeClass(member.role)">
-                  {{ member.role }}
-                </span>
+                <!-- Role badge / selector -->
+                @if (community.isAdmin) {
+                  <div class="flex items-center gap-2 flex-shrink-0">
+                    <select
+                      [value]="member.role"
+                      (change)="changeRole(member.userId, $any($event.target).value)"
+                      [disabled]="changingRole[member.userId]"
+                      class="bg-brand-surface border border-brand-border text-slate-300 text-xs rounded-lg px-2 py-1 focus:outline-none focus:border-orange-500">
+                      <option value="MEMBER">MEMBER</option>
+                      <option value="MODERATOR">MODERATOR</option>
+                      <option value="ADMIN">ADMIN</option>
+                    </select>
+                    <button
+                      (click)="kickMember(member.userId, member.username)"
+                      class="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                      title="Kick member">
+                      <span class="material-icons text-sm">person_remove</span>
+                    </button>
+                  </div>
+                } @else {
+                  <span
+                    class="text-xs font-semibold px-2.5 py-1 rounded-full border"
+                    [class]="getRoleBadgeClass(member.role)">
+                    {{ member.role }}
+                  </span>
+                }
               </div>
             }
           </div>
         }
+      </div>
+    }
+
+    <!-- ==================== INVITES TAB (admin only) ==================== -->
+    @if (activeTab === 'invites' && community.isAdmin) {
+      <div class="space-y-6">
+
+        <!-- Invite Form -->
+        <div class="card">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
+              <span class="material-icons text-white text-xl">person_add</span>
+            </div>
+            <h2 class="text-white font-bold text-lg">Invite a Member</h2>
+          </div>
+
+          <div class="flex gap-3">
+            <input
+              type="text"
+              [(ngModel)]="inviteUsername"
+              placeholder="Enter username..."
+              (keyup.enter)="sendInvite()"
+              class="input-field flex-1"
+            />
+            <button
+              (click)="sendInvite()"
+              [disabled]="inviteLoading || !inviteUsername.trim()"
+              class="btn-primary disabled:opacity-40 inline-flex items-center gap-2 whitespace-nowrap">
+              @if (inviteLoading) {
+                <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+              } @else {
+                <span class="material-icons text-base">send</span>
+              }
+              Send Invite
+            </button>
+          </div>
+
+          @if (inviteError) {
+            <div class="mt-3 bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl">
+              {{ inviteError }}
+            </div>
+          }
+          @if (inviteSuccess) {
+            <div class="mt-3 bg-green-500/10 border border-green-500/30 text-green-400 text-sm px-4 py-3 rounded-xl flex items-center gap-2">
+              <span class="material-icons text-base">check_circle</span>
+              {{ inviteSuccess }}
+            </div>
+          }
+        </div>
+
+        <!-- Pending Invites List -->
+        <div class="card">
+          <h3 class="text-white font-bold mb-4 flex items-center gap-2">
+            <span class="material-icons text-orange-400">schedule</span>
+            Pending Invites
+            @if (invites.length > 0) {
+              <span class="bg-orange-500/20 text-orange-400 text-xs font-bold px-2 py-0.5 rounded-full">{{ invites.length }}</span>
+            }
+          </h3>
+
+          @if (invites.length === 0) {
+            <div class="flex flex-col items-center justify-center py-10 gap-3 text-center">
+              <span class="material-icons text-slate-600 text-4xl">mail_outline</span>
+              <p class="text-slate-500 text-sm">No pending invites</p>
+            </div>
+          } @else {
+            <div class="space-y-3">
+              @for (invite of invites; track invite.id) {
+                <div class="flex items-center gap-4 p-4 bg-brand-surface rounded-xl border border-brand-border">
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                    {{ invite.invitedUsername.substring(0, 2).toUpperCase() }}
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-white font-semibold text-sm">&#64;{{ invite.invitedUsername }}</p>
+                    <p class="text-slate-500 text-xs">Invited by &#64;{{ invite.invitedByUsername }} · {{ timeAgo(invite.createdAt) }}</p>
+                  </div>
+                  <div class="flex items-center gap-2 flex-shrink-0">
+                    <span class="bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 text-xs font-semibold px-2.5 py-1 rounded-full">
+                      Pending
+                    </span>
+                    <button
+                      (click)="cancelInvite(invite.id)"
+                      class="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                      title="Cancel invite">
+                      <span class="material-icons text-sm">close</span>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
       </div>
     }
 
@@ -330,37 +459,21 @@
           <div class="space-y-4">
             <div>
               <label class="label">Community Name</label>
-              <input
-                type="text"
-                [(ngModel)]="settingsName"
-                placeholder="Community name"
-                class="input-field"
-              />
+              <input type="text" [(ngModel)]="settingsName" placeholder="Community name" class="input-field" />
             </div>
             <div>
               <label class="label">Description</label>
-              <textarea
-                [(ngModel)]="settingsDescription"
-                rows="3"
-                placeholder="What's this community about?"
-                class="input-field resize-none"
-              ></textarea>
+              <textarea [(ngModel)]="settingsDescription" rows="3" placeholder="What's this community about?" class="input-field resize-none"></textarea>
             </div>
             <div>
               <label class="label">Google Drive Folder ID</label>
-              <input
-                type="text"
-                [(ngModel)]="settingsDriveFolderId"
-                placeholder="e.g. 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs"
-                class="input-field"
-              />
+              <input type="text" [(ngModel)]="settingsDriveFolderId" placeholder="e.g. 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs" class="input-field" />
               <p class="text-slate-500 text-xs mt-1">
                 Paste your public Google Drive folder ID to enable photo syncing.
                 Open your folder in Google Drive and copy the ID from the URL.
               </p>
             </div>
 
-            <!-- Success message -->
             @if (settingsSuccess) {
               <div class="bg-green-500/10 border border-green-500/30 text-green-400 text-sm px-4 py-3 rounded-xl">
                 Settings saved successfully!
@@ -408,7 +521,7 @@
             Sync Drive Photos
           </button>
           @if (!community.driveFolderId) {
-            <p class="text-slate-500 text-xs mt-2">Set a Google Drive Folder ID above to enable syncing.</p>
+            <p class="text-slate-500 text-xs mt-2">Set a Google Drive Folder ID in Community Settings to enable syncing.</p>
           }
         </div>
 

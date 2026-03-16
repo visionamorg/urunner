@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { CommunityService } from '../../../core/services/community.service';
 import { FeedService } from '../../../core/services/feed.service';
-import { Community, CommunityMember } from '../../../core/models/community.model';
+import { Community, CommunityMember, InviteDto } from '../../../core/models/community.model';
 import { Post, Comment } from '../../../core/models/post.model';
 
 @Component({
@@ -18,7 +18,8 @@ export class CommunityDetailComponent implements OnInit {
   community: Community | null = null;
   posts: Post[] = [];
   members: CommunityMember[] = [];
-  activeTab: 'feed' | 'members' | 'settings' = 'feed';
+  invites: InviteDto[] = [];
+  activeTab: 'feed' | 'members' | 'invites' | 'settings' = 'feed';
   loading = true;
   feedLoading = false;
   syncing = false;
@@ -28,12 +29,21 @@ export class CommunityDetailComponent implements OnInit {
   showComments: { [postId: number]: boolean } = {};
   commentInput: { [postId: number]: string } = {};
 
+  // Invite state
+  inviteUsername = '';
+  inviteLoading = false;
+  inviteError = '';
+  inviteSuccess = '';
+
   // Settings form
   settingsName = '';
   settingsDescription = '';
   settingsDriveFolderId = '';
   settingsSaving = false;
   settingsSuccess = false;
+
+  // Role change state
+  changingRole: { [userId: number]: boolean } = {};
 
   private communityId!: number;
 
@@ -62,6 +72,7 @@ export class CommunityDetailComponent implements OnInit {
         this.loading = false;
         this.loadFeed();
         this.loadMembers();
+        if (c.isAdmin) this.loadInvites();
       },
       error: () => {
         this.loading = false;
@@ -84,6 +95,13 @@ export class CommunityDetailComponent implements OnInit {
   loadMembers(): void {
     this.communityService.getMembers(this.communityId).subscribe({
       next: (members) => { this.members = members; },
+      error: () => {}
+    });
+  }
+
+  loadInvites(): void {
+    this.communityService.getCommunityInvites(this.communityId).subscribe({
+      next: (invites) => { this.invites = invites; },
       error: () => {}
     });
   }
@@ -118,7 +136,6 @@ export class CommunityDetailComponent implements OnInit {
   }
 
   toggleLike(post: Post): void {
-    // Optimistic update
     const wasLiked = post.liked || post.likedByCurrentUser;
     post.liked = !wasLiked;
     post.likedByCurrentUser = !wasLiked;
@@ -131,7 +148,6 @@ export class CommunityDetailComponent implements OnInit {
         post.likedByCurrentUser = post.liked;
       },
       error: () => {
-        // Revert on error
         post.liked = wasLiked;
         post.likedByCurrentUser = wasLiked;
         post.likesCount = wasLiked ? post.likesCount + 1 : Math.max(0, post.likesCount - 1);
@@ -142,7 +158,6 @@ export class CommunityDetailComponent implements OnInit {
   toggleComments(postId: number): void {
     this.showComments[postId] = !this.showComments[postId];
     if (this.showComments[postId]) {
-      // Lazy load comments
       this.feedService.getComments(postId).subscribe({
         next: (comments) => {
           const post = this.posts.find(p => p.id === postId);
@@ -168,6 +183,86 @@ export class CommunityDetailComponent implements OnInit {
         this.commentInput[postId] = '';
       },
       error: (err) => console.error(err)
+    });
+  }
+
+  // ── Admin: Post Controls ────────────────────────────────────────────────
+
+  deletePost(postId: number): void {
+    if (!confirm('Delete this post?')) return;
+    this.communityService.deletePost(this.communityId, postId).subscribe({
+      next: () => { this.posts = this.posts.filter(p => p.id !== postId); },
+      error: (err) => alert(err.error?.message || 'Failed to delete post')
+    });
+  }
+
+  pinPost(post: Post): void {
+    this.communityService.pinPost(this.communityId, post.id).subscribe({
+      next: () => { post.pinned = !post.pinned; },
+      error: (err) => alert(err.error?.message || 'Failed to pin post')
+    });
+  }
+
+  // ── Admin: Member Controls ──────────────────────────────────────────────
+
+  kickMember(userId: number, username: string): void {
+    if (!confirm(`Kick @${username} from this community?`)) return;
+    this.communityService.kickMember(this.communityId, userId).subscribe({
+      next: () => {
+        this.members = this.members.filter(m => m.userId !== userId);
+        if (this.community) this.community.memberCount = Math.max(0, this.community.memberCount - 1);
+      },
+      error: (err) => alert(err.error?.message || 'Failed to kick member')
+    });
+  }
+
+  changeRole(userId: number, newRole: string): void {
+    this.changingRole[userId] = true;
+    this.communityService.changeMemberRole(this.communityId, userId, newRole).subscribe({
+      next: () => {
+        const member = this.members.find(m => m.userId === userId);
+        if (member) member.role = newRole;
+        this.changingRole[userId] = false;
+      },
+      error: (err) => {
+        alert(err.error?.message || 'Failed to change role');
+        this.changingRole[userId] = false;
+      }
+    });
+  }
+
+  // ── Invite Controls ─────────────────────────────────────────────────────
+
+  sendInvite(): void {
+    if (!this.inviteUsername.trim()) return;
+    this.inviteLoading = true;
+    this.inviteError = '';
+    this.inviteSuccess = '';
+
+    this.communityService.invite(this.communityId, this.inviteUsername.trim()).subscribe({
+      next: (invite) => {
+        this.invites.unshift(invite);
+        this.inviteUsername = '';
+        this.inviteSuccess = `Invite sent to @${invite.invitedUsername}`;
+        this.inviteLoading = false;
+        if (this.community) this.community.pendingInviteCount = (this.community.pendingInviteCount || 0) + 1;
+        setTimeout(() => { this.inviteSuccess = ''; }, 4000);
+      },
+      error: (err) => {
+        this.inviteError = err.error?.message || 'Failed to send invite';
+        this.inviteLoading = false;
+      }
+    });
+  }
+
+  cancelInvite(inviteId: number): void {
+    this.communityService.cancelInvite(this.communityId, inviteId).subscribe({
+      next: () => {
+        this.invites = this.invites.filter(i => i.id !== inviteId);
+        if (this.community && this.community.pendingInviteCount)
+          this.community.pendingInviteCount = Math.max(0, this.community.pendingInviteCount - 1);
+      },
+      error: (err) => alert(err.error?.message || 'Failed to cancel invite')
     });
   }
 
@@ -211,19 +306,10 @@ export class CommunityDetailComponent implements OnInit {
     });
   }
 
-  getPhotoGridClass(count: number): string {
-    if (count === 1) return 'grid-cols-1';
-    if (count === 2) return 'grid-cols-2';
-    if (count === 3 || count >= 4) return 'grid-cols-2';
-    return 'grid-cols-2';
-  }
-
   getInitials(name: string): string {
     if (!name) return '?';
     const parts = name.split(' ');
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[1][0]).toUpperCase();
-    }
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
     return name.substring(0, 2).toUpperCase();
   }
 
