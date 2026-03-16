@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(cd:*)",
-      "Bash(docker compose:*)"
+      "Bash(docker compose:*)",
+      "Bash(which java:*)",
+      "Bash(npx ng:*)",
+      "Bash(curl:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
