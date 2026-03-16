@@ -13,4 +13,5 @@ public class CommunityMemberDto {
     private String profileImageUrl;
     private String role;
     private LocalDateTime joinedAt;
+    private String initials;
 }

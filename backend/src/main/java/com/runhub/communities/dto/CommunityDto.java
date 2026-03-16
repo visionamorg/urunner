@@ -10,8 +10,14 @@ public class CommunityDto {
     private String name;
     private String description;
     private String imageUrl;
+    private String coverUrl;
+    private String driveFolderId;
+    private Boolean isPrivate;
     private Long creatorId;
     private String creatorUsername;
     private Integer memberCount;
     private LocalDateTime createdAt;
+    private boolean joined;
+    private String role;
+    private boolean isAdmin;
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 import { CommunityService } from '../../core/services/community.service';
 import { Community } from '../../core/models/community.model';
 
@@ -21,11 +21,12 @@ export class CommunitiesComponent implements OnInit {
   constructor(
     private communityService: CommunityService,
     private fb: FormBuilder,
-    private snackBar: MatSnackBar
+    private router: Router
   ) {
     this.form = this.fb.group({
       name: ['', Validators.required],
-      description: ['', Validators.required]
+      description: ['', Validators.required],
+      driveFolderId: ['']
     });
   }
 
@@ -40,27 +41,36 @@ export class CommunitiesComponent implements OnInit {
     });
   }
 
-  joinCommunity(id: number): void {
+  navigateToCommunity(id: number): void {
+    this.router.navigate(['/communities', id]);
+  }
+
+  join(id: number, event: Event): void {
+    event.stopPropagation();
     this.communityService.join(id).subscribe({
-      next: () => {
-        this.snackBar.open('Joined community!', 'Close', { duration: 3000 });
-        this.load();
-      },
-      error: (err) => {
-        this.snackBar.open(err.error?.message || 'Could not join', 'Close', { duration: 3000 });
-      }
+      next: () => this.load(),
+      error: (err) => console.error('Could not join community', err)
+    });
+  }
+
+  leave(id: number, event: Event): void {
+    event.stopPropagation();
+    this.communityService.leave(id).subscribe({
+      next: () => this.load(),
+      error: (err) => console.error('Could not leave community', err)
     });
   }
 
   onCreate(): void {
     if (this.form.invalid) return;
     this.communityService.create(this.form.value).subscribe({
-      next: () => {
+      next: (community) => {
         this.showForm = false;
         this.form.reset();
-        this.snackBar.open('Community created!', 'Close', { duration: 3000 });
         this.load();
-      }
+        this.router.navigate(['/communities', community.id]);
+      },
+      error: (err) => console.error('Could not create community', err)
     });
   }
 

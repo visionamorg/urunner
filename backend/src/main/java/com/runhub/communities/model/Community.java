@@ -28,6 +28,16 @@ public class Community {
     @Column(name = "image_url", length = 500)
     private String imageUrl;
 
+    @Column(name = "cover_url", length = 500)
+    private String coverUrl;
+
+    @Column(name = "drive_folder_id", length = 500)
+    private String driveFolderId;
+
+    @Column(name = "is_private", nullable = false)
+    @Builder.Default
+    private Boolean isPrivate = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id", nullable = false)
     private User creator;

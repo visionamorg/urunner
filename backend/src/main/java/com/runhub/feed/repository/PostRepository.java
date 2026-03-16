@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findAllByOrderByCreatedAtDesc(Pageable pageable);
+    Page<Post> findByCommunityIdOrderByCreatedAtDesc(Long communityId, Pageable pageable);
+    Page<Post> findByCommunityIsNullOrderByCreatedAtDesc(Pageable pageable);
 }

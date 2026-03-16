@@ -36,6 +36,8 @@ application:
       consumer-secret: ${GARMIN_CONSUMER_SECRET}
       redirect-uri: ${APP_BASE_URL:http://localhost:8080}/api/oauth/garmin/callback
     frontend-callback-url: ${FRONTEND_URL:http://localhost:4200}/oauth/callback
+  drive:
+    api-key: ${GOOGLE_DRIVE_API_KEY:}
 
 logging:
   level:

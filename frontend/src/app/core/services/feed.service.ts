@@ -7,24 +7,28 @@ import { Comment, PageResponse, Post } from '../models/post.model';
 export class FeedService {
   constructor(private http: HttpClient) {}
 
-  getPosts(page = 0, size = 20): Observable<PageResponse<Post>> {
+  getPosts(page: number = 0, size: number = 20): Observable<PageResponse<Post>> {
     const params = new HttpParams().set('page', page).set('size', size);
-    return this.http.get<PageResponse<Post>>('/api/posts', { params });
+    return this.http.get<PageResponse<Post>>('/api/feed/posts', { params });
   }
 
-  createPost(data: { content: string; communityId?: number }): Observable<Post> {
-    return this.http.post<Post>('/api/posts', data);
+  createPost(data: { content: string; communityId?: number; postType?: string; photoUrls?: string[] }): Observable<Post> {
+    return this.http.post<Post>('/api/feed/posts', data);
+  }
+
+  toggleLike(postId: number): Observable<Post> {
+    return this.http.post<Post>(`/api/feed/posts/${postId}/like`, {});
   }
 
   likePost(id: number): Observable<Post> {
-    return this.http.post<Post>(`/api/posts/${id}/like`, {});
+    return this.toggleLike(id);
   }
 
   getComments(postId: number): Observable<Comment[]> {
-    return this.http.get<Comment[]>(`/api/posts/${postId}/comments`);
+    return this.http.get<Comment[]>(`/api/feed/posts/${postId}/comments`);
   }
 
   addComment(postId: number, content: string): Observable<Comment> {
-    return this.http.post<Comment>(`/api/posts/${postId}/comments`, { content });
+    return this.http.post<Comment>(`/api/feed/posts/${postId}/comments`, { content });
   }
 }

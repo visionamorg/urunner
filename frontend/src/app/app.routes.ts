@@ -33,6 +33,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/communities/communities.component').then(m => m.CommunitiesComponent)
       },
       {
+        path: 'communities/:id',
+        loadComponent: () => import('./features/communities/community-detail/community-detail.component').then(m => m.CommunityDetailComponent)
+      },
+      {
         path: 'events',
         loadComponent: () => import('./features/events/events.component').then(m => m.EventsComponent)
       },

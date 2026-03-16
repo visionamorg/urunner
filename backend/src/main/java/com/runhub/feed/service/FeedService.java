@@ -39,30 +39,76 @@ public class FeedService {
         User currentUser = userService.getUserEntityByEmail(email);
         Pageable pageable = PageRequest.of(page, size);
         return postRepository.findAllByOrderByCreatedAtDesc(pageable)
-                .map(post -> {
-                    PostDto dto = feedMapper.toPostDto(post);
-                    dto.setLikedByCurrentUser(likeRepository.existsByPostIdAndUserId(post.getId(), currentUser.getId()));
-                    return dto;
-                });
+                .map(post -> toPostDtoWithLike(post, currentUser));
+    }
+
+    public Page<PostDto> getPosts(User user, int page) {
+        Pageable pageable = PageRequest.of(page, 20);
+        return postRepository.findByCommunityIsNullOrderByCreatedAtDesc(pageable)
+                .map(post -> toPostDtoWithLike(post, user));
+    }
+
+    public Page<PostDto> getCommunityPosts(Long communityId, User user, int page) {
+        Pageable pageable = PageRequest.of(page, 20);
+        return postRepository.findByCommunityIdOrderByCreatedAtDesc(communityId, pageable)
+                .map(post -> toPostDtoWithLike(post, user));
     }
 
     @Transactional
     public PostDto createPost(String email, CreatePostRequest request) {
         User user = userService.getUserEntityByEmail(email);
+        return createPost(request, user);
+    }
+
+    @Transactional
+    public PostDto createPost(CreatePostRequest request, User user) {
         Community community = null;
         if (request.getCommunityId() != null) {
             community = communityRepository.findById(request.getCommunityId()).orElse(null);
         }
 
+        String postType = request.getPostType() != null ? request.getPostType() : "TEXT";
+        String photoUrlsJson = feedMapper.serializePhotoUrls(request.getPhotoUrls());
+
+        String content = request.getContent() != null ? request.getContent() : "";
+
         Post post = Post.builder()
                 .author(user)
-                .content(request.getContent())
+                .content(content)
                 .imageUrl(request.getImageUrl())
                 .community(community)
+                .postType(postType)
+                .photoUrls(photoUrlsJson)
                 .build();
 
         Post saved = postRepository.save(post);
         PostDto dto = feedMapper.toPostDto(saved);
+        dto.setLiked(false);
+        dto.setLikedByCurrentUser(false);
+        return dto;
+    }
+
+    @Transactional
+    public PostDto createPhotoPost(Long communityId, List<String> photoUrls, String caption, User user) {
+        Community community = null;
+        if (communityId != null) {
+            community = communityRepository.findById(communityId).orElse(null);
+        }
+
+        String photoUrlsJson = feedMapper.serializePhotoUrls(photoUrls);
+        String content = caption != null ? caption : "Photos from Google Drive";
+
+        Post post = Post.builder()
+                .author(user)
+                .content(content)
+                .community(community)
+                .postType("PHOTO_ALBUM")
+                .photoUrls(photoUrlsJson)
+                .build();
+
+        Post saved = postRepository.save(post);
+        PostDto dto = feedMapper.toPostDto(saved);
+        dto.setLiked(false);
         dto.setLikedByCurrentUser(false);
         return dto;
     }
@@ -70,6 +116,11 @@ public class FeedService {
     @Transactional
     public CommentDto addComment(Long postId, String email, String content) {
         User user = userService.getUserEntityByEmail(email);
+        return addComment(postId, content, user);
+    }
+
+    @Transactional
+    public CommentDto addComment(Long postId, String content, User user) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
 
@@ -89,6 +140,11 @@ public class FeedService {
     @Transactional
     public PostDto toggleLike(Long postId, String email) {
         User user = userService.getUserEntityByEmail(email);
+        return toggleLike(postId, user);
+    }
+
+    @Transactional
+    public PostDto toggleLike(Long postId, User user) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
 
@@ -106,12 +162,22 @@ public class FeedService {
 
         Post saved = postRepository.save(post);
         PostDto dto = feedMapper.toPostDto(saved);
-        dto.setLikedByCurrentUser(likeRepository.existsByPostIdAndUserId(postId, user.getId()));
+        boolean liked = likeRepository.existsByPostIdAndUserId(postId, user.getId());
+        dto.setLiked(liked);
+        dto.setLikedByCurrentUser(liked);
         return dto;
     }
 
     public List<CommentDto> getComments(Long postId) {
         return commentRepository.findByPostIdOrderByCreatedAtAsc(postId)
                 .stream().map(feedMapper::toCommentDto).toList();
+    }
+
+    private PostDto toPostDtoWithLike(Post post, User user) {
+        PostDto dto = feedMapper.toPostDto(post);
+        boolean liked = likeRepository.existsByPostIdAndUserId(post.getId(), user.getId());
+        dto.setLiked(liked);
+        dto.setLikedByCurrentUser(liked);
+        return dto;
     }
 }

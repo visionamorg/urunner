@@ -3,6 +3,7 @@ package com.runhub.feed.dto;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class PostDto {
@@ -10,11 +11,16 @@ public class PostDto {
     private Long authorId;
     private String authorUsername;
     private String authorProfileImageUrl;
+    private String authorInitials;
+    private Long communityId;
+    private String postType;
     private String content;
     private String imageUrl;
-    private Long communityId;
+    private List<String> photoUrls;
     private Integer likesCount;
     private Integer commentsCount;
-    private LocalDateTime createdAt;
+    private boolean liked;
     private boolean likedByCurrentUser;
+    private LocalDateTime createdAt;
+    private List<CommentDto> comments;
 }

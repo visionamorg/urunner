@@ -34,6 +34,13 @@ public class Post {
     @JoinColumn(name = "community_id")
     private Community community;
 
+    @Column(name = "post_type", length = 20, nullable = false)
+    @Builder.Default
+    private String postType = "TEXT";
+
+    @Column(name = "photo_urls", columnDefinition = "TEXT")
+    private String photoUrls;
+
     @Column(name = "likes_count", nullable = false)
     @Builder.Default
     private Integer likesCount = 0;

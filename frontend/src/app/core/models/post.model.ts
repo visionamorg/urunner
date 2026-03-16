@@ -3,13 +3,18 @@ export interface Post {
   authorId: number;
   authorUsername: string;
   authorProfileImageUrl?: string;
+  authorInitials: string;
+  communityId?: number;
+  postType: 'TEXT' | 'PHOTO_ALBUM';
   content: string;
   imageUrl?: string;
-  communityId?: number;
+  photoUrls: string[];
   likesCount: number;
   commentsCount: number;
-  createdAt: string;
+  liked: boolean;
   likedByCurrentUser: boolean;
+  createdAt: string;
+  comments?: Comment[];
 }
 
 export interface Comment {
@@ -17,6 +22,7 @@ export interface Comment {
   postId: number;
   authorId: number;
   authorUsername: string;
+  authorInitials: string;
   content: string;
   createdAt: string;
 }
