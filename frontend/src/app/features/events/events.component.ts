@@ -1,22 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { EventService } from '../../core/services/event.service';
 import { RunEvent } from '../../core/models/event.model';
 
 @Component({
   selector: 'app-events',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatCardModule, MatButtonModule, MatIconModule,
-    MatChipsModule, MatProgressSpinnerModule, MatSnackBarModule
-  ],
+  imports: [CommonModule],
   templateUrl: './events.component.html',
   styleUrl: './events.component.scss'
 })

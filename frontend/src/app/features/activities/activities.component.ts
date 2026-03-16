@@ -1,26 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatTableModule } from '@angular/material/table';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivityService } from '../../core/services/activity.service';
 import { Activity, ActivityStats } from '../../core/models/activity.model';
 
 @Component({
   selector: 'app-activities',
   standalone: true,
-  imports: [
-    CommonModule, ReactiveFormsModule,
-    MatCardModule, MatButtonModule, MatIconModule,
-    MatFormFieldModule, MatInputModule, MatDialogModule,
-    MatTableModule, MatProgressSpinnerModule
-  ],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './activities.component.html',
   styleUrl: './activities.component.scss'
 })

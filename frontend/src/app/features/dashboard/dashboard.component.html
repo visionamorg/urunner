@@ -1,120 +1,186 @@
 @if (loading) {
-  <div style="display:flex;justify-content:center;padding:60px">
-    <mat-spinner></mat-spinner>
+  <div class="flex flex-col items-center justify-center py-24 gap-4">
+    <div class="animate-spin rounded-full h-12 w-12 border-2 border-orange-500 border-t-transparent"></div>
+    <p class="text-slate-500">Loading your dashboard…</p>
   </div>
 } @else {
-  <div class="page-header">
-    <h1>Welcome back, {{ currentUser?.username }}! 👋</h1>
-  </div>
+  <div class="max-w-7xl mx-auto space-y-8 animate-fade-in">
 
-  <!-- Stats -->
-  <div class="stats-grid">
-    <mat-card class="stat-card">
-      <div class="stat-value">{{ stats?.totalDistanceKm?.toFixed(1) || 0 }}</div>
-      <div class="stat-label">Total KM</div>
-    </mat-card>
-    <mat-card class="stat-card">
-      <div class="stat-value">{{ stats?.weeklyDistanceKm?.toFixed(1) || 0 }}</div>
-      <div class="stat-label">This Week KM</div>
-    </mat-card>
-    <mat-card class="stat-card">
-      <div class="stat-value">{{ stats?.monthlyDistanceKm?.toFixed(1) || 0 }}</div>
-      <div class="stat-label">This Month KM</div>
-    </mat-card>
-    <mat-card class="stat-card">
-      <div class="stat-value">{{ stats?.totalRuns || 0 }}</div>
-      <div class="stat-label">Total Runs</div>
-    </mat-card>
-  </div>
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-black text-white">{{ getGreeting() }}, {{ currentUser?.username }} 👋</h1>
+        <p class="text-slate-400 mt-1">{{ 'today' | date:'EEEE, MMMM d, y' }}</p>
+      </div>
+      <a routerLink="/activities" class="btn-primary inline-flex items-center gap-2 self-start">
+        <span class="material-icons text-xl">add</span>
+        Log Run
+      </a>
+    </div>
 
-  <div class="dashboard-grid">
-    <!-- Recent Activities -->
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon style="vertical-align:middle;margin-right:8px;color:#1565C0">directions_run</mat-icon>
-          Recent Activities
-        </mat-card-title>
-        <span class="spacer"></span>
-        <a mat-button routerLink="/activities" color="primary">View All</a>
-      </mat-card-header>
-      <mat-card-content>
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Total Distance -->
+      <div class="card relative overflow-hidden group hover:border-orange-500/30 transition-colors">
+        <div class="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent pointer-events-none"></div>
+        <div class="relative">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center">
+              <span class="material-icons text-orange-400 text-xl">route</span>
+            </div>
+          </div>
+          <div class="stat-value">{{ stats?.totalDistanceKm?.toFixed(1) || '0.0' }}</div>
+          <p class="text-slate-400 text-xs font-medium uppercase tracking-wider mt-1">Total KM</p>
+        </div>
+      </div>
+
+      <!-- Weekly KM -->
+      <div class="card relative overflow-hidden group hover:border-orange-500/30 transition-colors">
+        <div class="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent pointer-events-none"></div>
+        <div class="relative">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-red-500/20 border border-red-500/30 flex items-center justify-center">
+              <span class="material-icons text-red-400 text-xl">calendar_view_week</span>
+            </div>
+          </div>
+          <div class="stat-value">{{ stats?.weeklyDistanceKm?.toFixed(1) || '0.0' }}</div>
+          <p class="text-slate-400 text-xs font-medium uppercase tracking-wider mt-1">This Week KM</p>
+        </div>
+      </div>
+
+      <!-- Monthly KM -->
+      <div class="card relative overflow-hidden group hover:border-orange-500/30 transition-colors">
+        <div class="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent pointer-events-none"></div>
+        <div class="relative">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center">
+              <span class="material-icons text-orange-400 text-xl">calendar_month</span>
+            </div>
+          </div>
+          <div class="stat-value">{{ stats?.monthlyDistanceKm?.toFixed(1) || '0.0' }}</div>
+          <p class="text-slate-400 text-xs font-medium uppercase tracking-wider mt-1">This Month KM</p>
+        </div>
+      </div>
+
+      <!-- Total Runs -->
+      <div class="card relative overflow-hidden group hover:border-orange-500/30 transition-colors">
+        <div class="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent pointer-events-none"></div>
+        <div class="relative">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-red-500/20 border border-red-500/30 flex items-center justify-center">
+              <span class="material-icons text-red-400 text-xl">directions_run</span>
+            </div>
+          </div>
+          <div class="stat-value">{{ stats?.totalRuns || 0 }}</div>
+          <p class="text-slate-400 text-xs font-medium uppercase tracking-wider mt-1">Total Runs</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two Column Grid -->
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+      <!-- Recent Activities - takes 2 cols -->
+      <div class="xl:col-span-2 card">
+        <div class="flex items-center justify-between mb-5">
+          <div class="flex items-center gap-3">
+            <span class="material-icons text-orange-400">directions_run</span>
+            <h2 class="text-white font-bold text-lg">Recent Activities</h2>
+          </div>
+          <a routerLink="/activities" class="text-orange-400 hover:text-orange-300 text-sm font-semibold transition-colors">View all →</a>
+        </div>
+
         @if (recentActivities.length === 0) {
-          <div class="empty-state">
-            <mat-icon>directions_run</mat-icon>
-            <p>No activities yet. <a routerLink="/activities">Log your first run!</a></p>
-          </div>
-        }
-        @for (activity of recentActivities; track activity.id) {
-          <div class="activity-item">
-            <div class="activity-icon"><mat-icon>directions_run</mat-icon></div>
-            <div class="activity-details">
-              <div class="activity-title">{{ activity.title }}</div>
-              <div class="activity-meta">{{ activity.activityDate | date:'MMM d' }} · {{ formatDuration(activity.durationMinutes) }} · {{ formatPace(activity.paceMinPerKm) }}</div>
+          <div class="flex flex-col items-center justify-center py-12 gap-3 text-center">
+            <div class="w-16 h-16 rounded-2xl bg-brand-surface border border-brand-border flex items-center justify-center">
+              <span class="material-icons text-slate-600 text-3xl">directions_run</span>
             </div>
-            <div class="activity-distance">{{ activity.distanceKm.toFixed(1) }} km</div>
+            <p class="text-slate-400">No activities yet.</p>
+            <a routerLink="/activities" class="text-orange-400 hover:text-orange-300 text-sm font-semibold">Log your first run!</a>
           </div>
         }
-      </mat-card-content>
-    </mat-card>
 
-    <!-- Upcoming Events -->
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon style="vertical-align:middle;margin-right:8px;color:#FF6F00">event</mat-icon>
-          Upcoming Events
-        </mat-card-title>
-        <span class="spacer"></span>
-        <a mat-button routerLink="/events" color="primary">View All</a>
-      </mat-card-header>
-      <mat-card-content>
-        @if (upcomingEvents.length === 0) {
-          <div class="empty-state">
-            <mat-icon>event</mat-icon>
-            <p>No upcoming events. <a routerLink="/events">Browse events!</a></p>
-          </div>
-        }
-        @for (event of upcomingEvents; track event.id) {
-          <div class="event-item">
-            <div class="event-date">
-              <div class="date-day">{{ event.eventDate | date:'d' }}</div>
-              <div class="date-month">{{ event.eventDate | date:'MMM' }}</div>
+        <div class="space-y-3">
+          @for (activity of recentActivities; track activity.id) {
+            <div class="flex items-center gap-4 p-4 bg-brand-surface rounded-xl border border-brand-border hover:border-orange-500/20 transition-colors">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 border border-orange-500/20 flex items-center justify-center flex-shrink-0">
+                <span class="material-icons text-orange-400 text-xl">directions_run</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-white font-semibold text-sm truncate">{{ activity.title }}</p>
+                <p class="text-slate-500 text-xs mt-0.5">{{ activity.activityDate | date:'MMM d' }} · {{ formatDuration(activity.durationMinutes) }} · {{ formatPace(activity.paceMinPerKm) }}</p>
+              </div>
+              <div class="flex-shrink-0">
+                <span class="badge bg-orange-500/15 text-orange-400 border border-orange-500/20">{{ activity.distanceKm.toFixed(1) }} km</span>
+              </div>
             </div>
-            <div class="event-details">
-              <div class="event-name">{{ event.name }}</div>
-              <div class="event-meta">{{ event.location }} · {{ event.distanceKm }}km</div>
-            </div>
-          </div>
-        }
-      </mat-card-content>
-    </mat-card>
+          }
+        </div>
+      </div>
 
-    <!-- Weekly Rankings -->
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon style="vertical-align:middle;margin-right:8px;color:#FF6F00">leaderboard</mat-icon>
-          Weekly Leaders
-        </mat-card-title>
-        <span class="spacer"></span>
-        <a mat-button routerLink="/rankings" color="primary">Full Rankings</a>
-      </mat-card-header>
-      <mat-card-content>
-        @for (r of topRankings; track r.rank) {
-          <div class="ranking-row" [class.top-1]="r.rank === 1" [class.top-2]="r.rank === 2" [class.top-3]="r.rank === 3">
-            <div class="rank-number">
-              @if (r.rank === 1) { 🥇 }
-              @else if (r.rank === 2) { 🥈 }
-              @else if (r.rank === 3) { 🥉 }
-              @else { {{ r.rank }} }
+      <!-- Right Column -->
+      <div class="space-y-6">
+
+        <!-- Upcoming Events -->
+        <div class="card">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <span class="material-icons text-orange-400">event</span>
+              <h2 class="text-white font-bold">Upcoming Events</h2>
             </div>
-            <div class="rank-avatar">{{ r.username.substring(0,2).toUpperCase() }}</div>
-            <div class="rank-name">{{ r.username }}</div>
-            <div class="rank-distance">{{ r.totalDistanceKm?.toFixed(1) }} km</div>
+            <a routerLink="/events" class="text-orange-400 hover:text-orange-300 text-xs font-semibold transition-colors">See all</a>
           </div>
-        }
-      </mat-card-content>
-    </mat-card>
+
+          @if (upcomingEvents.length === 0) {
+            <p class="text-slate-500 text-sm text-center py-4">No upcoming events. <a routerLink="/events" class="text-orange-400">Browse!</a></p>
+          }
+
+          <div class="space-y-3">
+            @for (event of upcomingEvents; track event.id) {
+              <div class="flex items-center gap-3">
+                <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex flex-col items-center justify-center">
+                  <span class="text-white font-black text-lg leading-none">{{ event.eventDate | date:'d' }}</span>
+                  <span class="text-white/80 text-xs uppercase tracking-wider">{{ event.eventDate | date:'MMM' }}</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-white text-sm font-semibold truncate">{{ event.name }}</p>
+                  <p class="text-slate-500 text-xs mt-0.5">{{ event.location }} · {{ event.distanceKm }}km</p>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Weekly Leaders -->
+        <div class="card">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <span class="material-icons text-orange-400">leaderboard</span>
+              <h2 class="text-white font-bold">Weekly Leaders</h2>
+            </div>
+            <a routerLink="/rankings" class="text-orange-400 hover:text-orange-300 text-xs font-semibold transition-colors">Full board</a>
+          </div>
+          <div class="space-y-2">
+            @for (r of topRankings; track r.rank) {
+              <div class="flex items-center gap-3 p-2 rounded-lg" [class.bg-orange-500]="r.rank === 1" [class.bg-opacity-10]="r.rank === 1">
+                <div class="w-7 text-center text-sm font-bold flex-shrink-0">
+                  @if (r.rank === 1) { <span>🥇</span> }
+                  @else if (r.rank === 2) { <span>🥈</span> }
+                  @else if (r.rank === 3) { <span>🥉</span> }
+                  @else { <span class="text-slate-500">{{ r.rank }}</span> }
+                </div>
+                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                  {{ getInitials(r.username) }}
+                </div>
+                <span class="flex-1 text-white text-sm font-medium truncate">{{ r.username }}</span>
+                <span class="text-orange-400 font-bold text-sm">{{ r.totalDistanceKm?.toFixed(1) }} km</span>
+              </div>
+            }
+          </div>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 }

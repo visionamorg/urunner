@@ -1,14 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatChipsModule } from '@angular/material/chips';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserService } from '../../core/services/user.service';
 import { BadgeService } from '../../core/services/badge.service';
 import { ActivityService } from '../../core/services/activity.service';
@@ -20,12 +13,7 @@ import { ActivityStats } from '../../core/models/activity.model';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [
-    CommonModule, TitleCasePipe, ReactiveFormsModule,
-    MatCardModule, MatButtonModule, MatIconModule,
-    MatFormFieldModule, MatInputModule, MatProgressSpinnerModule,
-    MatSnackBarModule, MatChipsModule
-  ],
+  imports: [CommonModule, TitleCasePipe, ReactiveFormsModule],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })
@@ -98,4 +86,18 @@ export class ProfileComponent implements OnInit {
 
   connectStrava(): void { this.authService.connectStrava(); }
   connectGarmin(): void { this.authService.connectGarmin(); }
+
+  getInitials(): string {
+    if (!this.user) return '?';
+    const first = this.user.firstName?.[0] || '';
+    const last = this.user.lastName?.[0] || '';
+    return (first + last).toUpperCase() || this.user.username.substring(0, 2).toUpperCase();
+  }
+
+  getProviderColor(): string {
+    const p = this.authUser?.provider;
+    if (p === 'STRAVA') return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+    if (p === 'GARMIN') return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+    return 'bg-brand-surface text-slate-400 border-brand-border';
+  }
 }

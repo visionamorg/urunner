@@ -1,22 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatTabsModule } from '@angular/material/tabs';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ProgramService } from '../../core/services/program.service';
 import { Program, ProgramProgress } from '../../core/models/program.model';
 
 @Component({
   selector: 'app-programs',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatCardModule, MatButtonModule, MatIconModule,
-    MatProgressSpinnerModule, MatSnackBarModule, MatTabsModule
-  ],
+  imports: [CommonModule],
   templateUrl: './programs.component.html',
   styleUrl: './programs.component.scss'
 })
@@ -64,5 +55,16 @@ export class ProgramsComponent implements OnInit {
   progressPercent(p: ProgramProgress): number {
     if (!p.totalSessions) return 0;
     return Math.round((p.completedSessions / p.totalSessions) * 100);
+  }
+
+  getLevelColor(level: string): string {
+    if (level === 'BEGINNER') return 'bg-green-500/20 text-green-400 border-green-500/30';
+    if (level === 'INTERMEDIATE') return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+    if (level === 'ADVANCED') return 'bg-red-500/20 text-red-400 border-red-500/30';
+    return 'bg-brand-surface text-slate-400 border-brand-border';
+  }
+
+  getActivePrograms(): ProgramProgress[] {
+    return this.myProgress.filter(p => p.status === 'ACTIVE');
   }
 }

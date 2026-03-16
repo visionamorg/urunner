@@ -1,24 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommunityService } from '../../core/services/community.service';
 import { Community } from '../../core/models/community.model';
 
 @Component({
   selector: 'app-communities',
   standalone: true,
-  imports: [
-    CommonModule, ReactiveFormsModule,
-    MatCardModule, MatButtonModule, MatIconModule,
-    MatFormFieldModule, MatInputModule, MatProgressSpinnerModule, MatSnackBarModule
-  ],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './communities.component.html',
   styleUrl: './communities.component.scss'
 })
@@ -72,5 +62,9 @@ export class CommunitiesComponent implements OnInit {
         this.load();
       }
     });
+  }
+
+  getInitials(name: string): string {
+    return name.substring(0, 2).toUpperCase();
   }
 }

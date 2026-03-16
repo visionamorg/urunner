@@ -1,61 +1,131 @@
-<div class="page-header">
-  <h1>Community Chat</h1>
-</div>
+<div class="flex h-[calc(100vh-8rem)] lg:h-[calc(100vh-4rem)] bg-brand-card border border-brand-border rounded-2xl overflow-hidden animate-fade-in">
 
-<div class="chat-container">
-  <!-- Community List -->
-  <div class="chat-sidebar">
-    <div style="padding:12px;font-weight:600;font-size:0.85rem;color:#888;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #eee">
-      Communities
+  <!-- Communities Sidebar -->
+  <aside class="w-72 flex-shrink-0 flex flex-col border-r border-brand-border">
+    <!-- Sidebar Header -->
+    <div class="px-4 py-4 border-b border-brand-border">
+      <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Communities</p>
     </div>
-    <mat-nav-list>
-      @for (community of communities; track community.id) {
-        <a mat-list-item
-           [class.selected]="selectedCommunity?.id === community.id"
-           (click)="selectCommunity(community)">
-          <span matListItemTitle>{{ community.name }}</span>
-          <span matListItemLine style="font-size:0.75rem">{{ community.memberCount }} members</span>
-        </a>
-      }
-    </mat-nav-list>
-  </div>
 
-  <!-- Messages -->
-  <div class="chat-main">
-    @if (selectedCommunity) {
-      <div class="chat-header">
-        <mat-icon>group</mat-icon>
-        <span>{{ selectedCommunity.name }}</span>
+    <!-- Community List -->
+    <div class="flex-1 overflow-y-auto py-2">
+      @if (communities.length === 0) {
+        <div class="flex flex-col items-center justify-center py-12 gap-3 px-4 text-center">
+          <span class="material-icons text-slate-600 text-3xl">group</span>
+          <p class="text-slate-500 text-sm">No communities yet</p>
+        </div>
+      }
+      @for (community of communities; track community.id) {
+        <button
+          (click)="selectCommunity(community)"
+          class="w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-200 hover:bg-brand-surface"
+          [ngClass]="selectedCommunity?.id === community.id ? 'bg-orange-500/10 border-r-2 border-orange-500' : ''">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+            [class.bg-gradient-to-br]="selectedCommunity?.id === community.id"
+            [class.from-orange-500]="selectedCommunity?.id === community.id"
+            [class.to-red-500]="selectedCommunity?.id === community.id"
+            [class.bg-brand-surface]="selectedCommunity?.id !== community.id"
+            [class.text-slate-400]="selectedCommunity?.id !== community.id">
+            {{ getInitials(community.name) }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-semibold text-sm truncate" [class.text-white]="selectedCommunity?.id === community.id" [class.text-slate-300]="selectedCommunity?.id !== community.id">{{ community.name }}</p>
+            <p class="text-slate-500 text-xs mt-0.5">{{ community.memberCount }} members</p>
+          </div>
+        </button>
+      }
+    </div>
+  </aside>
+
+  <!-- Chat Area -->
+  <div class="flex-1 flex flex-col min-w-0">
+
+    @if (!selectedCommunity) {
+      <div class="flex-1 flex flex-col items-center justify-center gap-4 text-center p-8">
+        <span class="material-icons text-slate-600 text-5xl">chat</span>
+        <p class="text-slate-400">Select a community to start chatting</p>
+      </div>
+    } @else {
+      <!-- Chat Header -->
+      <div class="flex items-center gap-4 px-6 py-4 border-b border-brand-border bg-brand-card">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white text-sm font-bold">
+          {{ getInitials(selectedCommunity.name) }}
+        </div>
+        <div>
+          <p class="text-white font-bold">{{ selectedCommunity.name }}</p>
+          <p class="text-slate-500 text-xs">{{ selectedCommunity.memberCount }} members</p>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+        @if (messages.length === 0) {
+          <div class="flex flex-col items-center justify-center h-full gap-4 text-center">
+            <div class="w-16 h-16 rounded-2xl bg-brand-surface border border-brand-border flex items-center justify-center">
+              <span class="material-icons text-slate-600 text-3xl">chat_bubble_outline</span>
+            </div>
+            <div>
+              <p class="text-white font-semibold">No messages yet</p>
+              <p class="text-slate-500 text-sm mt-1">Be the first to say hello!</p>
+            </div>
+          </div>
+        }
+
+        @for (msg of messages; track msg.id) {
+          <div class="flex gap-3" [class.flex-row-reverse]="isOwnMessage(msg)">
+
+            @if (!isOwnMessage(msg)) {
+              <div class="w-8 h-8 rounded-full bg-brand-surface border border-brand-border flex items-center justify-center text-slate-400 text-xs font-bold flex-shrink-0 self-end">
+                {{ getInitials(msg.senderUsername) }}
+              </div>
+            }
+
+            <div class="max-w-xs lg:max-w-md" [class.items-end]="isOwnMessage(msg)" [class.flex]="true" [class.flex-col]="true">
+              @if (!isOwnMessage(msg)) {
+                <p class="text-orange-400 text-xs font-semibold mb-1 px-1">{{ msg.senderUsername }}</p>
+              }
+              <div class="rounded-2xl px-4 py-2.5 text-sm leading-relaxed"
+                [class.rounded-br-sm]="isOwnMessage(msg)"
+                [class.rounded-bl-sm]="!isOwnMessage(msg)"
+                [class.bg-gradient-to-r]="isOwnMessage(msg)"
+                [class.from-orange-500]="isOwnMessage(msg)"
+                [class.to-red-500]="isOwnMessage(msg)"
+                [class.text-white]="isOwnMessage(msg)"
+                [class.bg-brand-surface]="!isOwnMessage(msg)"
+                [class.border]="!isOwnMessage(msg)"
+                [class.border-brand-border]="!isOwnMessage(msg)"
+                [class.text-slate-200]="!isOwnMessage(msg)">
+                {{ msg.content }}
+              </div>
+              <p class="text-slate-600 text-xs mt-1 px-1">{{ timeFormat(msg.sentAt) }}</p>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Input Bar -->
+      <div class="px-6 py-4 border-t border-brand-border">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+            {{ getInitials(currentUser?.username || '') }}
+          </div>
+          <div class="flex-1 flex items-center gap-3 bg-brand-surface border border-brand-border rounded-xl px-4 py-2.5 focus-within:border-orange-500 transition-colors">
+            <input
+              type="text"
+              [(ngModel)]="messageContent"
+              (keydown)="onEnter($event)"
+              placeholder="Type a message..."
+              class="flex-1 bg-transparent text-white placeholder-slate-500 focus:outline-none text-sm">
+            <button
+              (click)="send()"
+              [disabled]="!messageContent.trim()"
+              class="w-8 h-8 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center text-white disabled:opacity-40 hover:from-orange-600 hover:to-red-600 transition-all flex-shrink-0">
+              <span class="material-icons text-base">send</span>
+            </button>
+          </div>
+        </div>
       </div>
     }
-
-    <div class="chat-messages" #msgContainer>
-      @if (messages.length === 0) {
-        <div style="text-align:center;color:#aaa;padding:40px">
-          <mat-icon style="font-size:36px;width:36px;height:36px;display:block;margin:0 auto 8px">chat</mat-icon>
-          No messages yet. Say hello!
-        </div>
-      }
-      @for (msg of messages; track msg.id) {
-        <div class="chat-message" [class.own]="isOwnMessage(msg)">
-          @if (!isOwnMessage(msg)) {
-            <div class="msg-sender">{{ msg.senderUsername }}</div>
-          }
-          <div class="msg-content">{{ msg.content }}</div>
-          <div class="msg-time">{{ timeFormat(msg.sentAt) }}</div>
-        </div>
-      }
-    </div>
-
-    <div class="chat-input-area">
-      <form [formGroup]="form" (ngSubmit)="send()" style="display:flex;flex:1;gap:8px;align-items:center">
-        <mat-form-field appearance="outline" style="flex:1;margin-bottom:-1.25em">
-          <input matInput formControlName="content" placeholder="Type a message..." (keydown.enter)="send(); $event.preventDefault()">
-        </mat-form-field>
-        <button mat-icon-button color="primary" type="submit" [disabled]="form.invalid">
-          <mat-icon>send</mat-icon>
-        </button>
-      </form>
-    </div>
   </div>
+
 </div>

@@ -1,10 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { RouterModule } from '@angular/router';
 import { ActivityService } from '../../core/services/activity.service';
 import { EventService } from '../../core/services/event.service';
 import { RankingService } from '../../core/services/ranking.service';
@@ -16,10 +12,7 @@ import { AuthService } from '../../core/services/auth.service';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [
-    CommonModule, RouterLink,
-    MatCardModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule
-  ],
+  imports: [CommonModule, RouterModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -81,5 +74,16 @@ export class DashboardComponent implements OnInit {
     const h = Math.floor(min / 60);
     const m = min % 60;
     return h > 0 ? `${h}h ${m}m` : `${m}m`;
+  }
+
+  getGreeting(): string {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  }
+
+  getInitials(username: string): string {
+    return username.substring(0, 2).toUpperCase();
   }
 }

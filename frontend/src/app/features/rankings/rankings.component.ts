@@ -1,10 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RankingService } from '../../core/services/ranking.service';
 import { Ranking } from '../../core/models/ranking.model';
 import { AuthService } from '../../core/services/auth.service';
@@ -12,11 +7,7 @@ import { AuthService } from '../../core/services/auth.service';
 @Component({
   selector: 'app-rankings',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatCardModule, MatButtonModule, MatIconModule,
-    MatTabsModule, MatProgressSpinnerModule
-  ],
+  imports: [CommonModule],
   templateUrl: './rankings.component.html',
   styleUrl: './rankings.component.scss'
 })
@@ -25,6 +16,7 @@ export class RankingsComponent implements OnInit {
   monthlyRankings: Ranking[] = [];
   allTimeRankings: Ranking[] = [];
   loading = true;
+  activeTab: 'weekly' | 'monthly' | 'alltime' = 'weekly';
   currentUserId = this.authService.getCurrentUser()?.userId;
 
   constructor(
@@ -43,6 +35,16 @@ export class RankingsComponent implements OnInit {
     if (++this.count >= 3) this.loading = false;
   }
 
+  setTab(tab: 'weekly' | 'monthly' | 'alltime'): void {
+    this.activeTab = tab;
+  }
+
+  get currentRankings(): Ranking[] {
+    if (this.activeTab === 'weekly') return this.weeklyRankings;
+    if (this.activeTab === 'monthly') return this.monthlyRankings;
+    return this.allTimeRankings;
+  }
+
   getMedalEmoji(rank: number): string {
     if (rank === 1) return '🥇';
     if (rank === 2) return '🥈';
@@ -52,5 +54,16 @@ export class RankingsComponent implements OnInit {
 
   isCurrentUser(userId: number): boolean {
     return this.currentUserId === userId;
+  }
+
+  getInitials(username: string): string {
+    return username.substring(0, 2).toUpperCase();
+  }
+
+  getRankStyle(rank: number): string {
+    if (rank === 1) return 'bg-gradient-to-r from-yellow-500/20 to-transparent border-yellow-500/30';
+    if (rank === 2) return 'bg-gradient-to-r from-slate-400/10 to-transparent border-slate-400/20';
+    if (rank === 3) return 'bg-gradient-to-r from-orange-700/20 to-transparent border-orange-700/30';
+    return 'border-transparent hover:border-brand-border';
   }
 }

@@ -1,61 +1,99 @@
-<div class="page-header">
-  <h1>Communities</h1>
-  <button mat-raised-button color="primary" (click)="showForm = !showForm">
-    <mat-icon>add</mat-icon>
-    Create Community
-  </button>
-</div>
+<div class="max-w-7xl mx-auto space-y-6 animate-fade-in">
 
-@if (showForm) {
-  <mat-card style="margin-bottom:20px">
-    <mat-card-header><mat-card-title>New Community</mat-card-title></mat-card-header>
-    <mat-card-content style="padding:16px">
-      <form [formGroup]="form" (ngSubmit)="onCreate()">
-        <mat-form-field appearance="outline" style="width:100%">
-          <mat-label>Community Name</mat-label>
-          <input matInput formControlName="name">
-        </mat-form-field>
-        <mat-form-field appearance="outline" style="width:100%">
-          <mat-label>Description</mat-label>
-          <textarea matInput formControlName="description" rows="3"></textarea>
-        </mat-form-field>
-        <div style="display:flex;gap:8px;justify-content:flex-end">
-          <button mat-button type="button" (click)="showForm = false">Cancel</button>
-          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Create</button>
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-black text-white">Communities</h1>
+      <p class="text-slate-400 mt-1">Find and join running groups near you</p>
+    </div>
+    <button (click)="showForm = !showForm" class="btn-primary inline-flex items-center gap-2 self-start">
+      <span class="material-icons text-xl">{{ showForm ? 'close' : 'add' }}</span>
+      {{ showForm ? 'Cancel' : 'Create Community' }}
+    </button>
+  </div>
+
+  <!-- Create Community Form -->
+  @if (showForm) {
+    <div class="card animate-slide-up">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
+          <span class="material-icons text-white text-xl">group_add</span>
+        </div>
+        <h2 class="text-white font-bold text-lg">New Community</h2>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="onCreate()" class="space-y-4">
+        <div>
+          <label class="label">Community Name *</label>
+          <input type="text" formControlName="name" placeholder="e.g. Morning Runners NYC" class="input-field">
+          @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+            <p class="text-red-400 text-xs mt-1">Name is required</p>
+          }
+        </div>
+        <div>
+          <label class="label">Description *</label>
+          <textarea formControlName="description" rows="3" placeholder="What's this community about?" class="input-field resize-none"></textarea>
+          @if (form.get('description')?.hasError('required') && form.get('description')?.touched) {
+            <p class="text-red-400 text-xs mt-1">Description is required</p>
+          }
+        </div>
+        <div class="flex items-center gap-4 pt-2">
+          <button type="submit" [disabled]="form.invalid" class="btn-primary">Create Community</button>
+          <button type="button" (click)="showForm = false" class="btn-secondary">Cancel</button>
         </div>
       </form>
-    </mat-card-content>
-  </mat-card>
-}
+    </div>
+  }
 
-@if (loading) {
-  <div style="display:flex;justify-content:center;padding:40px"><mat-spinner></mat-spinner></div>
-} @else {
-  <div class="card-grid">
-    @for (community of communities; track community.id) {
-      <mat-card class="community-card">
-        <mat-card-header>
-          <div class="community-avatar" matCardAvatar>
-            {{ community.name.substring(0,2).toUpperCase() }}
+  <!-- Loading -->
+  @if (loading) {
+    <div class="flex justify-center py-16">
+      <div class="animate-spin rounded-full h-10 w-10 border-2 border-orange-500 border-t-transparent"></div>
+    </div>
+  } @else if (communities.length === 0) {
+    <div class="card flex flex-col items-center justify-center py-16 gap-4 text-center">
+      <div class="w-16 h-16 rounded-2xl bg-brand-surface border border-brand-border flex items-center justify-center">
+        <span class="material-icons text-slate-600 text-3xl">group</span>
+      </div>
+      <div>
+        <p class="text-white font-semibold">No communities yet</p>
+        <p class="text-slate-400 mt-1 text-sm">Be the first to create a running community!</p>
+      </div>
+    </div>
+  } @else {
+    <!-- Communities Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+      @for (community of communities; track community.id) {
+        <div class="card flex flex-col hover:border-orange-500/20 transition-colors group cursor-pointer">
+          <!-- Card Header -->
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white font-black text-xl flex-shrink-0">
+              {{ getInitials(community.name) }}
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-white font-bold truncate group-hover:text-orange-400 transition-colors">{{ community.name }}</h3>
+              <div class="flex items-center gap-1 text-slate-500 text-sm mt-0.5">
+                <span class="material-icons text-sm">group</span>
+                <span>{{ community.memberCount }} members</span>
+              </div>
+            </div>
           </div>
-          <mat-card-title>{{ community.name }}</mat-card-title>
-          <mat-card-subtitle>
-            <mat-icon style="font-size:14px;vertical-align:middle">group</mat-icon>
-            {{ community.memberCount }} members
-          </mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <p style="color:#555;font-size:0.875rem;margin:0">{{ community.description }}</p>
-        </mat-card-content>
-        <mat-card-actions>
-          <button mat-raised-button color="primary" (click)="joinCommunity(community.id)">
-            <mat-icon>person_add</mat-icon>
-            Join
-          </button>
-          <span class="spacer"></span>
-          <span style="font-size:0.75rem;color:#888">by {{ community.creatorUsername }}</span>
-        </mat-card-actions>
-      </mat-card>
-    }
-  </div>
-}
+
+          <!-- Description -->
+          <p class="text-slate-400 text-sm leading-relaxed flex-1 mb-5">{{ community.description }}</p>
+
+          <!-- Footer -->
+          <div class="flex items-center justify-between pt-4 border-t border-brand-border">
+            <span class="text-slate-500 text-xs">by {{ community.creatorUsername }}</span>
+            <button
+              (click)="joinCommunity(community.id)"
+              class="btn-primary !py-2 !px-4 !text-sm inline-flex items-center gap-2">
+              <span class="material-icons text-base">person_add</span>
+              Join
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>

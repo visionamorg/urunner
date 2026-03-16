@@ -1,124 +1,155 @@
-<div class="page-header">
-  <h1>My Activities</h1>
-  <button mat-raised-button color="primary" (click)="showForm = !showForm">
-    <mat-icon>add</mat-icon>
-    Log Run
-  </button>
-</div>
+<div class="max-w-5xl mx-auto space-y-6 animate-fade-in">
 
-<!-- Stats -->
-@if (stats) {
-  <div class="stats-grid">
-    <mat-card class="stat-card">
-      <div class="stat-value">{{ stats.totalDistanceKm?.toFixed(1) }}</div>
-      <div class="stat-label">Total KM</div>
-    </mat-card>
-    <mat-card class="stat-card">
-      <div class="stat-value">{{ stats.weeklyDistanceKm?.toFixed(1) }}</div>
-      <div class="stat-label">Weekly KM</div>
-    </mat-card>
-    <mat-card class="stat-card">
-      <div class="stat-value">{{ stats.monthlyDistanceKm?.toFixed(1) }}</div>
-      <div class="stat-label">Monthly KM</div>
-    </mat-card>
-    <mat-card class="stat-card">
-      <div class="stat-value">{{ stats.totalRuns }}</div>
-      <div class="stat-label">Total Runs</div>
-    </mat-card>
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-black text-white">Activities</h1>
+      <p class="text-slate-400 mt-1">Track and review your running history</p>
+    </div>
+    <button (click)="showForm = !showForm" class="btn-primary inline-flex items-center gap-2 self-start">
+      <span class="material-icons text-xl">{{ showForm ? 'close' : 'add' }}</span>
+      {{ showForm ? 'Cancel' : 'Log Run' }}
+    </button>
   </div>
-}
 
-<!-- Log Activity Form -->
-@if (showForm) {
-  <mat-card class="form-card">
-    <mat-card-header>
-      <mat-card-title>Log New Run</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div class="form-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Title</mat-label>
-            <input matInput formControlName="title" placeholder="Morning Run">
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Date</mat-label>
-            <input matInput type="date" formControlName="activityDate">
-          </mat-form-field>
+  <!-- Stats Row -->
+  @if (stats) {
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="card text-center">
+        <div class="stat-value">{{ stats.totalDistanceKm?.toFixed(1) }}</div>
+        <p class="text-slate-400 text-xs uppercase tracking-wider mt-1">Total KM</p>
+      </div>
+      <div class="card text-center">
+        <div class="stat-value">{{ stats.weeklyDistanceKm?.toFixed(1) }}</div>
+        <p class="text-slate-400 text-xs uppercase tracking-wider mt-1">Weekly KM</p>
+      </div>
+      <div class="card text-center">
+        <div class="stat-value">{{ stats.monthlyDistanceKm?.toFixed(1) }}</div>
+        <p class="text-slate-400 text-xs uppercase tracking-wider mt-1">Monthly KM</p>
+      </div>
+      <div class="card text-center">
+        <div class="stat-value">{{ stats.totalRuns }}</div>
+        <p class="text-slate-400 text-xs uppercase tracking-wider mt-1">Total Runs</p>
+      </div>
+    </div>
+  }
+
+  <!-- Log Activity Form -->
+  @if (showForm) {
+    <div class="card animate-slide-up">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
+          <span class="material-icons text-white text-xl">add</span>
         </div>
-        <div class="form-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Distance (km)</mat-label>
-            <input matInput type="number" step="0.1" formControlName="distanceKm">
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Duration (minutes)</mat-label>
-            <input matInput type="number" formControlName="durationMinutes">
-          </mat-form-field>
+        <h2 class="text-white font-bold text-lg">Log New Run</h2>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="label">Title *</label>
+            <input type="text" formControlName="title" placeholder="Morning Run" class="input-field">
+            @if (form.get('title')?.hasError('required') && form.get('title')?.touched) {
+              <p class="text-red-400 text-xs mt-1">Title is required</p>
+            }
+          </div>
+          <div>
+            <label class="label">Date *</label>
+            <input type="date" formControlName="activityDate" class="input-field">
+          </div>
         </div>
-        <mat-form-field appearance="outline">
-          <mat-label>Location (optional)</mat-label>
-          <input matInput formControlName="location" placeholder="City Park">
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Notes (optional)</mat-label>
-          <textarea matInput formControlName="notes" rows="2"></textarea>
-        </mat-form-field>
-        <div class="form-actions">
-          <button mat-button type="button" (click)="showForm = false">Cancel</button>
-          <button mat-raised-button color="primary" type="submit" [disabled]="submitting || form.invalid">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="label">Distance (km) *</label>
+            <input type="number" step="0.1" formControlName="distanceKm" placeholder="5.0" class="input-field">
+            @if (form.get('distanceKm')?.hasError('required') && form.get('distanceKm')?.touched) {
+              <p class="text-red-400 text-xs mt-1">Distance is required</p>
+            }
+            @if (form.get('distanceKm')?.hasError('min') && form.get('distanceKm')?.touched) {
+              <p class="text-red-400 text-xs mt-1">Must be at least 0.1 km</p>
+            }
+          </div>
+          <div>
+            <label class="label">Duration (minutes) *</label>
+            <input type="number" formControlName="durationMinutes" placeholder="30" class="input-field">
+            @if (form.get('durationMinutes')?.hasError('required') && form.get('durationMinutes')?.touched) {
+              <p class="text-red-400 text-xs mt-1">Duration is required</p>
+            }
+          </div>
+        </div>
+
+        <div>
+          <label class="label">Location (optional)</label>
+          <input type="text" formControlName="location" placeholder="City Park, Downtown..." class="input-field">
+        </div>
+
+        <div>
+          <label class="label">Notes (optional)</label>
+          <textarea formControlName="notes" rows="3" placeholder="How did it feel? Any highlights..." class="input-field resize-none"></textarea>
+        </div>
+
+        <div class="flex items-center gap-4 pt-2">
+          <button type="submit" [disabled]="submitting || form.invalid" class="btn-primary flex items-center gap-2">
+            @if (submitting) {
+              <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+            }
             Save Activity
           </button>
+          <button type="button" (click)="showForm = false" class="btn-secondary">Cancel</button>
         </div>
       </form>
-    </mat-card-content>
-  </mat-card>
-}
+    </div>
+  }
 
-<!-- Activities List -->
-@if (loading) {
-  <div style="display:flex;justify-content:center;padding:40px">
-    <mat-spinner></mat-spinner>
-  </div>
-} @else {
-  @if (activities.length === 0) {
-    <mat-card>
-      <mat-card-content style="text-align:center;padding:40px;color:#aaa">
-        <mat-icon style="font-size:48px;width:48px;height:48px">directions_run</mat-icon>
-        <p>No activities yet. Log your first run!</p>
-      </mat-card-content>
-    </mat-card>
+  <!-- Activities List -->
+  @if (loading) {
+    <div class="flex justify-center py-16">
+      <div class="animate-spin rounded-full h-10 w-10 border-2 border-orange-500 border-t-transparent"></div>
+    </div>
+  } @else if (activities.length === 0) {
+    <div class="card flex flex-col items-center justify-center py-20 gap-4 text-center">
+      <div class="w-20 h-20 rounded-2xl bg-brand-surface border border-brand-border flex items-center justify-center">
+        <span class="material-icons text-slate-600 text-4xl">directions_run</span>
+      </div>
+      <div>
+        <p class="text-white font-semibold text-lg">No activities yet</p>
+        <p class="text-slate-400 mt-1">Start logging your runs to track your progress</p>
+      </div>
+      <button (click)="showForm = true" class="btn-primary inline-flex items-center gap-2">
+        <span class="material-icons text-xl">add</span>
+        Log your first run
+      </button>
+    </div>
   } @else {
-    @for (activity of activities; track activity.id) {
-      <mat-card class="activity-list-item">
-        <mat-card-content>
-          <div class="activity-row">
-            <div class="activity-icon"><mat-icon>directions_run</mat-icon></div>
-            <div class="activity-info">
-              <div class="activity-title">{{ activity.title }}</div>
-              <div class="activity-meta">
-                {{ activity.activityDate | date:'MMMM d, yyyy' }}
-                @if (activity.location) { · {{ activity.location }} }
-              </div>
+    <div class="space-y-3">
+      @for (activity of activities; track activity.id) {
+        <div class="card hover:border-orange-500/20 transition-colors">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 border border-orange-500/20 flex items-center justify-center flex-shrink-0">
+              <span class="material-icons text-orange-400 text-2xl">directions_run</span>
             </div>
-            <div class="activity-stats">
-              <div class="stat-item">
-                <span class="stat-val">{{ activity.distanceKm.toFixed(2) }}</span>
-                <span class="stat-unit">km</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-val">{{ formatDuration(activity.durationMinutes) }}</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-val">{{ formatPace(activity.paceMinPerKm) }}</span>
-              </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-white font-bold truncate">{{ activity.title }}</p>
+              <p class="text-slate-500 text-sm mt-0.5">
+                {{ activity.activityDate | date:'MMMM d, yyyy' }}
+                @if (activity.location) {
+                  · <span class="material-icons text-xs align-middle">location_on</span> {{ activity.location }}
+                }
+              </p>
+            </div>
+            <div class="flex items-center gap-3 flex-shrink-0">
+              <span class="badge bg-orange-500/15 text-orange-400 border border-orange-500/20">{{ activity.distanceKm.toFixed(2) }} km</span>
+              <span class="badge bg-brand-surface text-slate-400 border border-brand-border hidden sm:inline-flex">{{ formatDuration(activity.durationMinutes) }}</span>
+              <span class="badge bg-brand-surface text-slate-400 border border-brand-border hidden md:inline-flex">{{ formatPace(activity.paceMinPerKm) }}</span>
             </div>
           </div>
           @if (activity.notes) {
-            <div class="activity-notes">{{ activity.notes }}</div>
+            <p class="text-slate-400 text-sm mt-3 pt-3 border-t border-brand-border">{{ activity.notes }}</p>
           }
-        </mat-card-content>
-      </mat-card>
-    }
+        </div>
+      }
+    </div>
   }
-}
+
+</div>

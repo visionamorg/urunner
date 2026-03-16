@@ -1,82 +1,115 @@
-<div class="page-header">
-  <h1>Training Programs</h1>
-</div>
+<div class="max-w-7xl mx-auto space-y-6 animate-fade-in">
 
-@if (myProgress.length > 0) {
-  <mat-card style="margin-bottom:20px">
-    <mat-card-header>
-      <mat-card-title>
-        <mat-icon style="vertical-align:middle;color:#FF6F00;margin-right:8px">fitness_center</mat-icon>
-        My Active Programs
-      </mat-card-title>
-    </mat-card-header>
-    <mat-card-content style="padding:16px">
-      @for (p of myProgress; track p.id) {
-        @if (p.status === 'ACTIVE') {
-          <div class="progress-item">
-            <div class="progress-info">
-              <div class="progress-name">{{ p.programName }}</div>
-              <div class="progress-meta">
-                <span class="level-chip level-{{p.programLevel}}">{{ p.programLevel }}</span>
-                Week {{ Math.ceil((p.completedSessions + 1) / 7) }} of {{ p.durationWeeks }}
+  <!-- Page Header -->
+  <div>
+    <h1 class="text-3xl font-black text-white">Training Programs</h1>
+    <p class="text-slate-400 mt-1">Structured plans to reach your running goals</p>
+  </div>
+
+  <!-- Active Programs -->
+  @if (getActivePrograms().length > 0) {
+    <div class="card">
+      <div class="flex items-center gap-3 mb-5">
+        <span class="material-icons text-orange-400">fitness_center</span>
+        <h2 class="text-white font-bold text-lg">My Active Programs</h2>
+      </div>
+      <div class="space-y-4">
+        @for (p of myProgress; track p.id) {
+          @if (p.status === 'ACTIVE') {
+            <div class="p-4 bg-brand-surface rounded-xl border border-brand-border">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <p class="text-white font-semibold">{{ p.programName }}</p>
+                  <div class="flex items-center gap-3 mt-1">
+                    <span class="badge border text-xs {{ getLevelColor(p.programLevel) }}">{{ p.programLevel }}</span>
+                    <span class="text-slate-500 text-xs">Week {{ Math.ceil((p.completedSessions + 1) / 7) }} of {{ p.durationWeeks }}</span>
+                  </div>
+                </div>
+                <span class="text-orange-400 font-black text-xl">{{ progressPercent(p) }}%</span>
+              </div>
+              <!-- Progress Bar -->
+              <div class="w-full h-2 bg-brand-border rounded-full overflow-hidden">
+                <div
+                  class="h-full bg-gradient-to-r from-orange-500 to-red-500 rounded-full transition-all duration-500"
+                  [style.width.%]="progressPercent(p)">
+                </div>
+              </div>
+              <div class="flex justify-between mt-2">
+                <span class="text-slate-500 text-xs">{{ p.completedSessions }} sessions done</span>
+                <span class="text-slate-500 text-xs">{{ p.totalSessions }} total</span>
               </div>
             </div>
-            <div class="progress-bar-wrap">
-              <div class="progress-bar">
-                <div class="progress-fill" [style.width.%]="progressPercent(p)"></div>
-              </div>
-              <span class="progress-pct">{{ progressPercent(p) }}%</span>
-            </div>
-          </div>
+          }
         }
-      }
-    </mat-card-content>
-  </mat-card>
-}
+      </div>
+    </div>
+  }
 
-@if (loading) {
-  <div style="display:flex;justify-content:center;padding:40px"><mat-spinner></mat-spinner></div>
-} @else {
-  <div class="card-grid">
-    @for (program of programs; track program.id) {
-      <mat-card>
-        <mat-card-header>
-          <mat-card-title>{{ program.name }}</mat-card-title>
-          <mat-card-subtitle>
-            <span class="level-chip level-{{program.level}}">{{ program.level }}</span>
-          </mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content style="padding:0 16px 8px">
-          <p style="color:#555;font-size:0.875rem;margin-bottom:12px">{{ program.description }}</p>
-          <div class="program-stats">
-            <div class="prog-stat">
-              <mat-icon>schedule</mat-icon>
+  <!-- Loading -->
+  @if (loading) {
+    <div class="flex justify-center py-16">
+      <div class="animate-spin rounded-full h-10 w-10 border-2 border-orange-500 border-t-transparent"></div>
+    </div>
+  } @else if (programs.length === 0) {
+    <div class="card flex flex-col items-center justify-center py-16 gap-4 text-center">
+      <div class="w-16 h-16 rounded-2xl bg-brand-surface border border-brand-border flex items-center justify-center">
+        <span class="material-icons text-slate-600 text-3xl">fitness_center</span>
+      </div>
+      <p class="text-white font-semibold">No programs available</p>
+    </div>
+  } @else {
+    <h2 class="text-white font-bold text-lg">All Programs</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+      @for (program of programs; track program.id) {
+        <div class="card flex flex-col hover:border-orange-500/20 transition-colors">
+          <!-- Header -->
+          <div class="flex items-start justify-between mb-3">
+            <span class="badge border text-xs {{ getLevelColor(program.level) }}">
+              {{ program.level }}
+            </span>
+            @if (isEnrolled(program.id)) {
+              <span class="badge bg-green-500/10 text-green-400 border border-green-500/20 text-xs">
+                <span class="material-icons text-sm">check_circle</span>
+                Enrolled
+              </span>
+            }
+          </div>
+
+          <!-- Name + Description -->
+          <h3 class="text-white font-bold text-lg mb-2">{{ program.name }}</h3>
+          <p class="text-slate-400 text-sm leading-relaxed flex-1 mb-5">{{ program.description }}</p>
+
+          <!-- Stats -->
+          <div class="flex flex-wrap gap-3 mb-5">
+            <div class="flex items-center gap-1.5 text-slate-400 text-sm">
+              <span class="material-icons text-orange-400 text-base">schedule</span>
               <span>{{ program.durationWeeks }} weeks</span>
             </div>
-            <div class="prog-stat">
-              <mat-icon>directions_run</mat-icon>
-              <span>{{ program.targetDistanceKm }}km goal</span>
+            <div class="flex items-center gap-1.5 text-slate-400 text-sm">
+              <span class="material-icons text-orange-400 text-base">directions_run</span>
+              <span>{{ program.targetDistanceKm }} km goal</span>
             </div>
-            <div class="prog-stat">
-              <mat-icon>checklist</mat-icon>
+            <div class="flex items-center gap-1.5 text-slate-400 text-sm">
+              <span class="material-icons text-orange-400 text-base">checklist</span>
               <span>{{ program.sessionsCount }} sessions</span>
             </div>
           </div>
-        </mat-card-content>
-        <mat-card-actions style="padding:8px 16px">
+
+          <!-- Action -->
           @if (isEnrolled(program.id)) {
-            <button mat-stroked-button color="primary" disabled>
-              <mat-icon>check</mat-icon>
-              Enrolled
-            </button>
+            <div class="flex items-center gap-2 px-4 py-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 font-semibold text-sm">
+              <span class="material-icons text-base">check_circle</span>
+              Currently Enrolled
+            </div>
           } @else {
-            <button mat-raised-button color="primary" (click)="startProgram(program.id)">
-              <mat-icon>play_arrow</mat-icon>
+            <button (click)="startProgram(program.id)" class="btn-primary w-full flex items-center justify-center gap-2">
+              <span class="material-icons text-xl">play_arrow</span>
               Start Program
             </button>
           }
-        </mat-card-actions>
-      </mat-card>
-    }
-  </div>
-}
+        </div>
+      }
+    </div>
+  }
+
+</div>

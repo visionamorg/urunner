@@ -1,133 +1,184 @@
 @if (loading) {
-  <div style="display:flex;justify-content:center;padding:60px"><mat-spinner></mat-spinner></div>
+  <div class="flex justify-center py-24">
+    <div class="animate-spin rounded-full h-12 w-12 border-2 border-orange-500 border-t-transparent"></div>
+  </div>
 } @else if (user) {
-  <div class="profile-grid">
-    <!-- Profile Card -->
-    <mat-card class="profile-card">
-      <mat-card-content style="padding:24px;text-align:center">
-        <div class="profile-avatar">{{ user.username.substring(0,2).toUpperCase() }}</div>
-        <h2 style="margin:12px 0 4px">{{ user.firstName }} {{ user.lastName }}</h2>
-        <div style="color:#888;font-size:0.875rem">&#64;{{ user.username }}</div>
-        <div class="role-badge">{{ user.role }}</div>
+  <div class="max-w-5xl mx-auto space-y-6 animate-fade-in">
 
-        <!-- Provider badge -->
-        @if (user.authProvider && user.authProvider !== 'LOCAL') {
-          <div class="provider-badge" [ngClass]="user.authProvider.toLowerCase()">
-            <mat-icon style="font-size:14px;height:14px;width:14px">link</mat-icon>
-            Connected via {{ user.authProvider | titlecase }}
-          </div>
-        }
+    <!-- Hero Section -->
+    <div class="relative rounded-2xl overflow-hidden border border-brand-border">
+      <!-- Background gradient -->
+      <div class="absolute inset-0 bg-gradient-to-br from-orange-500/20 via-brand-card to-red-500/10"></div>
+      <div class="absolute top-0 left-0 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
 
-        @if (user.bio) {
-          <p style="margin-top:12px;color:#555;font-size:0.875rem">{{ user.bio }}</p>
-        }
-
-        <div style="display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap">
-          <button mat-stroked-button (click)="editMode = !editMode">
-            <mat-icon>edit</mat-icon>
-            Edit Profile
-          </button>
-
-          <!-- Sync button for connected providers -->
-          @if (authUser?.provider && authUser?.provider !== 'LOCAL') {
-            <button mat-raised-button
-              [style.background]="authUser?.provider === 'STRAVA' ? '#fc4c02' : '#007cc1'"
-              style="color:#fff"
-              [disabled]="syncing"
-              (click)="syncActivities()">
-              @if (syncing) {
-                <mat-spinner diameter="16" style="display:inline-block;margin-right:6px"></mat-spinner>
-              } @else {
-                <mat-icon>sync</mat-icon>
-              }
-              Sync {{ authUser?.provider | titlecase }} Activities
-            </button>
-          }
-
-          <!-- Connect buttons for LOCAL users -->
-          @if (!authUser?.provider || authUser?.provider === 'LOCAL') {
-            <button class="oauth-btn strava-btn" type="button" (click)="connectStrava()" style="padding:6px 12px;font-size:0.8rem">
-              Connect Strava
-            </button>
-            <button class="oauth-btn garmin-btn" type="button" (click)="connectGarmin()" style="padding:6px 12px;font-size:0.8rem">
-              Connect Garmin
-            </button>
-          }
+      <div class="relative z-10 p-8 flex flex-col sm:flex-row items-center sm:items-start gap-6">
+        <!-- Avatar -->
+        <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white text-3xl font-black flex-shrink-0 shadow-xl">
+          {{ getInitials() }}
         </div>
-      </mat-card-content>
-    </mat-card>
 
-    <!-- Stats -->
-    @if (stats) {
-      <mat-card>
-        <mat-card-header><mat-card-title>Running Stats</mat-card-title></mat-card-header>
-        <mat-card-content style="padding:16px">
-          <div class="stats-grid">
-            <div class="stat-card" style="padding:12px">
-              <div class="stat-value">{{ stats.totalDistanceKm?.toFixed(0) }}</div>
-              <div class="stat-label">Total KM</div>
-            </div>
-            <div class="stat-card" style="padding:12px">
-              <div class="stat-value">{{ stats.totalRuns }}</div>
-              <div class="stat-label">Total Runs</div>
-            </div>
-            <div class="stat-card" style="padding:12px">
-              <div class="stat-value">{{ stats.weeklyDistanceKm?.toFixed(1) }}</div>
-              <div class="stat-label">Weekly KM</div>
-            </div>
-            <div class="stat-card" style="padding:12px">
-              <div class="stat-value">{{ stats.monthlyDistanceKm?.toFixed(1) }}</div>
-              <div class="stat-label">Monthly KM</div>
-            </div>
+        <!-- Info -->
+        <div class="flex-1 text-center sm:text-left">
+          <h1 class="text-3xl font-black text-white">{{ user.firstName }} {{ user.lastName }}</h1>
+          <p class="text-slate-400 mt-1">&#64;{{ user.username }}</p>
+          @if (user.bio) {
+            <p class="text-slate-300 mt-3 max-w-md">{{ user.bio }}</p>
+          }
+          <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-4">
+            <span class="badge bg-brand-surface border border-brand-border text-slate-300">
+              <span class="material-icons text-sm">shield</span>
+              {{ user.role | titlecase }}
+            </span>
+            @if (user.authProvider) {
+              <span class="badge border {{ getProviderColor() }}">
+                <span class="material-icons text-sm">link</span>
+                {{ user.authProvider | titlecase }}
+              </span>
+            }
           </div>
-        </mat-card-content>
-      </mat-card>
+        </div>
+
+        <!-- Edit button -->
+        <button (click)="editMode = !editMode" class="btn-secondary flex-shrink-0 flex items-center gap-2 !py-2">
+          <span class="material-icons text-xl">{{ editMode ? 'close' : 'edit' }}</span>
+          {{ editMode ? 'Cancel' : 'Edit Profile' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    @if (stats) {
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="card text-center">
+          <div class="stat-value">{{ stats.totalRuns }}</div>
+          <p class="text-slate-400 text-xs uppercase tracking-wider mt-1">Total Runs</p>
+        </div>
+        <div class="card text-center">
+          <div class="stat-value">{{ stats.totalDistanceKm?.toFixed(0) }}</div>
+          <p class="text-slate-400 text-xs uppercase tracking-wider mt-1">Total KM</p>
+        </div>
+        <div class="card text-center">
+          <div class="stat-value">{{ stats.weeklyDistanceKm?.toFixed(1) }}</div>
+          <p class="text-slate-400 text-xs uppercase tracking-wider mt-1">Weekly KM</p>
+        </div>
+        <div class="card text-center">
+          <div class="stat-value">{{ badges.length }}</div>
+          <p class="text-slate-400 text-xs uppercase tracking-wider mt-1">Badges</p>
+        </div>
+      </div>
     }
 
-    <!-- Badges -->
-    @if (badges.length > 0) {
-      <mat-card>
-        <mat-card-header><mat-card-title>Badges ({{ badges.length }})</mat-card-title></mat-card-header>
-        <mat-card-content style="padding:16px">
-          <div class="badge-grid">
+    <!-- Two Column -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <!-- Left Column: Edit Form + Sync -->
+      <div class="space-y-5">
+
+        <!-- Edit Form -->
+        @if (editMode) {
+          <div class="card animate-slide-up">
+            <h2 class="text-white font-bold text-lg mb-5">Edit Profile</h2>
+            <form [formGroup]="form" (ngSubmit)="save()" class="space-y-4">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="label">First Name</label>
+                  <input type="text" formControlName="firstName" placeholder="Jane" class="input-field">
+                </div>
+                <div>
+                  <label class="label">Last Name</label>
+                  <input type="text" formControlName="lastName" placeholder="Runner" class="input-field">
+                </div>
+              </div>
+              <div>
+                <label class="label">Bio</label>
+                <textarea formControlName="bio" rows="4" placeholder="Tell us about your running journey..." class="input-field resize-none"></textarea>
+              </div>
+              <div class="flex items-center gap-4 pt-2">
+                <button type="submit" class="btn-primary flex items-center gap-2">
+                  <span class="material-icons text-xl">save</span>
+                  Save Changes
+                </button>
+                <button type="button" (click)="editMode = false" class="btn-secondary">Cancel</button>
+              </div>
+            </form>
+          </div>
+        }
+
+        <!-- Sync + Connect -->
+        <div class="card">
+          <h2 class="text-white font-bold text-lg mb-5">Integrations</h2>
+
+          @if (authUser?.provider && authUser?.provider !== 'LOCAL') {
+            <button
+              (click)="syncActivities()"
+              [disabled]="syncing"
+              class="btn-primary w-full flex items-center justify-center gap-3 mb-4">
+              @if (syncing) {
+                <div class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                Syncing...
+              } @else {
+                <span class="material-icons text-xl">sync</span>
+                Sync {{ authUser?.provider | titlecase }} Activities
+              }
+            </button>
+            <p class="text-slate-500 text-sm text-center">Pulls your latest activities from {{ authUser?.provider | titlecase }}</p>
+          }
+
+          @if (!authUser?.provider || authUser?.provider === 'LOCAL') {
+            <p class="text-slate-400 text-sm mb-4">Connect your fitness tracker to automatically sync activities.</p>
+            <div class="space-y-3">
+              <button
+                type="button"
+                (click)="connectStrava()"
+                class="w-full flex items-center justify-center gap-3 py-3 px-6 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold hover:from-orange-600 hover:to-orange-700 transition-all duration-200">
+                <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor">
+                  <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/>
+                </svg>
+                Connect Strava
+              </button>
+              <button
+                type="button"
+                (click)="connectGarmin()"
+                class="w-full flex items-center justify-center gap-3 py-3 px-6 rounded-xl text-white font-semibold transition-all duration-200"
+                style="background-color: #007cc1;">
+                <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                </svg>
+                Connect Garmin
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Right Column: Badges -->
+      <div class="card">
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="text-white font-bold text-lg">Badges</h2>
+          @if (badges.length > 0) {
+            <span class="badge bg-orange-500/20 text-orange-400 border border-orange-500/30">{{ badges.length }}</span>
+          }
+        </div>
+
+        @if (badges.length === 0) {
+          <div class="flex flex-col items-center justify-center py-12 gap-3 text-center">
+            <div class="w-16 h-16 rounded-2xl bg-brand-surface border border-brand-border flex items-center justify-center">
+              <span class="material-icons text-slate-600 text-3xl">emoji_events</span>
+            </div>
+            <p class="text-slate-400 text-sm">Keep running to earn badges!</p>
+          </div>
+        } @else {
+          <div class="grid grid-cols-3 sm:grid-cols-4 gap-3">
             @for (badge of badges; track badge.badgeId) {
-              <div class="badge-card" [title]="badge.badgeDescription">
-                <div class="badge-icon">{{ badge.badgeIconUrl || '🏅' }}</div>
-                <div class="badge-name">{{ badge.badgeName }}</div>
+              <div class="flex flex-col items-center p-3 bg-brand-surface border border-brand-border rounded-xl text-center hover:border-orange-500/30 transition-colors" [title]="badge.badgeDescription">
+                <div class="text-3xl mb-2">{{ badge.badgeIconUrl || '🏅' }}</div>
+                <p class="text-slate-400 text-xs font-medium leading-tight">{{ badge.badgeName }}</p>
               </div>
             }
           </div>
-        </mat-card-content>
-      </mat-card>
-    }
-  </div>
+        }
+      </div>
 
-  <!-- Edit Form -->
-  @if (editMode) {
-    <mat-card style="margin-top:16px;max-width:500px">
-      <mat-card-header><mat-card-title>Edit Profile</mat-card-title></mat-card-header>
-      <mat-card-content style="padding:16px">
-        <form [formGroup]="form" (ngSubmit)="save()">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-            <mat-form-field appearance="outline">
-              <mat-label>First Name</mat-label>
-              <input matInput formControlName="firstName">
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Last Name</mat-label>
-              <input matInput formControlName="lastName">
-            </mat-form-field>
-          </div>
-          <mat-form-field appearance="outline" style="width:100%">
-            <mat-label>Bio</mat-label>
-            <textarea matInput formControlName="bio" rows="3" placeholder="Tell us about your running journey..."></textarea>
-          </mat-form-field>
-          <div style="display:flex;gap:8px;justify-content:flex-end">
-            <button mat-button type="button" (click)="editMode = false">Cancel</button>
-            <button mat-raised-button color="primary" type="submit">Save</button>
-          </div>
-        </form>
-      </mat-card-content>
-    </mat-card>
-  }
+    </div>
+  </div>
 }

@@ -1,50 +1,127 @@
-<mat-sidenav-container class="sidenav-container">
-  <mat-sidenav class="sidenav" mode="side" opened>
+<div class="flex min-h-screen bg-brand-bg">
+
+  <!-- Desktop Sidebar -->
+  <aside class="hidden lg:flex flex-col fixed left-0 top-0 h-full w-64 bg-brand-card border-r border-brand-border z-30">
 
     <!-- Logo -->
-    <div class="logo-section">
-      <mat-icon>directions_run</mat-icon>
-      <span>RunHub</span>
+    <div class="flex items-center gap-3 px-6 py-5 border-b border-brand-border">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
+        <span class="material-icons text-white text-base">bolt</span>
+      </div>
+      <span class="text-xl font-black bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent tracking-wider">RUNHUB</span>
     </div>
 
-    <!-- Navigation -->
-    <mat-nav-list class="sidebar-nav">
+    <!-- Nav Items -->
+    <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
       @for (item of navItems; track item.path) {
-        <a mat-list-item
-           [routerLink]="item.path"
-           routerLinkActive="active">
-          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
-          <span matListItemTitle>{{ item.label }}</span>
+        <a
+          [routerLink]="item.path"
+          routerLinkActive="bg-gradient-to-r from-orange-500/20 to-red-500/10 text-orange-400 border border-orange-500/30"
+          [routerLinkActiveOptions]="{exact: false}"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-brand-surface transition-all duration-200 group no-underline">
+          <span class="material-icons text-xl group-[.active]:text-orange-400">{{ item.icon }}</span>
+          <span class="text-sm font-medium">{{ item.label }}</span>
         </a>
       }
-    </mat-nav-list>
+    </nav>
 
-    <!-- Footer -->
-    <div class="sidebar-footer">
-      <button (click)="logout()">
-        <mat-icon>logout</mat-icon>
-        <span>Logout</span>
-      </button>
-    </div>
-
-  </mat-sidenav>
-
-  <mat-sidenav-content>
-    <!-- Toolbar -->
-    <mat-toolbar class="top-toolbar">
-      <span>RunHub</span>
-      <span class="spacer"></span>
-      @if (currentUser) {
-        <div class="user-chip">
-          <mat-icon style="font-size:18px;width:18px;height:18px">directions_run</mat-icon>
-          {{ currentUser.username }}
+    <!-- User Footer -->
+    <div class="px-3 py-4 border-t border-brand-border">
+      @if (user) {
+        <div class="flex items-center gap-3 px-3 py-2 mb-2">
+          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+            {{ getInitials() }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-white text-sm font-semibold truncate">{{ user.username }}</p>
+            <p class="text-slate-500 text-xs truncate">{{ user.email }}</p>
+          </div>
         </div>
       }
-    </mat-toolbar>
+      <button
+        (click)="logout()"
+        class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200">
+        <span class="material-icons text-xl">logout</span>
+        <span class="text-sm font-medium">Sign Out</span>
+      </button>
+    </div>
+  </aside>
 
-    <!-- Page content -->
-    <div class="main-content">
+  <!-- Mobile Top Bar -->
+  <header class="lg:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 bg-brand-card border-b border-brand-border">
+    <button (click)="toggleSidebar()" class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-brand-surface transition-all">
+      <span class="material-icons">menu</span>
+    </button>
+    <span class="text-lg font-black bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent tracking-wider">RUNHUB</span>
+    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white text-sm font-bold">
+      {{ getInitials() }}
+    </div>
+  </header>
+
+  <!-- Mobile Sidebar Overlay -->
+  @if (sidebarOpen) {
+    <div class="lg:hidden fixed inset-0 z-50 flex">
+      <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" (click)="toggleSidebar()"></div>
+      <aside class="relative flex flex-col w-72 h-full bg-brand-card border-r border-brand-border z-10 animate-slide-up">
+        <div class="flex items-center justify-between px-6 py-5 border-b border-brand-border">
+          <span class="text-xl font-black bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent tracking-wider">RUNHUB</span>
+          <button (click)="toggleSidebar()" class="p-1 text-slate-400 hover:text-white">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+        <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+          @for (item of navItems; track item.path) {
+            <a
+              [routerLink]="item.path"
+              routerLinkActive="bg-gradient-to-r from-orange-500/20 to-red-500/10 text-orange-400 border border-orange-500/30"
+              (click)="toggleSidebar()"
+              class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-brand-surface transition-all duration-200 no-underline">
+              <span class="material-icons text-xl">{{ item.icon }}</span>
+              <span class="text-sm font-medium">{{ item.label }}</span>
+            </a>
+          }
+        </nav>
+        <div class="px-3 py-4 border-t border-brand-border">
+          @if (user) {
+            <div class="flex items-center gap-3 px-3 py-2 mb-2">
+              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white text-sm font-bold">
+                {{ getInitials() }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-white text-sm font-semibold truncate">{{ user.username }}</p>
+              </div>
+            </div>
+          }
+          <button
+            (click)="logout()"
+            class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200">
+            <span class="material-icons text-xl">logout</span>
+            <span class="text-sm font-medium">Sign Out</span>
+          </button>
+        </div>
+      </aside>
+    </div>
+  }
+
+  <!-- Main Content -->
+  <main class="flex-1 lg:ml-64 flex flex-col min-h-screen bg-brand-bg">
+    <div class="lg:hidden h-14"></div>
+    <div class="flex-1 p-4 lg:p-8 pb-20 lg:pb-8">
       <router-outlet />
     </div>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+  </main>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-brand-card border-t border-brand-border flex">
+    @for (item of mobileNavItems; track item.path) {
+      <a
+        [routerLink]="item.path"
+        routerLinkActive="text-orange-400"
+        class="flex-1 flex flex-col items-center justify-center py-3 text-slate-500 hover:text-slate-300 transition-colors no-underline">
+        <span class="material-icons text-2xl">{{ item.icon }}</span>
+        <span class="text-xs mt-0.5 font-medium">{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+
+</div>

@@ -1,13 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatListModule } from '@angular/material/list';
-import { MatDividerModule } from '@angular/material/divider';
+import { FormsModule } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ChatService } from '../../core/services/chat.service';
 import { CommunityService } from '../../core/services/community.service';
 import { Community } from '../../core/models/community.model';
@@ -17,11 +11,7 @@ import { AuthService } from '../../core/services/auth.service';
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [
-    CommonModule, ReactiveFormsModule,
-    MatCardModule, MatButtonModule, MatIconModule,
-    MatFormFieldModule, MatInputModule, MatListModule, MatDividerModule
-  ],
+  imports: [CommonModule, FormsModule],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss'
 })
@@ -29,17 +19,15 @@ export class ChatComponent implements OnInit {
   communities: Community[] = [];
   selectedCommunity: Community | null = null;
   messages: Message[] = [];
-  form: FormGroup;
+  messageContent = '';
   currentUser = this.authService.getCurrentUser();
 
   constructor(
     private chatService: ChatService,
     private communityService: CommunityService,
     private authService: AuthService,
-    private fb: FormBuilder
-  ) {
-    this.form = this.fb.group({ content: ['', Validators.required] });
-  }
+    private snackBar: MatSnackBar
+  ) {}
 
   ngOnInit(): void {
     this.communityService.getAll().subscribe(c => {
@@ -54,12 +42,12 @@ export class ChatComponent implements OnInit {
   }
 
   send(): void {
-    if (this.form.invalid || !this.selectedCommunity) return;
-    const content = this.form.value.content;
+    if (!this.messageContent.trim() || !this.selectedCommunity) return;
+    const content = this.messageContent;
     this.chatService.sendMessage({ communityId: this.selectedCommunity.id, content }).subscribe({
       next: msg => {
         this.messages.push(msg);
-        this.form.reset();
+        this.messageContent = '';
       }
     });
   }
@@ -70,5 +58,16 @@ export class ChatComponent implements OnInit {
 
   timeFormat(dateStr: string): string {
     return new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  getInitials(username: string): string {
+    return username.substring(0, 2).toUpperCase();
+  }
+
+  onEnter(event: KeyboardEvent): void {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      this.send();
+    }
   }
 }
