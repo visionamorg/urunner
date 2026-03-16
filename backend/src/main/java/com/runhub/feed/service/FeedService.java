@@ -50,7 +50,7 @@ public class FeedService {
 
     public Page<PostDto> getCommunityPosts(Long communityId, User user, int page) {
         Pageable pageable = PageRequest.of(page, 20);
-        return postRepository.findByCommunityIdAndDeletedFalseOrderByPinnedDescCreatedAtDesc(communityId, pageable)
+        return postRepository.findCommunityFeed(communityId, pageable)
                 .map(post -> toPostDtoWithLike(post, user));
     }
 
