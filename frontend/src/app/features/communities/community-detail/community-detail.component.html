@@ -195,32 +195,41 @@
               @if (post.postType === 'PHOTO_ALBUM' && post.photoUrls && post.photoUrls.length > 0) {
                 <div class="rounded-xl overflow-hidden">
                   @if (post.photoUrls.length === 1) {
-                    <img
-                      [src]="post.photoUrls[0]"
-                      alt="Post photo"
-                      class="w-full max-h-96 object-cover rounded-xl cursor-pointer hover:opacity-95 transition-opacity"
-                    />
+                    <img (click)="openLightbox(post.photoUrls, 0)"
+                      [src]="post.photoUrls[0]" alt="Post photo"
+                      class="w-full max-h-96 object-cover rounded-xl cursor-pointer hover:opacity-90 transition-opacity" />
                   } @else if (post.photoUrls.length === 2) {
                     <div class="grid grid-cols-2 gap-1">
-                      @for (url of post.photoUrls; track url) {
-                        <img [src]="url" alt="Post photo" class="w-full h-48 object-cover cursor-pointer hover:opacity-95 transition-opacity rounded-xl" />
+                      @for (url of post.photoUrls; track url; let i = $index) {
+                        <img (click)="openLightbox(post.photoUrls, i)"
+                          [src]="url" alt="Post photo"
+                          class="w-full h-48 object-cover cursor-pointer hover:opacity-90 transition-opacity rounded-xl" />
                       }
                     </div>
                   } @else if (post.photoUrls.length === 3) {
                     <div class="grid grid-cols-2 gap-1">
-                      <img [src]="post.photoUrls[0]" alt="Post photo" class="w-full h-64 object-cover cursor-pointer hover:opacity-95 transition-opacity rounded-xl row-span-2" />
+                      <img (click)="openLightbox(post.photoUrls, 0)"
+                        [src]="post.photoUrls[0]" alt="Post photo"
+                        class="w-full h-64 object-cover cursor-pointer hover:opacity-90 transition-opacity rounded-xl row-span-2" />
                       <div class="flex flex-col gap-1">
-                        <img [src]="post.photoUrls[1]" alt="Post photo" class="w-full h-[calc(128px-2px)] object-cover cursor-pointer hover:opacity-95 transition-opacity rounded-xl" />
-                        <img [src]="post.photoUrls[2]" alt="Post photo" class="w-full h-[calc(128px-2px)] object-cover cursor-pointer hover:opacity-95 transition-opacity rounded-xl" />
+                        <img (click)="openLightbox(post.photoUrls, 1)"
+                          [src]="post.photoUrls[1]" alt="Post photo"
+                          class="w-full h-[calc(128px-2px)] object-cover cursor-pointer hover:opacity-90 transition-opacity rounded-xl" />
+                        <img (click)="openLightbox(post.photoUrls, 2)"
+                          [src]="post.photoUrls[2]" alt="Post photo"
+                          class="w-full h-[calc(128px-2px)] object-cover cursor-pointer hover:opacity-90 transition-opacity rounded-xl" />
                       </div>
                     </div>
                   } @else {
                     <div class="grid grid-cols-2 gap-1">
                       @for (url of post.photoUrls.slice(0, 4); track url; let i = $index) {
                         <div class="relative">
-                          <img [src]="url" alt="Post photo" class="w-full h-40 object-cover cursor-pointer hover:opacity-95 transition-opacity rounded-xl" />
+                          <img (click)="openLightbox(post.photoUrls, i)"
+                            [src]="url" alt="Post photo"
+                            class="w-full h-40 object-cover cursor-pointer hover:opacity-90 transition-opacity rounded-xl" />
                           @if (i === 3 && post.photoUrls.length > 4) {
-                            <div class="absolute inset-0 bg-black/60 flex items-center justify-center rounded-xl cursor-pointer">
+                            <div (click)="openLightbox(post.photoUrls, 3)"
+                              class="absolute inset-0 bg-black/60 hover:bg-black/50 flex items-center justify-center rounded-xl cursor-pointer transition-colors">
                               <span class="text-white text-2xl font-black">+{{ post.photoUrls.length - 4 }}</span>
                             </div>
                           }
@@ -231,18 +240,49 @@
                 </div>
               }
 
+              <!-- Reaction counts display -->
+              @if (post.reactions && reactionEntries(post.reactions).length > 0) {
+                <div class="flex flex-wrap gap-1.5 pt-1">
+                  @for (r of reactionEntries(post.reactions); track r.emoji) {
+                    <button (click)="sendReaction(post, r.emoji)"
+                      class="flex items-center gap-1 text-xs px-2 py-1 rounded-full border transition-all"
+                      [class]="post.myReaction === r.emoji
+                        ? 'bg-orange-500/20 border-orange-500/40 text-white'
+                        : 'bg-brand-surface border-brand-border text-slate-400 hover:border-slate-500'">
+                      <span>{{ r.emoji }}</span>
+                      <span>{{ r.count }}</span>
+                    </button>
+                  }
+                </div>
+              }
+
               <!-- Action Bar -->
-              <div class="flex items-center gap-4 pt-2 border-t border-brand-border">
-                <button
-                  (click)="toggleLike(post)"
-                  class="flex items-center gap-1.5 text-sm transition-colors"
-                  [class]="(post.liked || post.likedByCurrentUser) ? 'text-orange-400' : 'text-slate-400 hover:text-orange-400'">
-                  <span class="material-icons text-base">{{ (post.liked || post.likedByCurrentUser) ? 'favorite' : 'favorite_border' }}</span>
-                  <span>{{ post.likesCount }}</span>
-                </button>
-                <button
-                  (click)="toggleComments(post.id)"
-                  class="flex items-center gap-1.5 text-sm text-slate-400 hover:text-blue-400 transition-colors">
+              <div class="flex items-center gap-2 pt-2 border-t border-brand-border" (click)="closeAllPickers()">
+                <!-- Reaction button -->
+                <div class="relative">
+                  <button (click)="toggleReactionPicker(post.id, $event)"
+                    class="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-xl transition-all"
+                    [class]="post.myReaction ? 'text-orange-400 bg-orange-500/10' : 'text-slate-400 hover:text-orange-400 hover:bg-orange-500/10'">
+                    <span class="text-base leading-none">{{ post.myReaction || '🤍' }}</span>
+                    <span class="text-xs">React</span>
+                  </button>
+
+                  <!-- Emoji picker popup -->
+                  @if (showReactionPicker[post.id]) {
+                    <div class="absolute bottom-full left-0 mb-2 bg-brand-card border border-brand-border rounded-2xl px-3 py-2 flex gap-1 shadow-xl z-10 animate-fade-in">
+                      @for (emoji of EMOJIS; track emoji) {
+                        <button (click)="sendReaction(post, emoji); $event.stopPropagation()"
+                          class="text-2xl hover:scale-125 transition-transform w-9 h-9 flex items-center justify-center rounded-xl"
+                          [class]="post.myReaction === emoji ? 'bg-orange-500/20 scale-110' : 'hover:bg-brand-surface'">
+                          {{ emoji }}
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+
+                <button (click)="toggleComments(post.id)"
+                  class="flex items-center gap-1.5 text-sm text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 px-3 py-1.5 rounded-xl transition-all">
                   <span class="material-icons text-base">chat_bubble_outline</span>
                   <span>{{ post.commentsCount }}</span>
                 </button>
@@ -520,6 +560,54 @@
     }
 
   </div>
+
+  <!-- ==================== LIGHTBOX ==================== -->
+  @if (lightboxOpen) {
+    <div class="fixed inset-0 z-50 bg-black flex flex-col"
+         (touchstart)="onTouchStart($event)"
+         (touchend)="onTouchEnd($event)">
+
+      <!-- Top bar -->
+      <div class="flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/80 to-transparent absolute top-0 left-0 right-0 z-10">
+        <span class="text-white/70 text-sm font-medium">{{ lightboxIndex + 1 }} / {{ lightboxPhotos.length }}</span>
+        <button (click)="closeLightbox()" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
+          <span class="material-icons text-white">close</span>
+        </button>
+      </div>
+
+      <!-- Image -->
+      <div class="flex-1 flex items-center justify-center p-4">
+        <img [src]="lightboxPhotos[lightboxIndex]"
+             alt="Photo"
+             class="max-w-full max-h-full object-contain select-none"
+             draggable="false" />
+      </div>
+
+      <!-- Navigation arrows -->
+      @if (lightboxPhotos.length > 1) {
+        <button (click)="prevPhoto()"
+          class="absolute left-2 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center transition-colors">
+          <span class="material-icons text-white text-3xl">chevron_left</span>
+        </button>
+        <button (click)="nextPhoto()"
+          class="absolute right-2 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center transition-colors">
+          <span class="material-icons text-white text-3xl">chevron_right</span>
+        </button>
+      }
+
+      <!-- Dot indicators (max 10) -->
+      @if (lightboxPhotos.length > 1 && lightboxPhotos.length <= 20) {
+        <div class="absolute bottom-6 left-0 right-0 flex justify-center gap-1.5">
+          @for (p of lightboxPhotos; track p; let i = $index) {
+            <button (click)="lightboxIndex = i"
+              class="rounded-full transition-all"
+              [class]="i === lightboxIndex ? 'w-4 h-2 bg-white' : 'w-2 h-2 bg-white/40'">
+            </button>
+          }
+        </div>
+      }
+    </div>
+  }
 
   <!-- ==================== DRIVE FOLDER PICKER MODAL ==================== -->
   @if (showDrivePicker) {

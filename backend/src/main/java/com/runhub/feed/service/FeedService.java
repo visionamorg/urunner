@@ -10,8 +10,10 @@ import com.runhub.feed.mapper.FeedMapper;
 import com.runhub.feed.model.Comment;
 import com.runhub.feed.model.Like;
 import com.runhub.feed.model.Post;
+import com.runhub.feed.model.PostReaction;
 import com.runhub.feed.repository.CommentRepository;
 import com.runhub.feed.repository.LikeRepository;
+import com.runhub.feed.repository.PostReactionRepository;
 import com.runhub.feed.repository.PostRepository;
 import com.runhub.users.model.User;
 import com.runhub.users.service.UserService;
@@ -22,7 +24,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +35,7 @@ public class FeedService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
+    private final PostReactionRepository reactionRepository;
     private final FeedMapper feedMapper;
     private final UserService userService;
     private final CommunityRepository communityRepository;
@@ -173,11 +178,46 @@ public class FeedService {
                 .stream().map(feedMapper::toCommentDto).toList();
     }
 
+    @Transactional
+    public PostDto react(Long postId, String emoji, User user) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+
+        reactionRepository.findByPostIdAndUserId(postId, user.getId()).ifPresentOrElse(
+                existing -> {
+                    if (existing.getEmoji().equals(emoji)) {
+                        // Same emoji — remove reaction
+                        reactionRepository.delete(existing);
+                    } else {
+                        // Different emoji — switch reaction
+                        existing.setEmoji(emoji);
+                        reactionRepository.save(existing);
+                    }
+                },
+                () -> {
+                    PostReaction reaction = PostReaction.builder()
+                            .post(post).user(user).emoji(emoji).build();
+                    reactionRepository.save(reaction);
+                }
+        );
+
+        return toPostDtoWithLike(post, user);
+    }
+
     private PostDto toPostDtoWithLike(Post post, User user) {
         PostDto dto = feedMapper.toPostDto(post);
         boolean liked = likeRepository.existsByPostIdAndUserId(post.getId(), user.getId());
         dto.setLiked(liked);
         dto.setLikedByCurrentUser(liked);
+
+        // Reactions
+        Map<String, Long> reactions = new LinkedHashMap<>();
+        reactionRepository.countByEmojiForPost(post.getId())
+                .forEach(row -> reactions.put((String) row[0], (Long) row[1]));
+        dto.setReactions(reactions);
+        reactionRepository.findByPostIdAndUserId(post.getId(), user.getId())
+                .ifPresent(r -> dto.setMyReaction(r.getEmoji()));
+
         return dto;
     }
 }

@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class PostDto {
@@ -25,4 +26,6 @@ public class PostDto {
     private boolean deleted;
     private LocalDateTime createdAt;
     private List<CommentDto> comments;
+    private Map<String, Long> reactions;
+    private String myReaction;
 }

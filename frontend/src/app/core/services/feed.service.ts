@@ -20,6 +20,10 @@ export class FeedService {
     return this.http.post<Post>(`/api/feed/posts/${postId}/like`, {});
   }
 
+  react(postId: number, emoji: string): Observable<Post> {
+    return this.http.post<Post>(`/api/feed/posts/${postId}/react`, { emoji });
+  }
+
   likePost(id: number): Observable<Post> {
     return this.toggleLike(id);
   }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
@@ -14,7 +14,7 @@ import { Post, Comment } from '../../../core/models/post.model';
   templateUrl: './community-detail.component.html',
   styleUrl: './community-detail.component.scss'
 })
-export class CommunityDetailComponent implements OnInit {
+export class CommunityDetailComponent implements OnInit, OnDestroy {
   community: Community | null = null;
   posts: Post[] = [];
   members: CommunityMember[] = [];
@@ -35,6 +35,16 @@ export class CommunityDetailComponent implements OnInit {
   loadingFolders = false;
   syncingFolderId: string | null = null;
   driveError = '';
+
+  // Lightbox
+  lightboxPhotos: string[] = [];
+  lightboxIndex = 0;
+  lightboxOpen = false;
+  private touchStartX = 0;
+
+  // Reactions
+  readonly EMOJIS = ['❤️', '👍', '😂', '😮', '😢', '🙌'];
+  showReactionPicker: { [postId: number]: boolean } = {};
 
   // Invite state
   inviteUsername = '';
@@ -366,6 +376,99 @@ export class CommunityDetailComponent implements OnInit {
     if (diffHours < 24) return `${diffHours}h ago`;
     if (diffDays < 7) return `${diffDays}d ago`;
     return date.toLocaleDateString();
+  }
+
+  // ── Lightbox ───────────────────────────────────────────────────────────────
+
+  openLightbox(photos: string[], index: number): void {
+    this.lightboxPhotos = photos;
+    this.lightboxIndex = index;
+    this.lightboxOpen = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeLightbox(): void {
+    this.lightboxOpen = false;
+    document.body.style.overflow = '';
+  }
+
+  prevPhoto(): void {
+    this.lightboxIndex = (this.lightboxIndex - 1 + this.lightboxPhotos.length) % this.lightboxPhotos.length;
+  }
+
+  nextPhoto(): void {
+    this.lightboxIndex = (this.lightboxIndex + 1) % this.lightboxPhotos.length;
+  }
+
+  onTouchStart(e: TouchEvent): void {
+    this.touchStartX = e.touches[0].clientX;
+  }
+
+  onTouchEnd(e: TouchEvent): void {
+    const diff = this.touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) diff > 0 ? this.nextPhoto() : this.prevPhoto();
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onKeyDown(e: KeyboardEvent): void {
+    if (!this.lightboxOpen) return;
+    if (e.key === 'ArrowRight') this.nextPhoto();
+    else if (e.key === 'ArrowLeft') this.prevPhoto();
+    else if (e.key === 'Escape') this.closeLightbox();
+  }
+
+  ngOnDestroy(): void {
+    document.body.style.overflow = '';
+  }
+
+  // ── Reactions ──────────────────────────────────────────────────────────────
+
+  toggleReactionPicker(postId: number, event: Event): void {
+    event.stopPropagation();
+    const isOpen = this.showReactionPicker[postId];
+    this.showReactionPicker = {};
+    if (!isOpen) this.showReactionPicker[postId] = true;
+  }
+
+  closeAllPickers(): void {
+    this.showReactionPicker = {};
+  }
+
+  sendReaction(post: Post, emoji: string): void {
+    this.showReactionPicker = {};
+    const prev = post.myReaction;
+
+    // Optimistic update
+    if (!post.reactions) post.reactions = {};
+    if (prev) {
+      post.reactions[prev] = Math.max(0, (post.reactions[prev] || 1) - 1);
+      if (post.reactions[prev] === 0) delete post.reactions[prev];
+    }
+    if (prev !== emoji) {
+      post.reactions[emoji] = (post.reactions[emoji] || 0) + 1;
+      post.myReaction = emoji;
+    } else {
+      post.myReaction = null;
+    }
+
+    this.feedService.react(post.id, emoji).subscribe({
+      next: (updated) => {
+        post.reactions = updated.reactions;
+        post.myReaction = updated.myReaction;
+      },
+      error: () => {
+        // Revert
+        post.reactions = post.reactions;
+        post.myReaction = prev;
+      }
+    });
+  }
+
+  reactionEntries(reactions: { [emoji: string]: number } | undefined): { emoji: string; count: number }[] {
+    if (!reactions) return [];
+    return Object.entries(reactions)
+      .filter(([, count]) => count > 0)
+      .map(([emoji, count]) => ({ emoji, count }));
   }
 
   getRoleBadgeClass(role: string): string {

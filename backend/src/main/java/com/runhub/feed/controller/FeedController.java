@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -67,6 +68,14 @@ public class FeedController {
             @Valid @RequestBody AddCommentRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(feedService.addComment(id, request.getContent(), user));
+    }
+
+    @PostMapping("/feed/posts/{id}/react")
+    public ResponseEntity<PostDto> react(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body,
+            @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(feedService.react(id, body.get("emoji"), user));
     }
 
     @PostMapping("/feed/posts/{id}/like")

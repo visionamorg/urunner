@@ -16,6 +16,8 @@ export interface Post {
   pinned: boolean;
   deleted?: boolean;
   createdAt: string;
+  reactions?: { [emoji: string]: number };
+  myReaction?: string | null;
   comments?: Comment[];
 }
 
