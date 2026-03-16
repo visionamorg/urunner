@@ -10,4 +10,5 @@ import java.util.List;
 public interface MessageRepository extends JpaRepository<Message, Long> {
     List<Message> findByCommunityIdOrderBySentAtAsc(Long communityId);
     List<Message> findByEventIdOrderBySentAtAsc(Long eventId);
+    List<Message> findByRoomIdOrderBySentAtAsc(Long roomId);
 }

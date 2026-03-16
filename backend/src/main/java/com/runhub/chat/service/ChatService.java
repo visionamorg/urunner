@@ -10,6 +10,9 @@ import com.runhub.communities.repository.CommunityRepository;
 import com.runhub.config.BadRequestException;
 import com.runhub.events.model.Event;
 import com.runhub.events.repository.EventRepository;
+import com.runhub.rooms.model.Room;
+import com.runhub.rooms.repository.RoomMemberRepository;
+import com.runhub.rooms.repository.RoomRepository;
 import com.runhub.users.model.User;
 import com.runhub.users.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -27,16 +30,21 @@ public class ChatService {
     private final UserService userService;
     private final CommunityRepository communityRepository;
     private final EventRepository eventRepository;
+    private final RoomRepository roomRepository;
+    private final RoomMemberRepository roomMemberRepository;
 
-    public List<MessageDto> getMessages(Long communityId, Long eventId) {
-        if (communityId != null) {
+    public List<MessageDto> getMessages(Long communityId, Long eventId, Long roomId) {
+        if (roomId != null) {
+            return messageRepository.findByRoomIdOrderBySentAtAsc(roomId)
+                    .stream().map(messageMapper::toDto).toList();
+        } else if (communityId != null) {
             return messageRepository.findByCommunityIdOrderBySentAtAsc(communityId)
                     .stream().map(messageMapper::toDto).toList();
         } else if (eventId != null) {
             return messageRepository.findByEventIdOrderBySentAtAsc(eventId)
                     .stream().map(messageMapper::toDto).toList();
         }
-        throw new BadRequestException("communityId or eventId required");
+        throw new BadRequestException("communityId, eventId, or roomId required");
     }
 
     @Transactional
@@ -49,6 +57,7 @@ public class ChatService {
 
         Community community = null;
         Event event = null;
+        Room room = null;
 
         if (request.getCommunityId() != null) {
             community = communityRepository.findById(request.getCommunityId()).orElse(null);
@@ -56,11 +65,21 @@ public class ChatService {
         if (request.getEventId() != null) {
             event = eventRepository.findById(request.getEventId()).orElse(null);
         }
+        if (request.getRoomId() != null) {
+            room = roomRepository.findById(request.getRoomId()).orElse(null);
+            if (room != null && room.getIsPrivate()) {
+                boolean isMember = roomMemberRepository.existsByIdRoomIdAndIdUserId(room.getId(), sender.getId());
+                if (!isMember) {
+                    throw new BadRequestException("You are not a member of this room");
+                }
+            }
+        }
 
         Message message = Message.builder()
                 .sender(sender)
                 .community(community)
                 .event(event)
+                .room(room)
                 .content(request.getContent())
                 .build();
 

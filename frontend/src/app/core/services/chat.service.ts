@@ -7,10 +7,11 @@ import { Message, SendMessageRequest } from '../models/message.model';
 export class ChatService {
   constructor(private http: HttpClient) {}
 
-  getMessages(communityId?: number, eventId?: number): Observable<Message[]> {
+  getMessages(communityId?: number, eventId?: number, roomId?: number): Observable<Message[]> {
     let params = new HttpParams();
     if (communityId) params = params.set('communityId', communityId);
     if (eventId) params = params.set('eventId', eventId);
+    if (roomId) params = params.set('roomId', roomId);
     return this.http.get<Message[]>('/api/messages', { params });
   }
 

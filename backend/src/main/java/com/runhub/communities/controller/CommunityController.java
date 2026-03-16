@@ -3,11 +3,16 @@ package com.runhub.communities.controller;
 import com.runhub.communities.dto.*;
 import com.runhub.communities.dto.DriveFolderDto;
 import com.runhub.communities.service.CommunityService;
+import com.runhub.events.dto.CreateEventRequest;
+import com.runhub.events.dto.EventDto;
+import com.runhub.events.dto.UpdateEventRequest;
+import com.runhub.events.service.EventService;
 import com.runhub.feed.dto.CreatePostRequest;
 import com.runhub.feed.dto.PostDto;
 import com.runhub.feed.service.FeedService;
 import com.runhub.users.model.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +27,7 @@ public class CommunityController {
 
     private final CommunityService communityService;
     private final FeedService feedService;
+    private final EventService eventService;
 
     // ── Community CRUD ────────────────────────────────────────────────────────
 
@@ -157,6 +163,37 @@ public class CommunityController {
                                              @PathVariable Long inviteId,
                                              @AuthenticationPrincipal User user) {
         communityService.cancelInvite(id, inviteId, user);
+        return ResponseEntity.ok().build();
+    }
+
+    // ── Community Events ──────────────────────────────────────────────────────
+
+    @GetMapping("/{id}/events")
+    public List<EventDto> getCommunityEvents(@PathVariable Long id) {
+        return eventService.getCommunityEvents(id);
+    }
+
+    @PostMapping("/{id}/events")
+    public ResponseEntity<EventDto> createCommunityEvent(@PathVariable Long id,
+                                                          @RequestBody CreateEventRequest request,
+                                                          @AuthenticationPrincipal User user) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(eventService.createCommunityEvent(id, user.getEmail(), request));
+    }
+
+    @PutMapping("/{id}/events/{eid}")
+    public EventDto updateCommunityEvent(@PathVariable Long id,
+                                          @PathVariable Long eid,
+                                          @RequestBody UpdateEventRequest request,
+                                          @AuthenticationPrincipal User user) {
+        return eventService.updateCommunityEvent(id, eid, request, user.getEmail());
+    }
+
+    @DeleteMapping("/{id}/events/{eid}")
+    public ResponseEntity<Void> cancelCommunityEvent(@PathVariable Long id,
+                                                      @PathVariable Long eid,
+                                                      @AuthenticationPrincipal User user) {
+        eventService.cancelCommunityEvent(id, eid, user.getEmail());
         return ResponseEntity.ok().build();
     }
 

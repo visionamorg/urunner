@@ -2,6 +2,7 @@ package com.runhub.chat.model;
 
 import com.runhub.communities.model.Community;
 import com.runhub.events.model.Event;
+import com.runhub.rooms.model.Room;
 import com.runhub.users.model.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -32,6 +33,10 @@ public class Message {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     private Event event;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id")
+    private Room room;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;

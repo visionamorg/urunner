@@ -4,13 +4,19 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { CommunityService } from '../../../core/services/community.service';
 import { FeedService } from '../../../core/services/feed.service';
+import { ChatService } from '../../../core/services/chat.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { Community, CommunityMember, InviteDto, DriveFolderDto } from '../../../core/models/community.model';
 import { Post, Comment } from '../../../core/models/post.model';
+import { RunEvent, CreateEventRequest, UpdateEventRequest } from '../../../core/models/event.model';
+import { Message } from '../../../core/models/message.model';
+import { CommunityCalendarComponent } from '../community-calendar/community-calendar.component';
+import { CommunityRoomsComponent } from '../community-rooms/community-rooms.component';
 
 @Component({
   selector: 'app-community-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, CommunityCalendarComponent, CommunityRoomsComponent],
   templateUrl: './community-detail.component.html',
   styleUrl: './community-detail.component.scss'
 })
@@ -19,7 +25,25 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
   posts: Post[] = [];
   members: CommunityMember[] = [];
   invites: InviteDto[] = [];
-  activeTab: 'feed' | 'members' | 'invites' | 'settings' = 'feed';
+  activeTab: 'feed' | 'members' | 'invites' | 'settings' | 'events' | 'calendar' | 'chat' | 'rooms' = 'feed';
+
+  // ── Events Tab ─────────────────────────────────────────────────────────────
+  communityEvents: RunEvent[] = [];
+  eventsLoading = false;
+  eventsLoaded = false;
+  showEventForm = false;
+  editingEvent: RunEvent | null = null;
+  eventForm: CreateEventRequest = { name: '', description: '', eventDate: '', location: '', distanceKm: 0, price: 0 };
+  savingEvent = false;
+  eventError = '';
+
+  // ── Chat Tab ───────────────────────────────────────────────────────────────
+  chatMessages: Message[] = [];
+  chatInput = '';
+  chatLoading = false;
+  chatLoaded = false;
+  sendingChat = false;
+  currentUsername = '';
   loading = true;
   feedLoading = false;
   syncing = false;
@@ -62,18 +86,24 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
   // Role change state
   changingRole: { [userId: number]: boolean } = {};
 
-  private communityId!: number;
+  communityId!: number;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private communityService: CommunityService,
-    private feedService: FeedService
+    private feedService: FeedService,
+    private chatService: ChatService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
+    this.currentUsername = this.authService.getCurrentUser()?.username || '';
     this.route.params.subscribe(params => {
       this.communityId = +params['id'];
+      this.activeTab = 'feed';
+      this.eventsLoaded = false;
+      this.chatLoaded = false;
       this.loadCommunity();
     });
   }
@@ -469,6 +499,114 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     return Object.entries(reactions)
       .filter(([, count]) => count > 0)
       .map(([emoji, count]) => ({ emoji, count }));
+  }
+
+  // ── Events Tab Methods ──────────────────────────────────────────────────────
+
+  loadEvents(): void {
+    if (this.eventsLoaded) return;
+    this.eventsLoading = true;
+    this.communityService.getCommunityEvents(this.communityId).subscribe({
+      next: (events) => { this.communityEvents = events; this.eventsLoading = false; this.eventsLoaded = true; },
+      error: () => { this.eventsLoading = false; }
+    });
+  }
+
+  openCreateEvent(): void {
+    this.editingEvent = null;
+    this.eventForm = { name: '', description: '', eventDate: '', location: '', distanceKm: 0, price: 0 };
+    this.eventError = '';
+    this.showEventForm = true;
+  }
+
+  openEditEvent(event: RunEvent): void {
+    this.editingEvent = event;
+    const d = new Date(event.eventDate);
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    this.eventForm = {
+      name: event.name,
+      description: event.description,
+      eventDate: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`,
+      location: event.location,
+      distanceKm: event.distanceKm,
+      price: event.price,
+      maxParticipants: event.maxParticipants
+    };
+    this.eventError = '';
+    this.showEventForm = true;
+  }
+
+  saveEvent(): void {
+    if (!this.eventForm.name.trim() || !this.eventForm.location.trim()) {
+      this.eventError = 'Name and location are required';
+      return;
+    }
+    this.savingEvent = true;
+    this.eventError = '';
+
+    if (this.editingEvent) {
+      this.communityService.updateCommunityEvent(this.communityId, this.editingEvent.id, this.eventForm).subscribe({
+        next: (updated) => {
+          const idx = this.communityEvents.findIndex(e => e.id === updated.id);
+          if (idx !== -1) this.communityEvents[idx] = updated;
+          this.showEventForm = false;
+          this.savingEvent = false;
+        },
+        error: (err) => { this.eventError = err.error?.message || 'Failed to update event'; this.savingEvent = false; }
+      });
+    } else {
+      this.communityService.createCommunityEvent(this.communityId, this.eventForm).subscribe({
+        next: (event) => {
+          this.communityEvents.unshift(event);
+          this.showEventForm = false;
+          this.savingEvent = false;
+        },
+        error: (err) => { this.eventError = err.error?.message || 'Failed to create event'; this.savingEvent = false; }
+      });
+    }
+  }
+
+  cancelEvent(event: RunEvent): void {
+    if (!confirm(`Cancel event "${event.name}"?`)) return;
+    this.communityService.cancelCommunityEvent(this.communityId, event.id).subscribe({
+      next: () => { event.isCancelled = true; },
+      error: (err) => alert(err.error?.message || 'Failed to cancel event')
+    });
+  }
+
+  formatEventDate(dateStr: string): string {
+    return new Date(dateStr).toLocaleDateString([], {
+      weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+  }
+
+  // ── Chat Tab Methods ─────────────────────────────────────────────────────────
+
+  loadChat(): void {
+    if (this.chatLoaded) return;
+    this.chatLoading = true;
+    this.chatService.getMessages(this.communityId).subscribe({
+      next: (msgs) => { this.chatMessages = msgs; this.chatLoading = false; this.chatLoaded = true; },
+      error: () => { this.chatLoading = false; }
+    });
+  }
+
+  sendChatMessage(): void {
+    if (!this.chatInput.trim() || this.sendingChat) return;
+    this.sendingChat = true;
+    this.chatService.sendMessage({ communityId: this.communityId, content: this.chatInput.trim() }).subscribe({
+      next: (msg) => { this.chatMessages.push(msg); this.chatInput = ''; this.sendingChat = false; },
+      error: () => { this.sendingChat = false; }
+    });
+  }
+
+  onChatKeyDown(e: KeyboardEvent): void {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.sendChatMessage(); }
+  }
+
+  isOwnMessage(msg: Message): boolean {
+    return msg.senderUsername === this.currentUsername;
   }
 
   getRoleBadgeClass(role: string): string {

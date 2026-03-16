@@ -11,6 +11,7 @@ public class MessageDto {
     private String senderUsername;
     private Long communityId;
     private Long eventId;
+    private Long roomId;
     private String content;
     private LocalDateTime sentAt;
 }

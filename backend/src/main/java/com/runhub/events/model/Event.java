@@ -51,6 +51,10 @@ public class Event {
     @JoinColumn(name = "community_id")
     private Community community;
 
+    @Column(name = "is_cancelled", nullable = false)
+    @Builder.Default
+    private Boolean isCancelled = false;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();

@@ -4,6 +4,7 @@ export interface Message {
   senderUsername: string;
   communityId?: number;
   eventId?: number;
+  roomId?: number;
   content: string;
   sentAt: string;
 }
@@ -11,5 +12,6 @@ export interface Message {
 export interface SendMessageRequest {
   communityId?: number;
   eventId?: number;
+  roomId?: number;
   content: string;
 }

@@ -12,5 +12,6 @@ public interface MessageMapper {
     @Mapping(source = "sender.displayUsername", target = "senderUsername")
     @Mapping(source = "community.id", target = "communityId")
     @Mapping(source = "event.id", target = "eventId")
+    @Mapping(source = "room.id", target = "roomId")
     MessageDto toDto(Message message);
 }

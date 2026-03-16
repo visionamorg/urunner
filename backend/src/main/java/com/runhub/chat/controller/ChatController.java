@@ -21,8 +21,9 @@ public class ChatController {
     @GetMapping
     public ResponseEntity<List<MessageDto>> getMessages(
             @RequestParam(required = false) Long communityId,
-            @RequestParam(required = false) Long eventId) {
-        return ResponseEntity.ok(chatService.getMessages(communityId, eventId));
+            @RequestParam(required = false) Long eventId,
+            @RequestParam(required = false) Long roomId) {
+        return ResponseEntity.ok(chatService.getMessages(communityId, eventId, roomId));
     }
 
     @PostMapping

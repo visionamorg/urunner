@@ -37,6 +37,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/oauth/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/rankings/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/events/**").permitAll()
+                .requestMatchers("/api/communities/*/rooms/**").authenticated()
                 .requestMatchers(HttpMethod.GET, "/api/communities/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/programs/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/badges/**").permitAll()

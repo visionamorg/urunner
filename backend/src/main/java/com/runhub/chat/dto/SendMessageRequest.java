@@ -6,5 +6,6 @@ import lombok.Data;
 public class SendMessageRequest {
     private Long communityId;
     private Long eventId;
+    private Long roomId;
     private String content;
 }

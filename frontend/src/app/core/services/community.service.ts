@@ -3,6 +3,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Community, CommunityMember, CreateCommunityRequest, InviteDto, DriveFolderDto } from '../models/community.model';
 import { Post, PageResponse } from '../models/post.model';
+import { RunEvent, CreateEventRequest, UpdateEventRequest } from '../models/event.model';
+import { RoomDto, CreateRoomRequest, RoomMemberDto } from '../models/room.model';
 
 @Injectable({ providedIn: 'root' })
 export class CommunityService {
@@ -102,5 +104,49 @@ export class CommunityService {
 
   declineInvite(token: string): Observable<void> {
     return this.http.post<void>(`/api/communities/invites/${token}/decline`, {});
+  }
+
+  // ── Community Events ───────────────────────────────────────────────────────
+
+  getCommunityEvents(communityId: number): Observable<RunEvent[]> {
+    return this.http.get<RunEvent[]>(`/api/communities/${communityId}/events`);
+  }
+
+  createCommunityEvent(communityId: number, data: CreateEventRequest): Observable<RunEvent> {
+    return this.http.post<RunEvent>(`/api/communities/${communityId}/events`, data);
+  }
+
+  updateCommunityEvent(communityId: number, eventId: number, data: UpdateEventRequest): Observable<RunEvent> {
+    return this.http.put<RunEvent>(`/api/communities/${communityId}/events/${eventId}`, data);
+  }
+
+  cancelCommunityEvent(communityId: number, eventId: number): Observable<void> {
+    return this.http.delete<void>(`/api/communities/${communityId}/events/${eventId}`);
+  }
+
+  // ── Rooms ──────────────────────────────────────────────────────────────────
+
+  getRooms(communityId: number): Observable<RoomDto[]> {
+    return this.http.get<RoomDto[]>(`/api/communities/${communityId}/rooms`);
+  }
+
+  createRoom(communityId: number, data: CreateRoomRequest): Observable<RoomDto> {
+    return this.http.post<RoomDto>(`/api/communities/${communityId}/rooms`, data);
+  }
+
+  deleteRoom(communityId: number, roomId: number): Observable<void> {
+    return this.http.delete<void>(`/api/communities/${communityId}/rooms/${roomId}`);
+  }
+
+  getRoomMembers(communityId: number, roomId: number): Observable<RoomMemberDto[]> {
+    return this.http.get<RoomMemberDto[]>(`/api/communities/${communityId}/rooms/${roomId}/members`);
+  }
+
+  addRoomMember(communityId: number, roomId: number, userId: number): Observable<void> {
+    return this.http.post<void>(`/api/communities/${communityId}/rooms/${roomId}/members`, { userId });
+  }
+
+  removeRoomMember(communityId: number, roomId: number, userId: number): Observable<void> {
+    return this.http.delete<void>(`/api/communities/${communityId}/rooms/${roomId}/members/${userId}`);
   }
 }
