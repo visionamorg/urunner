@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
-    Page<Post> findAllByOrderByCreatedAtDesc(Pageable pageable);
-    Page<Post> findByCommunityIdOrderByCreatedAtDesc(Long communityId, Pageable pageable);
-    Page<Post> findByCommunityIsNullOrderByCreatedAtDesc(Pageable pageable);
+    Page<Post> findAllByDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
+    Page<Post> findByCommunityIdAndDeletedFalseOrderByPinnedDescCreatedAtDesc(Long communityId, Pageable pageable);
+    Page<Post> findByCommunityIsNullAndDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
 }

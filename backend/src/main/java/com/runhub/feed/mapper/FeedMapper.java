@@ -46,6 +46,9 @@ public class FeedMapper {
             dto.setAuthorInitials(initials.toUpperCase());
         }
 
+        dto.setPinned(post.isPinned());
+        dto.setDeleted(post.isDeleted());
+
         // Parse photoUrls from JSON string
         dto.setPhotoUrls(parsePhotoUrls(post.getPhotoUrls()));
 

@@ -47,7 +47,7 @@ public class GoogleDriveService {
 
         String url = UriComponentsBuilder.fromHttpUrl(DRIVE_API_BASE)
                 .queryParam("q", query)
-                .queryParam("fields", "files(id,name,mimeType,thumbnailLink,webViewLink)")
+                .queryParam("fields", "files(id,name,mimeType,thumbnailLink)")
                 .queryParam("key", apiKey)
                 .queryParam("pageSize", 100)
                 .build()
@@ -60,12 +60,25 @@ public class GoogleDriveService {
             JsonNode root = objectMapper.readTree(response);
             JsonNode files = root.path("files");
 
+            log.info("Drive API raw response: {}", response);
+
             List<String> imageUrls = new ArrayList<>();
             if (files.isArray()) {
                 for (JsonNode file : files) {
                     String fileId = file.path("id").asText();
+                    String thumbnailLink = file.path("thumbnailLink").asText("");
+
                     if (!fileId.isBlank()) {
-                        imageUrls.add("https://drive.google.com/uc?export=view&id=" + fileId);
+                        // Use thumbnailLink if available (reliable CDN URL), upgrade to larger size
+                        if (!thumbnailLink.isBlank()) {
+                            // Replace thumbnail size (s220) with larger size for better quality
+                            String largeUrl = thumbnailLink.replaceAll("=s\\d+$", "=s1600")
+                                    .replaceAll("=s\\d+&", "=s1600&");
+                            imageUrls.add(largeUrl);
+                        } else {
+                            // Fallback to Drive thumbnail endpoint
+                            imageUrls.add("https://drive.google.com/thumbnail?id=" + fileId + "&sz=w1600");
+                        }
                     }
                 }
             }

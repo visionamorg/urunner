@@ -21,6 +21,8 @@ public class PostDto {
     private Integer commentsCount;
     private boolean liked;
     private boolean likedByCurrentUser;
+    private boolean pinned;
+    private boolean deleted;
     private LocalDateTime createdAt;
     private List<CommentDto> comments;
 }

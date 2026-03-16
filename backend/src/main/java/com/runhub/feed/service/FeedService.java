@@ -38,19 +38,19 @@ public class FeedService {
     public Page<PostDto> getPosts(int page, int size, String email) {
         User currentUser = userService.getUserEntityByEmail(email);
         Pageable pageable = PageRequest.of(page, size);
-        return postRepository.findAllByOrderByCreatedAtDesc(pageable)
+        return postRepository.findAllByDeletedFalseOrderByCreatedAtDesc(pageable)
                 .map(post -> toPostDtoWithLike(post, currentUser));
     }
 
     public Page<PostDto> getPosts(User user, int page) {
         Pageable pageable = PageRequest.of(page, 20);
-        return postRepository.findByCommunityIsNullOrderByCreatedAtDesc(pageable)
+        return postRepository.findByCommunityIsNullAndDeletedFalseOrderByCreatedAtDesc(pageable)
                 .map(post -> toPostDtoWithLike(post, user));
     }
 
     public Page<PostDto> getCommunityPosts(Long communityId, User user, int page) {
         Pageable pageable = PageRequest.of(page, 20);
-        return postRepository.findByCommunityIdOrderByCreatedAtDesc(communityId, pageable)
+        return postRepository.findByCommunityIdAndDeletedFalseOrderByPinnedDescCreatedAtDesc(communityId, pageable)
                 .map(post -> toPostDtoWithLike(post, user));
     }
 

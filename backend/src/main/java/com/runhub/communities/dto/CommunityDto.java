@@ -1,5 +1,6 @@
 package com.runhub.communities.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ public class CommunityDto {
     private LocalDateTime createdAt;
     private boolean joined;
     private String role;
+    @JsonProperty("isAdmin")
     private boolean isAdmin;
     private int pendingInviteCount;
 }
