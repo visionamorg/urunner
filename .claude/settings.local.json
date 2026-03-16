@@ -6,7 +6,8 @@
       "Bash(which java:*)",
       "Bash(npx ng:*)",
       "Bash(curl:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git add:*)"
     ]
   }
 }
