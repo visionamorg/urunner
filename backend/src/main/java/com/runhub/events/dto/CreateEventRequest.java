@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class CreateEventRequest {
@@ -15,4 +16,5 @@ public class CreateEventRequest {
     private BigDecimal price;
     private Integer maxParticipants;
     private Long communityId;
+    private List<String> photoUrls;
 }

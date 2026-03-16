@@ -68,7 +68,7 @@
     <!-- Tab Bar -->
     <div class="flex items-center gap-1 mb-6 bg-brand-surface border border-brand-border rounded-2xl p-1 overflow-x-auto">
       <button
-        (click)="activeTab = 'feed'"
+        (click)="switchTab('feed')"
         [class]="activeTab === 'feed'
           ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-orange-500/20 text-orange-400 font-semibold text-sm transition-all whitespace-nowrap'
           : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-slate-400 hover:text-slate-200 font-medium text-sm transition-all whitespace-nowrap'">
@@ -76,7 +76,7 @@
         Feed
       </button>
       <button
-        (click)="activeTab = 'events'; loadEvents()"
+        (click)="switchTab('events')"
         [class]="activeTab === 'events'
           ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-orange-500/20 text-orange-400 font-semibold text-sm transition-all whitespace-nowrap'
           : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-slate-400 hover:text-slate-200 font-medium text-sm transition-all whitespace-nowrap'">
@@ -84,7 +84,7 @@
         Events
       </button>
       <button
-        (click)="activeTab = 'calendar'"
+        (click)="switchTab('calendar')"
         [class]="activeTab === 'calendar'
           ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-orange-500/20 text-orange-400 font-semibold text-sm transition-all whitespace-nowrap'
           : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-slate-400 hover:text-slate-200 font-medium text-sm transition-all whitespace-nowrap'">
@@ -93,7 +93,7 @@
       </button>
       @if (community.joined) {
         <button
-          (click)="activeTab = 'chat'; loadChat()"
+          (click)="switchTab('chat')"
           [class]="activeTab === 'chat'
             ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-orange-500/20 text-orange-400 font-semibold text-sm transition-all whitespace-nowrap'
             : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-slate-400 hover:text-slate-200 font-medium text-sm transition-all whitespace-nowrap'">
@@ -101,7 +101,7 @@
           Chat
         </button>
         <button
-          (click)="activeTab = 'rooms'"
+          (click)="switchTab('rooms')"
           [class]="activeTab === 'rooms'
             ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-orange-500/20 text-orange-400 font-semibold text-sm transition-all whitespace-nowrap'
             : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-slate-400 hover:text-slate-200 font-medium text-sm transition-all whitespace-nowrap'">
@@ -110,7 +110,7 @@
         </button>
       }
       <button
-        (click)="activeTab = 'members'"
+        (click)="switchTab('members')"
         [class]="activeTab === 'members'
           ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-orange-500/20 text-orange-400 font-semibold text-sm transition-all whitespace-nowrap'
           : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-slate-400 hover:text-slate-200 font-medium text-sm transition-all whitespace-nowrap'">
@@ -119,7 +119,7 @@
       </button>
       @if (community.isAdmin) {
         <button
-          (click)="activeTab = 'invites'; loadInvites()"
+          (click)="switchTab('invites'); loadInvites()"
           [class]="activeTab === 'invites'
             ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-orange-500/20 text-orange-400 font-semibold text-sm transition-all whitespace-nowrap'
             : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-slate-400 hover:text-slate-200 font-medium text-sm transition-all whitespace-nowrap'">
@@ -132,7 +132,7 @@
           }
         </button>
         <button
-          (click)="activeTab = 'settings'"
+          (click)="switchTab('settings')"
           [class]="activeTab === 'settings'
             ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-orange-500/20 text-orange-400 font-semibold text-sm transition-all whitespace-nowrap'
             : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-slate-400 hover:text-slate-200 font-medium text-sm transition-all whitespace-nowrap'">
@@ -165,6 +165,33 @@
           </div>
         }
 
+        <!-- Upcoming Events Strip (feed tab) -->
+        @if (communityEvents.length > 0) {
+          <div class="space-y-2">
+            @for (event of communityEvents.slice(0, 3); track event.id) {
+              @if (!event.isCancelled) {
+                <div (click)="openEventDetail(event)"
+                  class="cursor-pointer rounded-xl overflow-hidden bg-gradient-to-r from-orange-600/30 to-red-600/20 border border-orange-500/30 hover:border-orange-500/60 transition-all p-4">
+                  <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex flex-col items-center justify-center flex-shrink-0">
+                      <span class="text-white text-xs font-bold leading-none">{{ event.eventDate | date:'MMM' }}</span>
+                      <span class="text-white text-lg font-black leading-none">{{ event.eventDate | date:'d' }}</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-white font-bold text-sm truncate">{{ event.name }}</p>
+                      <p class="text-orange-300 text-xs mt-0.5 truncate">
+                        <span class="material-icons text-xs align-middle">location_on</span> {{ event.location }}
+                        @if (event.distanceKm) { · {{ event.distanceKm }} km }
+                      </p>
+                    </div>
+                    <span class="material-icons text-orange-400 flex-shrink-0">chevron_right</span>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        }
+
         <!-- Feed Loading -->
         @if (feedLoading) {
           <div class="flex justify-center py-12">
@@ -189,8 +216,14 @@
                   {{ post.authorInitials || getInitials(post.authorUsername) }}
                 </div>
                 <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-2 flex-wrap">
                     <p class="text-white font-semibold text-sm">{{ post.authorUsername }}</p>
+                    @if (getMemberRole(post.authorUsername); as role) {
+                      <span class="text-xs font-semibold px-1.5 py-0.5 rounded-full border"
+                        [class]="role === 'Admin' ? 'bg-orange-500/20 text-orange-400 border-orange-500/30' : 'bg-blue-500/20 text-blue-400 border-blue-500/30'">
+                        {{ role }}
+                      </span>
+                    }
                     @if (post.pinned) {
                       <span class="flex items-center gap-1 text-orange-400 text-xs">
                         <span class="material-icons text-xs">push_pin</span>
@@ -409,6 +442,29 @@
               <input type="number" [(ngModel)]="eventForm.maxParticipants" min="1" placeholder="Unlimited" class="input-field" />
             </div>
 
+            <!-- Photos Section -->
+            <div>
+              <label class="label">Photos <span class="text-slate-500 font-normal">(optional)</span></label>
+              <div class="flex gap-2">
+                <input type="url" [(ngModel)]="eventPhotoInput" placeholder="https://example.com/photo.jpg" class="input-field flex-1 !text-sm" />
+                <button type="button" (click)="addEventPhoto()"
+                  class="btn-secondary !py-2 !px-3 !text-sm whitespace-nowrap">Add Photo</button>
+              </div>
+              @if (eventForm.photoUrls && eventForm.photoUrls.length > 0) {
+                <div class="flex gap-2 flex-wrap mt-2">
+                  @for (url of eventForm.photoUrls; track url; let i = $index) {
+                    <div class="relative group">
+                      <img [src]="url" alt="Event photo" class="w-16 h-16 object-cover rounded-lg border border-brand-border" />
+                      <button (click)="removeEventPhoto(i)"
+                        class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span class="material-icons text-xs">close</span>
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
             <div class="flex gap-3 pt-2">
               <button (click)="saveEvent()" [disabled]="savingEvent"
                 class="btn-primary disabled:opacity-40 inline-flex items-center gap-2">
@@ -444,7 +500,7 @@
         } @else {
           <div class="space-y-4">
             @for (event of communityEvents; track event.id) {
-              <div class="card" [class]="event.isCancelled ? 'opacity-60' : ''">
+              <div (click)="openEventDetail(event)" class="card cursor-pointer hover:border-orange-500/30 transition-all" [class]="event.isCancelled ? 'opacity-60' : ''">
                 <div class="flex items-start gap-4">
                   <div class="w-14 h-14 rounded-2xl flex flex-col items-center justify-center flex-shrink-0 text-center"
                     [class]="event.isCancelled ? 'bg-red-500/20' : 'bg-orange-500/20'">
@@ -495,12 +551,12 @@
                   </div>
                   @if (community.isAdmin && !event.isCancelled) {
                     <div class="flex items-center gap-1 flex-shrink-0">
-                      <button (click)="openEditEvent(event)"
+                      <button (click)="openEditEvent(event); $event.stopPropagation()"
                         class="p-1.5 rounded-lg text-slate-500 hover:text-blue-400 hover:bg-blue-500/10 transition-colors"
                         title="Edit event">
                         <span class="material-icons text-sm">edit</span>
                       </button>
-                      <button (click)="cancelEvent(event)"
+                      <button (click)="cancelEvent(event); $event.stopPropagation()"
                         class="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                         title="Cancel event">
                         <span class="material-icons text-sm">event_busy</span>
@@ -550,11 +606,20 @@
                   @if (!isOwnMessage(msg)) {
                     <p class="text-slate-500 text-xs px-1">{{ msg.senderUsername }}</p>
                   }
-                  <div class="px-3 py-2 rounded-2xl text-sm"
+                  <div class="rounded-2xl text-sm overflow-hidden"
                     [class]="isOwnMessage(msg)
                       ? 'bg-gradient-to-br from-orange-500 to-red-500 text-white rounded-br-sm'
                       : 'bg-brand-surface border border-brand-border text-slate-200 rounded-bl-sm'">
-                    {{ msg.content }}
+                    @if (msg.content) {
+                      <div class="px-3 py-2">{{ msg.content }}</div>
+                    }
+                    @if (msg.mediaType === 'image' || msg.mediaType === 'gif') {
+                      <img [src]="msg.mediaUrl" alt="Media" class="max-w-full rounded-xl" style="max-height: 250px; object-fit: contain;" />
+                    } @else if (msg.mediaType === 'video') {
+                      <video [src]="msg.mediaUrl" controls class="max-w-full rounded-xl" style="max-height: 250px;"></video>
+                    } @else if (msg.mediaType === 'audio') {
+                      <div class="px-3 py-2"><audio [src]="msg.mediaUrl" controls class="w-full"></audio></div>
+                    }
                   </div>
                   <p class="text-slate-600 text-xs px-1" [class]="isOwnMessage(msg) ? 'text-right' : ''">
                     {{ timeAgo(msg.sentAt) }}
@@ -565,8 +630,25 @@
           }
         </div>
         <!-- Input -->
-        <div class="p-4 border-t border-brand-border">
+        <div class="p-4 border-t border-brand-border space-y-2">
+          @if (showChatMediaInput) {
+            <div class="flex gap-2 items-center">
+              <input type="url" [(ngModel)]="chatMediaUrl" placeholder="https://example.com/image.jpg" class="input-field flex-1 !text-sm !py-2" />
+              <select [(ngModel)]="chatMediaType"
+                class="bg-brand-surface border border-brand-border text-slate-300 text-sm rounded-xl px-2 py-2 focus:outline-none focus:border-orange-500">
+                <option value="image">Image</option>
+                <option value="gif">GIF</option>
+                <option value="video">Video</option>
+                <option value="audio">Audio</option>
+              </select>
+            </div>
+          }
           <div class="flex items-center gap-2">
+            <button (click)="showChatMediaInput = !showChatMediaInput"
+              class="w-11 h-11 rounded-xl flex items-center justify-center transition-colors flex-shrink-0"
+              [class]="showChatMediaInput ? 'bg-orange-500/20 text-orange-400' : 'bg-brand-surface border border-brand-border text-slate-400 hover:text-white'">
+              <span class="material-icons text-xl">attach_file</span>
+            </button>
             <input
               type="text"
               [(ngModel)]="chatInput"
@@ -575,7 +657,7 @@
               class="input-field flex-1"
             />
             <button (click)="sendChatMessage()"
-              [disabled]="!chatInput.trim() || sendingChat"
+              [disabled]="(!chatInput.trim() && !chatMediaUrl.trim()) || sendingChat"
               class="w-11 h-11 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center disabled:opacity-40 hover:from-orange-400 hover:to-red-400 transition-all flex-shrink-0">
               <span class="material-icons text-white">send</span>
             </button>
@@ -769,6 +851,14 @@
                 Open your folder in Google Drive and copy the ID from the URL.
               </p>
             </div>
+            <div>
+              <label class="label">Cover Image URL <span class="text-slate-500 font-normal">(optional)</span></label>
+              <input type="url" [(ngModel)]="settingsCoverUrl" placeholder="https://example.com/cover.jpg" class="input-field" />
+            </div>
+            <div>
+              <label class="label">Community Icon URL <span class="text-slate-500 font-normal">(optional)</span></label>
+              <input type="url" [(ngModel)]="settingsImageUrl" placeholder="https://example.com/icon.png" class="input-field" />
+            </div>
 
             @if (settingsSuccess) {
               <div class="bg-green-500/10 border border-green-500/30 text-green-400 text-sm px-4 py-3 rounded-xl">
@@ -824,49 +914,218 @@
 
   <!-- ==================== LIGHTBOX ==================== -->
   @if (lightboxOpen) {
-    <div class="fixed inset-0 z-50 bg-black flex flex-col"
+    <div class="fixed inset-0 z-50 bg-black/95 flex flex-col"
          (touchstart)="onTouchStart($event)"
          (touchend)="onTouchEnd($event)">
 
-      <!-- Top bar -->
-      <div class="flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/80 to-transparent absolute top-0 left-0 right-0 z-10">
-        <span class="text-white/70 text-sm font-medium">{{ lightboxIndex + 1 }} / {{ lightboxPhotos.length }}</span>
+      <!-- Top bar: close left, counter right -->
+      <div class="flex items-center justify-between px-4 py-3 absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/70 to-transparent">
         <button (click)="closeLightbox()" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
           <span class="material-icons text-white">close</span>
         </button>
+        <span class="text-white/70 text-sm font-medium">{{ lightboxIndex + 1 }} / {{ lightboxPhotos.length }}</span>
       </div>
 
-      <!-- Image -->
-      <div class="flex-1 flex items-center justify-center p-4">
+      <!-- Main Image -->
+      <div class="flex-1 flex items-center justify-center p-4 pt-16 pb-4 relative">
         <img [src]="lightboxPhotos[lightboxIndex]"
              alt="Photo"
-             class="max-w-full max-h-full object-contain select-none"
+             class="max-w-full max-h-full object-contain select-none transition-opacity duration-150"
+             [class]="lightboxTransitioning ? 'opacity-0' : 'opacity-100'"
              draggable="false" />
+
+        <!-- Navigation arrows -->
+        @if (lightboxPhotos.length > 1) {
+          <button (click)="prevPhoto()"
+            class="absolute left-2 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center transition-colors">
+            <span class="material-icons text-white text-3xl">chevron_left</span>
+          </button>
+          <button (click)="nextPhoto()"
+            class="absolute right-2 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center transition-colors">
+            <span class="material-icons text-white text-3xl">chevron_right</span>
+          </button>
+        }
       </div>
 
-      <!-- Navigation arrows -->
+      <!-- Bottom Thumbnail Strip -->
       @if (lightboxPhotos.length > 1) {
-        <button (click)="prevPhoto()"
-          class="absolute left-2 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center transition-colors">
-          <span class="material-icons text-white text-3xl">chevron_left</span>
-        </button>
-        <button (click)="nextPhoto()"
-          class="absolute right-2 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center transition-colors">
-          <span class="material-icons text-white text-3xl">chevron_right</span>
-        </button>
+        <div class="bg-gradient-to-t from-black/80 to-transparent px-4 pb-4 pt-2">
+          <div class="flex gap-2 overflow-x-auto py-2">
+            @for (p of lightboxPhotos; track p; let i = $index) {
+              <button (click)="goToPhoto(i)"
+                class="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden transition-all"
+                [class]="i === lightboxIndex ? 'ring-2 ring-orange-400 ring-offset-1 ring-offset-black opacity-100' : 'opacity-50 hover:opacity-75'">
+                <img [src]="p" alt="Thumb" class="w-full h-full object-cover" />
+              </button>
+            }
+          </div>
+        </div>
       }
+    </div>
+  }
 
-      <!-- Dot indicators (max 10) -->
-      @if (lightboxPhotos.length > 1 && lightboxPhotos.length <= 20) {
-        <div class="absolute bottom-6 left-0 right-0 flex justify-center gap-1.5">
-          @for (p of lightboxPhotos; track p; let i = $index) {
-            <button (click)="lightboxIndex = i"
-              class="rounded-full transition-all"
-              [class]="i === lightboxIndex ? 'w-4 h-2 bg-white' : 'w-2 h-2 bg-white/40'">
+  <!-- ==================== EVENT DETAIL MODAL ==================== -->
+  @if (selectedEvent) {
+    <!-- Backdrop -->
+    <div class="fixed inset-0 bg-black/70 z-40" (click)="closeEventDetail()"></div>
+
+    <!-- Slide-in panel -->
+    <div class="fixed inset-y-0 right-0 z-50 w-full max-w-lg flex flex-col bg-brand-card border-l border-brand-border shadow-2xl overflow-hidden animate-slide-up">
+
+      <!-- Header Banner -->
+      <div class="relative h-36 bg-gradient-to-br from-orange-600/60 to-red-600/40 flex-shrink-0">
+        <div class="absolute inset-0 bg-gradient-to-t from-brand-card via-transparent to-transparent"></div>
+        <div class="absolute top-4 right-4">
+          <button (click)="closeEventDetail()" class="w-9 h-9 rounded-full bg-black/30 hover:bg-black/50 flex items-center justify-center transition-colors">
+            <span class="material-icons text-white">close</span>
+          </button>
+        </div>
+        <div class="absolute bottom-4 left-5 right-5">
+          <h2 class="text-white font-black text-xl leading-tight">{{ selectedEvent.name }}</h2>
+        </div>
+      </div>
+
+      <!-- Scrollable Content -->
+      <div class="flex-1 overflow-y-auto">
+
+        <!-- Event Info -->
+        <div class="p-5 space-y-4">
+
+          <!-- Date, Location -->
+          <div class="flex flex-col gap-2 text-sm">
+            <div class="flex items-center gap-2 text-slate-300">
+              <span class="material-icons text-orange-400 text-base">schedule</span>
+              {{ formatEventDate(selectedEvent.eventDate) }}
+            </div>
+            <div class="flex items-center gap-2 text-slate-300">
+              <span class="material-icons text-orange-400 text-base">location_on</span>
+              {{ selectedEvent.location }}
+            </div>
+          </div>
+
+          <!-- Stats Row -->
+          <div class="grid grid-cols-3 gap-3">
+            @if (selectedEvent.distanceKm) {
+              <div class="bg-brand-surface rounded-xl p-3 text-center border border-brand-border">
+                <span class="material-icons text-orange-400 text-lg">directions_run</span>
+                <p class="text-white font-bold text-sm mt-1">{{ selectedEvent.distanceKm }} km</p>
+                <p class="text-slate-500 text-xs">Distance</p>
+              </div>
+            }
+            <div class="bg-brand-surface rounded-xl p-3 text-center border border-brand-border">
+              <span class="material-icons text-green-400 text-lg">payments</span>
+              <p class="text-white font-bold text-sm mt-1">{{ selectedEvent.price > 0 ? (selectedEvent.price | currency) : 'Free' }}</p>
+              <p class="text-slate-500 text-xs">Entry</p>
+            </div>
+            <div class="bg-brand-surface rounded-xl p-3 text-center border border-brand-border">
+              <span class="material-icons text-blue-400 text-lg">group</span>
+              <p class="text-white font-bold text-sm mt-1">
+                {{ selectedEvent.participantCount }}
+                @if (selectedEvent.maxParticipants) { / {{ selectedEvent.maxParticipants }} }
+              </p>
+              <p class="text-slate-500 text-xs">Registered</p>
+            </div>
+          </div>
+
+          <!-- Description -->
+          @if (selectedEvent.description) {
+            <p class="text-slate-300 text-sm leading-relaxed">{{ selectedEvent.description }}</p>
+          }
+
+          <!-- Register button -->
+          @if (!selectedEvent.isCancelled) {
+            <button (click)="registerForEvent(selectedEvent)"
+              [disabled]="!!eventRegistered[selectedEvent.id]"
+              class="w-full btn-primary disabled:opacity-60">
+              {{ eventRegistered[selectedEvent.id] ? 'Registered ✓' : 'Register for Event' }}
             </button>
           }
         </div>
-      }
+
+        <!-- Participants -->
+        @if (eventParticipants.length > 0) {
+          <div class="px-5 pb-4">
+            <h3 class="text-white font-bold mb-3 flex items-center gap-2">
+              <span class="material-icons text-orange-400 text-base">people</span>
+              Participants ({{ eventParticipants.length }})
+            </h3>
+            <div class="flex flex-wrap gap-2">
+              @for (p of eventParticipants; track p.userId) {
+                <div class="flex items-center gap-1.5 bg-brand-surface border border-brand-border rounded-full px-3 py-1.5">
+                  <div class="w-5 h-5 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white text-xs font-bold">
+                    {{ (p.username || '?').substring(0, 1).toUpperCase() }}
+                  </div>
+                  <span class="text-slate-300 text-xs">{{ p.username }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Event Photos -->
+        @if (selectedEvent.photoUrls && selectedEvent.photoUrls.length > 0) {
+          <div class="px-5 pb-4">
+            <h3 class="text-white font-bold mb-3 flex items-center gap-2">
+              <span class="material-icons text-orange-400 text-base">photo_library</span>
+              Photos
+            </h3>
+            <div class="grid grid-cols-3 gap-2">
+              @for (url of selectedEvent.photoUrls; track url; let i = $index) {
+                <img (click)="openLightbox(selectedEvent.photoUrls!, i)"
+                  [src]="url" alt="Event photo"
+                  class="w-full aspect-square object-cover rounded-xl cursor-pointer hover:opacity-90 transition-opacity" />
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Event Discussion -->
+        <div class="px-5 pb-5">
+          <h3 class="text-white font-bold mb-3 flex items-center gap-2">
+            <span class="material-icons text-orange-400 text-base">chat_bubble</span>
+            Discussion
+          </h3>
+
+          @if (loadingEventDetail) {
+            <div class="flex justify-center py-6">
+              <div class="animate-spin rounded-full h-8 w-8 border-2 border-orange-500 border-t-transparent"></div>
+            </div>
+          } @else if (eventMessages.length === 0) {
+            <p class="text-slate-600 text-sm text-center py-6">No messages yet. Be the first!</p>
+          } @else {
+            <div class="space-y-3 mb-4 max-h-60 overflow-y-auto">
+              @for (msg of eventMessages; track msg.id) {
+                <div class="flex items-start gap-2">
+                  <div class="w-7 h-7 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                    {{ msg.senderUsername.substring(0, 1).toUpperCase() }}
+                  </div>
+                  <div class="flex-1 bg-brand-surface border border-brand-border rounded-xl px-3 py-2">
+                    <div class="flex items-center gap-2 mb-0.5">
+                      <span class="text-white text-xs font-semibold">{{ msg.senderUsername }}</span>
+                      <span class="text-slate-600 text-xs">{{ timeAgo(msg.sentAt) }}</span>
+                    </div>
+                    <p class="text-slate-300 text-sm">{{ msg.content }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Chat Input -->
+          <div class="flex items-center gap-2 border-t border-brand-border pt-3">
+            <input type="text" [(ngModel)]="eventChatInput"
+              (keydown)="onEventChatKeyDown($event)"
+              placeholder="Write a message..."
+              class="input-field flex-1 !py-2 !text-sm" />
+            <button (click)="sendEventMessage()"
+              [disabled]="!eventChatInput.trim() || sendingEventChat"
+              class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center disabled:opacity-40 flex-shrink-0">
+              <span class="material-icons text-white text-sm">send</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
     </div>
   }
 

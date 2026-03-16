@@ -55,6 +55,9 @@ public class Event {
     @Builder.Default
     private Boolean isCancelled = false;
 
+    @Column(name = "photo_urls", columnDefinition = "TEXT")
+    private String photoUrls;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();

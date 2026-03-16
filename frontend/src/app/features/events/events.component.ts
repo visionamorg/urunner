@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { EventService } from '../../core/services/event.service';
 import { RunEvent } from '../../core/models/event.model';
@@ -7,7 +8,7 @@ import { RunEvent } from '../../core/models/event.model';
 @Component({
   selector: 'app-events',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './events.component.html',
   styleUrl: './events.component.scss'
 })
@@ -17,7 +18,8 @@ export class EventsComponent implements OnInit {
 
   constructor(
     private eventService: EventService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -45,5 +47,9 @@ export class EventsComponent implements OnInit {
 
   isUpcoming(eventDate: string): boolean {
     return new Date(eventDate) > new Date();
+  }
+
+  openDetail(id: number): void {
+    this.router.navigate(['/events', id]);
   }
 }

@@ -41,6 +41,14 @@
           <input type="text" formControlName="driveFolderId" placeholder="e.g. 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs" class="input-field">
           <p class="text-slate-500 text-xs mt-1">Paste your public Google Drive folder ID to sync photos</p>
         </div>
+        <div>
+          <label class="label">Community Icon URL <span class="text-slate-500 font-normal">(optional)</span></label>
+          <input type="url" formControlName="imageUrl" placeholder="https://example.com/icon.png" class="input-field">
+        </div>
+        <div>
+          <label class="label">Cover Image URL <span class="text-slate-500 font-normal">(optional)</span></label>
+          <input type="url" formControlName="coverUrl" placeholder="https://example.com/cover.jpg" class="input-field">
+        </div>
         <div class="flex items-center gap-4 pt-2">
           <button type="submit" [disabled]="form.invalid" class="btn-primary">Create Community</button>
           <button type="button" (click)="showForm = false" class="btn-secondary">Cancel</button>

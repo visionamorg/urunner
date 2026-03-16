@@ -18,4 +18,15 @@ public class UserDto {
     private Role role;
     private AuthProvider authProvider;
     private LocalDateTime createdAt;
+    private String location;
+    private String runningCategory;
+    private String passion;
+    private String gender;
+    private Integer yearsRunning;
+    private Double weeklyGoalKm;
+    private String pb5k;
+    private String pb10k;
+    private String pbHalfMarathon;
+    private String pbMarathon;
+    private String instagramHandle;
 }

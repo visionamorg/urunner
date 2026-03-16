@@ -29,6 +29,12 @@ export class CommunityCalendarComponent implements OnInit {
 
   currentYear = new Date().getFullYear();
   currentMonth = new Date().getMonth();
+  selectedDate: Date = new Date();
+
+  viewMode: 'month' | 'week' | 'day' | 'agenda' = 'month';
+  weekDays: { date: Date; events: RunEvent[] }[] = [];
+  dayEvents: RunEvent[] = [];
+  agendaEvents: RunEvent[] = [];
 
   showCreateForm = false;
   creating = false;
@@ -59,10 +65,54 @@ export class CommunityCalendarComponent implements OnInit {
     this.communityService.getCommunityEvents(this.communityId).subscribe({
       next: (events) => {
         this.events = events;
-        this.buildCalendar();
+        this.buildCurrentView();
       },
-      error: () => { this.buildCalendar(); }
+      error: () => { this.buildCurrentView(); }
     });
+  }
+
+  setView(mode: 'month' | 'week' | 'day' | 'agenda'): void {
+    this.viewMode = mode;
+    this.buildCurrentView();
+  }
+
+  buildCurrentView(): void {
+    if (this.viewMode === 'month') this.buildCalendar();
+    else if (this.viewMode === 'week') this.buildWeekView();
+    else if (this.viewMode === 'day') this.buildDayView();
+    else this.buildAgendaView();
+  }
+
+  buildWeekView(): void {
+    const startOfWeek = new Date(this.selectedDate);
+    const day = startOfWeek.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+    startOfWeek.setDate(startOfWeek.getDate() + diff);
+
+    this.weekDays = [];
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(startOfWeek);
+      date.setDate(startOfWeek.getDate() + i);
+      const dayEventsForDate = this.events.filter(e => {
+        const ed = new Date(e.eventDate);
+        return ed.toDateString() === date.toDateString();
+      });
+      this.weekDays.push({ date, events: dayEventsForDate });
+    }
+  }
+
+  buildDayView(): void {
+    this.dayEvents = this.events.filter(e => {
+      const ed = new Date(e.eventDate);
+      return ed.toDateString() === this.selectedDate.toDateString();
+    });
+  }
+
+  buildAgendaView(): void {
+    const now = new Date();
+    this.agendaEvents = [...this.events]
+      .filter(e => new Date(e.eventDate) >= now)
+      .sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
   }
 
   buildCalendar(): void {
@@ -103,29 +153,54 @@ export class CommunityCalendarComponent implements OnInit {
   }
 
   prevMonth(): void {
-    if (this.currentMonth === 0) {
-      this.currentMonth = 11;
-      this.currentYear--;
+    if (this.viewMode === 'week') {
+      this.selectedDate = new Date(this.selectedDate);
+      this.selectedDate.setDate(this.selectedDate.getDate() - 7);
+      this.buildWeekView();
+    } else if (this.viewMode === 'day') {
+      this.selectedDate = new Date(this.selectedDate);
+      this.selectedDate.setDate(this.selectedDate.getDate() - 1);
+      this.buildDayView();
     } else {
-      this.currentMonth--;
+      if (this.currentMonth === 0) {
+        this.currentMonth = 11;
+        this.currentYear--;
+      } else {
+        this.currentMonth--;
+      }
+      this.selectedDate = new Date(this.currentYear, this.currentMonth, 1);
+      this.selectedDay = null;
+      if (this.viewMode === 'agenda') this.buildAgendaView();
+      else this.buildCalendar();
     }
-    this.selectedDay = null;
-    this.buildCalendar();
   }
 
   nextMonth(): void {
-    if (this.currentMonth === 11) {
-      this.currentMonth = 0;
-      this.currentYear++;
+    if (this.viewMode === 'week') {
+      this.selectedDate = new Date(this.selectedDate);
+      this.selectedDate.setDate(this.selectedDate.getDate() + 7);
+      this.buildWeekView();
+    } else if (this.viewMode === 'day') {
+      this.selectedDate = new Date(this.selectedDate);
+      this.selectedDate.setDate(this.selectedDate.getDate() + 1);
+      this.buildDayView();
     } else {
-      this.currentMonth++;
+      if (this.currentMonth === 11) {
+        this.currentMonth = 0;
+        this.currentYear++;
+      } else {
+        this.currentMonth++;
+      }
+      this.selectedDate = new Date(this.currentYear, this.currentMonth, 1);
+      this.selectedDay = null;
+      if (this.viewMode === 'agenda') this.buildAgendaView();
+      else this.buildCalendar();
     }
-    this.selectedDay = null;
-    this.buildCalendar();
   }
 
   selectDay(day: CalendarDay): void {
     this.selectedDay = day;
+    this.selectedDate = day.date;
     this.showCreateForm = false;
     this.createError = '';
   }
@@ -182,5 +257,25 @@ export class CommunityCalendarComponent implements OnInit {
 
   formatDate(date: Date): string {
     return date.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+  }
+
+  getViewLabel(): string {
+    if (this.viewMode === 'month') return `${this.MONTH_NAMES[this.currentMonth]} ${this.currentYear}`;
+    if (this.viewMode === 'week') {
+      if (this.weekDays.length === 0) return '';
+      const start = this.weekDays[0].date;
+      const end = this.weekDays[6].date;
+      return `${start.toLocaleDateString([], { month: 'short', day: 'numeric' })} – ${end.toLocaleDateString([], { month: 'short', day: 'numeric' })}`;
+    }
+    if (this.viewMode === 'day') return this.selectedDate.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    return 'Upcoming Events';
+  }
+
+  isSelectedDate(date: Date): boolean {
+    return date.toDateString() === this.selectedDate.toDateString();
+  }
+
+  isToday(date: Date): boolean {
+    return date.toDateString() === new Date().toDateString();
   }
 }

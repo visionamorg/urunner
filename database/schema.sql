@@ -37,6 +37,17 @@ CREATE TABLE users (
     provider_refresh_token VARCHAR(1000),
     provider_token_secret VARCHAR(1000),
     provider_token_expires_at BIGINT,
+    location VARCHAR(200),
+    running_category VARCHAR(50),
+    passion TEXT,
+    gender VARCHAR(20),
+    years_running INTEGER,
+    weekly_goal_km DECIMAL(8,2),
+    pb_5k VARCHAR(20),
+    pb_10k VARCHAR(20),
+    pb_half_marathon VARCHAR(20),
+    pb_marathon VARCHAR(20),
+    instagram_handle VARCHAR(100),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );

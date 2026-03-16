@@ -13,5 +13,7 @@ public class MessageDto {
     private Long eventId;
     private Long roomId;
     private String content;
+    private String mediaUrl;
+    private String mediaType;
     private LocalDateTime sentAt;
 }

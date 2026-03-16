@@ -1,10 +1,4 @@
-@if (loading) {
-  <div class="flex flex-col items-center justify-center py-24 gap-4">
-    <div class="animate-spin rounded-full h-12 w-12 border-2 border-orange-500 border-t-transparent"></div>
-    <p class="text-slate-500">Loading your dashboard…</p>
-  </div>
-} @else {
-  <div class="max-w-7xl mx-auto space-y-8 animate-fade-in">
+<div class="max-w-7xl mx-auto space-y-6 animate-fade-in">
 
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -18,16 +12,14 @@
       </a>
     </div>
 
-    <!-- Stats Grid -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Stats Grid (6 cards) -->
+    <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
       <!-- Total Distance -->
-      <div class="card relative overflow-hidden group hover:border-orange-500/30 transition-colors">
+      <div class="card relative overflow-hidden hover:border-orange-500/30 transition-colors">
         <div class="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent pointer-events-none"></div>
         <div class="relative">
-          <div class="flex items-center justify-between mb-3">
-            <div class="w-10 h-10 rounded-xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center">
-              <span class="material-icons text-orange-400 text-xl">route</span>
-            </div>
+          <div class="w-9 h-9 rounded-xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center mb-3">
+            <span class="material-icons text-orange-400 text-base">route</span>
           </div>
           <div class="stat-value">{{ stats?.totalDistanceKm?.toFixed(1) || '0.0' }}</div>
           <p class="text-slate-400 text-xs font-medium uppercase tracking-wider mt-1">Total KM</p>
@@ -35,13 +27,11 @@
       </div>
 
       <!-- Weekly KM -->
-      <div class="card relative overflow-hidden group hover:border-orange-500/30 transition-colors">
+      <div class="card relative overflow-hidden hover:border-orange-500/30 transition-colors">
         <div class="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent pointer-events-none"></div>
         <div class="relative">
-          <div class="flex items-center justify-between mb-3">
-            <div class="w-10 h-10 rounded-xl bg-red-500/20 border border-red-500/30 flex items-center justify-center">
-              <span class="material-icons text-red-400 text-xl">calendar_view_week</span>
-            </div>
+          <div class="w-9 h-9 rounded-xl bg-red-500/20 border border-red-500/30 flex items-center justify-center mb-3">
+            <span class="material-icons text-red-400 text-base">calendar_view_week</span>
           </div>
           <div class="stat-value">{{ stats?.weeklyDistanceKm?.toFixed(1) || '0.0' }}</div>
           <p class="text-slate-400 text-xs font-medium uppercase tracking-wider mt-1">This Week KM</p>
@@ -49,13 +39,11 @@
       </div>
 
       <!-- Monthly KM -->
-      <div class="card relative overflow-hidden group hover:border-orange-500/30 transition-colors">
+      <div class="card relative overflow-hidden hover:border-orange-500/30 transition-colors">
         <div class="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent pointer-events-none"></div>
         <div class="relative">
-          <div class="flex items-center justify-between mb-3">
-            <div class="w-10 h-10 rounded-xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center">
-              <span class="material-icons text-orange-400 text-xl">calendar_month</span>
-            </div>
+          <div class="w-9 h-9 rounded-xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center mb-3">
+            <span class="material-icons text-orange-400 text-base">calendar_month</span>
           </div>
           <div class="stat-value">{{ stats?.monthlyDistanceKm?.toFixed(1) || '0.0' }}</div>
           <p class="text-slate-400 text-xs font-medium uppercase tracking-wider mt-1">This Month KM</p>
@@ -63,24 +51,117 @@
       </div>
 
       <!-- Total Runs -->
-      <div class="card relative overflow-hidden group hover:border-orange-500/30 transition-colors">
+      <div class="card relative overflow-hidden hover:border-orange-500/30 transition-colors">
         <div class="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent pointer-events-none"></div>
         <div class="relative">
-          <div class="flex items-center justify-between mb-3">
-            <div class="w-10 h-10 rounded-xl bg-red-500/20 border border-red-500/30 flex items-center justify-center">
-              <span class="material-icons text-red-400 text-xl">directions_run</span>
-            </div>
+          <div class="w-9 h-9 rounded-xl bg-red-500/20 border border-red-500/30 flex items-center justify-center mb-3">
+            <span class="material-icons text-red-400 text-base">directions_run</span>
           </div>
           <div class="stat-value">{{ stats?.totalRuns || 0 }}</div>
           <p class="text-slate-400 text-xs font-medium uppercase tracking-wider mt-1">Total Runs</p>
         </div>
       </div>
+
+      <!-- Avg Pace -->
+      <div class="card relative overflow-hidden hover:border-orange-500/30 transition-colors">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent pointer-events-none"></div>
+        <div class="relative">
+          <div class="w-9 h-9 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center mb-3">
+            <span class="material-icons text-blue-400 text-base">speed</span>
+          </div>
+          <div class="stat-value">{{ formatPace(stats?.avgPaceMinPerKm || 0).split(' ')[0] }}</div>
+          <p class="text-slate-400 text-xs font-medium uppercase tracking-wider mt-1">Avg Pace /km</p>
+        </div>
+      </div>
+
+      <!-- Total Hours -->
+      <div class="card relative overflow-hidden hover:border-orange-500/30 transition-colors">
+        <div class="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent pointer-events-none"></div>
+        <div class="relative">
+          <div class="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center mb-3">
+            <span class="material-icons text-purple-400 text-base">timer</span>
+          </div>
+          <div class="stat-value">{{ getTotalHours() }}</div>
+          <p class="text-slate-400 text-xs font-medium uppercase tracking-wider mt-1">Total Time</p>
+        </div>
+      </div>
     </div>
 
-    <!-- Two Column Grid -->
+    <!-- Row 1: This Week + Today's Schedule -->
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
-      <!-- Recent Activities - takes 2 cols -->
+      <!-- This Week (2/3) -->
+      <div class="xl:col-span-2 card">
+        <h2 class="text-white font-bold mb-4 flex items-center gap-2">
+          <span class="material-icons text-orange-400">calendar_view_week</span>
+          This Week
+        </h2>
+        <div class="grid grid-cols-7 gap-2">
+          @for (day of thisWeekDays; track day.date.toISOString()) {
+            <div class="flex flex-col items-center gap-1.5">
+              <span class="text-xs text-slate-500 font-medium">{{ day.date | date:'EEE' }}</span>
+              <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold"
+                [class]="day.isToday ? 'bg-orange-500 text-white' : day.hasActivity ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' : 'bg-brand-surface text-slate-600 border border-brand-border'">
+                {{ day.date | date:'d' }}
+              </div>
+              @if (day.hasActivity) {
+                <div class="w-1.5 h-1.5 rounded-full bg-orange-400"></div>
+              } @else {
+                <div class="w-1.5 h-1.5"></div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Today's Schedule (1/3) -->
+      <div class="card">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="material-icons text-orange-400">today</span>
+          <h2 class="text-white font-bold">Today's Schedule</h2>
+        </div>
+
+        @if (todayActivities.length === 0 && upcomingEvents.length === 0) {
+          <div class="text-center py-6">
+            <span class="material-icons text-slate-600 text-3xl">wb_sunny</span>
+            <p class="text-slate-400 mt-2 text-sm">Nothing scheduled today. Rest day?</p>
+            <a routerLink="/activities" class="text-orange-400 text-sm hover:underline mt-1 inline-block">Log a run</a>
+          </div>
+        } @else {
+          <div class="space-y-2">
+            @for (a of todayActivities; track a.id) {
+              <div class="flex items-center gap-3 p-2 bg-brand-surface rounded-xl border border-brand-border">
+                <div class="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center flex-shrink-0">
+                  <span class="material-icons text-orange-400 text-sm">directions_run</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-white text-xs font-semibold truncate">{{ a.title }}</p>
+                  <p class="text-slate-500 text-xs">{{ a.distanceKm?.toFixed(1) }} km</p>
+                </div>
+              </div>
+            }
+            @for (e of upcomingEvents.slice(0, 2); track e.id) {
+              @if ((e.eventDate | date:'d MMM y') === ('today' | date:'d MMM y')) {
+                <div class="flex items-center gap-3 p-2 bg-brand-surface rounded-xl border border-orange-500/30">
+                  <div class="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center flex-shrink-0">
+                    <span class="material-icons text-orange-400 text-sm">event</span>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-white text-xs font-semibold truncate">{{ e.name }}</p>
+                    <p class="text-slate-500 text-xs">{{ e.location }}</p>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Row 2: Recent Activities + Right Column -->
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+      <!-- Recent Activities (2/3) -->
       <div class="xl:col-span-2 card">
         <div class="flex items-center justify-between mb-5">
           <div class="flex items-center gap-3">
@@ -118,7 +199,7 @@
         </div>
       </div>
 
-      <!-- Right Column -->
+      <!-- Right Column: Upcoming Events + Weekly Leaders -->
       <div class="space-y-6">
 
         <!-- Upcoming Events -->
@@ -137,16 +218,16 @@
 
           <div class="space-y-3">
             @for (event of upcomingEvents; track event.id) {
-              <div class="flex items-center gap-3">
+              <a [routerLink]="['/events', event.id]" class="flex items-center gap-3 group">
                 <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex flex-col items-center justify-center">
                   <span class="text-white font-black text-lg leading-none">{{ event.eventDate | date:'d' }}</span>
-                  <span class="text-white/80 text-xs uppercase tracking-wider">{{ event.eventDate | date:'MMM' }}</span>
+                  <span class="text-white/80 text-[10px] uppercase tracking-wider">{{ event.eventDate | date:'MMM' }}</span>
                 </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-white text-sm font-semibold truncate">{{ event.name }}</p>
-                  <p class="text-slate-500 text-xs mt-0.5">{{ event.location }} · {{ event.distanceKm }}km</p>
+                <div class="flex-1 overflow-hidden">
+                  <p class="text-white text-sm font-semibold truncate group-hover:text-orange-400 transition-colors">{{ event.name || 'Untitled Event' }}</p>
+                  <p class="text-slate-400 text-xs mt-0.5 truncate">{{ event.location }}{{ event.distanceKm ? ' · ' + event.distanceKm + 'km' : '' }}</p>
                 </div>
-              </div>
+              </a>
             }
           </div>
         </div>
@@ -182,5 +263,80 @@
       </div>
     </div>
 
+    <!-- Row 3: Challenges + Active Programs -->
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+      <!-- Challenges -->
+      <div class="card">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="material-icons text-orange-400">emoji_events</span>
+          <h2 class="text-white font-bold">Active Challenges</h2>
+        </div>
+        <div class="space-y-5">
+          @for (challenge of challenges; track challenge.id) {
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="material-icons text-xl"
+                    [ngClass]="{
+                      'text-orange-400': challenge.color === 'orange',
+                      'text-red-400': challenge.color === 'red',
+                      'text-blue-400': challenge.color === 'blue'
+                    }">{{ challenge.icon }}</span>
+                  <div>
+                    <p class="text-white text-sm font-semibold">{{ challenge.title }}</p>
+                    <p class="text-slate-500 text-xs">{{ challenge.description }}</p>
+                  </div>
+                </div>
+                <span class="text-orange-400 font-bold text-sm">{{ getChallengeValue(challenge) }}</span>
+              </div>
+              <div class="w-full bg-brand-surface rounded-full h-2">
+                <div class="h-2 rounded-full bg-gradient-to-r from-orange-500 to-red-500 transition-all duration-500"
+                  [style.width.%]="getChallengeProgress(challenge)"></div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Active Training Programs -->
+      <div class="card flex flex-col">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="material-icons text-orange-400">fitness_center</span>
+          <h2 class="text-white font-bold">Active Programs</h2>
+          <a routerLink="/programs" class="ml-auto text-orange-400 hover:text-orange-300 text-xs font-semibold transition-colors">View all →</a>
+        </div>
+
+        @if (programProgress.length === 0) {
+          <div class="flex flex-col items-center justify-center py-6 gap-2 text-center">
+            <span class="material-icons text-slate-600 text-3xl">fitness_center</span>
+            <p class="text-slate-400 text-sm">No active programs</p>
+            <a routerLink="/programs" class="text-orange-400 text-sm hover:underline">Browse training plans</a>
+          </div>
+        } @else {
+          <div class="space-y-3">
+            @for (prog of programProgress; track prog.id) {
+              <div class="p-3 bg-brand-surface rounded-xl border border-brand-border space-y-2">
+                <div class="flex items-center justify-between">
+                  <div class="min-w-0 flex-1">
+                    <p class="text-white font-semibold text-sm truncate">{{ prog.programName || 'Training Program' }}</p>
+                    <span class="text-slate-500 text-xs uppercase">{{ prog.status || 'Active' }}</span>
+                  </div>
+                  <span class="text-orange-400 font-bold text-sm flex-shrink-0 ml-3">
+                    {{ prog.completedSessions || 0 }} / {{ prog.totalSessions || '?' }}
+                  </span>
+                </div>
+                <div class="w-full bg-brand-card rounded-full h-1.5">
+                  <div class="h-1.5 rounded-full bg-gradient-to-r from-orange-500 to-red-500 transition-all duration-500"
+                    [style.width.%]="getProgramProgress(prog)">
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+    </div>
+
   </div>
-}

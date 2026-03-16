@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { UserService } from '../../core/services/user.service';
 import { BadgeService } from '../../core/services/badge.service';
 import { ActivityService } from '../../core/services/activity.service';
@@ -13,7 +13,7 @@ import { ActivityStats } from '../../core/models/activity.model';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, TitleCasePipe, ReactiveFormsModule],
+  imports: [CommonModule, TitleCasePipe, ReactiveFormsModule, MatSnackBarModule],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })
@@ -24,8 +24,12 @@ export class ProfileComponent implements OnInit {
   loading = true;
   editMode = false;
   syncing = false;
+  saving = false;
   form: FormGroup;
   authUser = this.authService.getCurrentUser();
+
+  readonly categories = ['TRAIL', 'MARATHON', 'SPRINT', 'ULTRA', 'ROAD', 'CASUAL', 'TRACK'];
+  readonly genders = ['Male', 'Female', 'Non-binary', 'Prefer not to say'];
 
   constructor(
     private userService: UserService,
@@ -33,31 +37,91 @@ export class ProfileComponent implements OnInit {
     private activityService: ActivityService,
     private authService: AuthService,
     private fb: FormBuilder,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private cdr: ChangeDetectorRef
   ) {
     this.form = this.fb.group({
       firstName: [''],
       lastName: [''],
-      bio: ['']
+      profileImageUrl: [''],
+      bio: [''],
+      passion: [''],
+      location: [''],
+      runningCategory: [''],
+      gender: [''],
+      yearsRunning: [null],
+      weeklyGoalKm: [null],
+      pb5k: [''],
+      pb10k: [''],
+      pbHalfMarathon: [''],
+      pbMarathon: [''],
+      instagramHandle: ['']
     });
   }
 
   ngOnInit(): void {
     this.userService.getMe().subscribe(u => {
       this.user = u;
-      this.form.patchValue({ firstName: u.firstName, lastName: u.lastName, bio: u.bio });
+      this.patchForm(u);
       this.loading = false;
+      this.cdr.detectChanges();
     });
-    this.badgeService.getMyBadges().subscribe(b => this.badges = b);
-    this.activityService.getMyStats().subscribe(s => this.stats = s);
+    this.badgeService.getMyBadges().subscribe(b => { this.badges = b; this.cdr.detectChanges(); });
+    this.activityService.getMyStats().subscribe(s => { this.stats = s; this.cdr.detectChanges(); });
+  }
+
+  private patchForm(u: User): void {
+    this.form.patchValue({
+      firstName: u.firstName,
+      lastName: u.lastName,
+      profileImageUrl: u.profileImageUrl || '',
+      bio: u.bio || '',
+      passion: u.passion || '',
+      location: u.location || '',
+      runningCategory: u.runningCategory || '',
+      gender: u.gender || '',
+      yearsRunning: u.yearsRunning ?? null,
+      weeklyGoalKm: u.weeklyGoalKm ?? null,
+      pb5k: u.pb5k || '',
+      pb10k: u.pb10k || '',
+      pbHalfMarathon: u.pbHalfMarathon || '',
+      pbMarathon: u.pbMarathon || '',
+      instagramHandle: u.instagramHandle || ''
+    });
   }
 
   save(): void {
-    this.userService.updateMe(this.form.value).subscribe({
+    this.saving = true;
+    const val = this.form.value;
+    const payload: any = {
+      firstName: val.firstName,
+      lastName: val.lastName,
+      profileImageUrl: val.profileImageUrl || null,
+      bio: val.bio || null,
+      passion: val.passion || null,
+      location: val.location || null,
+      runningCategory: val.runningCategory || null,
+      gender: val.gender || null,
+      yearsRunning: val.yearsRunning || null,
+      weeklyGoalKm: val.weeklyGoalKm || null,
+      pb5k: val.pb5k || null,
+      pb10k: val.pb10k || null,
+      pbHalfMarathon: val.pbHalfMarathon || null,
+      pbMarathon: val.pbMarathon || null,
+      instagramHandle: val.instagramHandle || null
+    };
+    this.userService.updateMe(payload).subscribe({
       next: u => {
         this.user = u;
+        this.patchForm(u);
         this.editMode = false;
+        this.saving = false;
         this.snackBar.open('Profile updated!', 'Close', { duration: 2000 });
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.saving = false;
+        this.snackBar.open('Failed to save profile', 'Close', { duration: 3000 });
       }
     });
   }
@@ -65,16 +129,14 @@ export class ProfileComponent implements OnInit {
   syncActivities(): void {
     const provider = this.authUser?.provider;
     if (!provider || provider === 'LOCAL') return;
-
     this.syncing = true;
     const sync$ = provider === 'STRAVA'
         ? this.activityService.syncStrava()
         : this.activityService.syncGarmin();
-
     sync$.subscribe({
       next: result => {
         this.snackBar.open(result.message, 'Close', { duration: 4000 });
-        this.activityService.getMyStats().subscribe(s => this.stats = s);
+        this.activityService.getMyStats().subscribe(s => { this.stats = s; this.cdr.detectChanges(); });
         this.syncing = false;
       },
       error: err => {
@@ -94,10 +156,44 @@ export class ProfileComponent implements OnInit {
     return (first + last).toUpperCase() || this.user.username.substring(0, 2).toUpperCase();
   }
 
+  getCategoryColor(cat?: string): string {
+    const map: Record<string, string> = {
+      TRAIL: 'bg-green-500/20 text-green-400 border-green-500/30',
+      MARATHON: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+      SPRINT: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+      ULTRA: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+      ROAD: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
+      CASUAL: 'bg-slate-500/20 text-slate-400 border-slate-500/30',
+      TRACK: 'bg-red-500/20 text-red-400 border-red-500/30'
+    };
+    return map[cat || ''] || 'bg-brand-surface text-slate-400 border-brand-border';
+  }
+
+  getCategoryIcon(cat?: string): string {
+    const map: Record<string, string> = {
+      TRAIL: 'landscape',
+      MARATHON: 'directions_run',
+      SPRINT: 'flash_on',
+      ULTRA: 'terrain',
+      ROAD: 'route',
+      CASUAL: 'self_improvement',
+      TRACK: 'speed'
+    };
+    return map[cat || ''] || 'directions_run';
+  }
+
+  hasPbs(): boolean {
+    return !!(this.user?.pb5k || this.user?.pb10k || this.user?.pbHalfMarathon || this.user?.pbMarathon);
+  }
+
   getProviderColor(): string {
     const p = this.authUser?.provider;
     if (p === 'STRAVA') return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
     if (p === 'GARMIN') return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
     return 'bg-brand-surface text-slate-400 border-brand-border';
+  }
+
+  get previewImageUrl(): string {
+    return this.form.get('profileImageUrl')?.value || '';
   }
 }

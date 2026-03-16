@@ -14,6 +14,7 @@ export interface RunEvent {
   participantCount: number;
   isCancelled?: boolean;
   createdAt: string;
+  photoUrls?: string[];
 }
 
 export interface CreateEventRequest {
@@ -25,6 +26,7 @@ export interface CreateEventRequest {
   price: number;
   maxParticipants?: number;
   communityId?: number;
+  photoUrls?: string[];
 }
 
 export interface UpdateEventRequest {
@@ -35,4 +37,5 @@ export interface UpdateEventRequest {
   distanceKm?: number;
   price?: number;
   maxParticipants?: number;
+  photoUrls?: string[];
 }

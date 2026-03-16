@@ -8,4 +8,6 @@ public class SendMessageRequest {
     private Long eventId;
     private Long roomId;
     private String content;
+    private String mediaUrl;
+    private String mediaType;
 }

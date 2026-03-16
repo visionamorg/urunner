@@ -66,6 +66,39 @@ public class User implements UserDetails {
     @Column(name = "profile_image_url", length = 500)
     private String profileImageUrl;
 
+    @Column(length = 200)
+    private String location;
+
+    @Column(name = "running_category", length = 50)
+    private String runningCategory;
+
+    @Column(columnDefinition = "TEXT")
+    private String passion;
+
+    @Column(length = 20)
+    private String gender;
+
+    @Column(name = "years_running")
+    private Integer yearsRunning;
+
+    @Column(name = "weekly_goal_km")
+    private Double weeklyGoalKm;
+
+    @Column(name = "pb_5k", length = 20)
+    private String pb5k;
+
+    @Column(name = "pb_10k", length = 20)
+    private String pb10k;
+
+    @Column(name = "pb_half_marathon", length = 20)
+    private String pbHalfMarathon;
+
+    @Column(name = "pb_marathon", length = 20)
+    private String pbMarathon;
+
+    @Column(name = "instagram_handle", length = 100)
+    private String instagramHandle;
+
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(nullable = false)

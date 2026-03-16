@@ -36,8 +36,19 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         if (request.getFirstName() != null) user.setFirstName(request.getFirstName());
         if (request.getLastName() != null) user.setLastName(request.getLastName());
-        if (request.getBio() != null) user.setBio(request.getBio());
-        if (request.getProfileImageUrl() != null) user.setProfileImageUrl(request.getProfileImageUrl());
+        user.setBio(request.getBio());
+        user.setProfileImageUrl(request.getProfileImageUrl());
+        user.setLocation(request.getLocation());
+        user.setRunningCategory(request.getRunningCategory());
+        user.setPassion(request.getPassion());
+        user.setGender(request.getGender());
+        user.setYearsRunning(request.getYearsRunning());
+        user.setWeeklyGoalKm(request.getWeeklyGoalKm());
+        user.setPb5k(request.getPb5k());
+        user.setPb10k(request.getPb10k());
+        user.setPbHalfMarathon(request.getPbHalfMarathon());
+        user.setPbMarathon(request.getPbMarathon());
+        user.setInstagramHandle(request.getInstagramHandle());
         return userMapper.toDto(userRepository.save(user));
     }
 

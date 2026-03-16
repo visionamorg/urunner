@@ -6,6 +6,7 @@ import { CommunityService } from '../../../core/services/community.service';
 import { FeedService } from '../../../core/services/feed.service';
 import { ChatService } from '../../../core/services/chat.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { EventService } from '../../../core/services/event.service';
 import { Community, CommunityMember, InviteDto, DriveFolderDto } from '../../../core/models/community.model';
 import { Post, Comment } from '../../../core/models/post.model';
 import { RunEvent, CreateEventRequest, UpdateEventRequest } from '../../../core/models/event.model';
@@ -33,9 +34,19 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
   eventsLoaded = false;
   showEventForm = false;
   editingEvent: RunEvent | null = null;
-  eventForm: CreateEventRequest = { name: '', description: '', eventDate: '', location: '', distanceKm: 0, price: 0 };
+  eventForm: CreateEventRequest = { name: '', description: '', eventDate: '', location: '', distanceKm: 0, price: 0, photoUrls: [] };
   savingEvent = false;
   eventError = '';
+  eventPhotoInput = '';
+
+  // ── Event Detail Modal ──────────────────────────────────────────────────────
+  selectedEvent: RunEvent | null = null;
+  eventParticipants: any[] = [];
+  eventMessages: Message[] = [];
+  eventChatInput = '';
+  sendingEventChat = false;
+  loadingEventDetail = false;
+  eventRegistered: { [eventId: number]: boolean } = {};
 
   // ── Chat Tab ───────────────────────────────────────────────────────────────
   chatMessages: Message[] = [];
@@ -43,6 +54,9 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
   chatLoading = false;
   chatLoaded = false;
   sendingChat = false;
+  chatMediaUrl = '';
+  chatMediaType = 'image';
+  showChatMediaInput = false;
   currentUsername = '';
   loading = true;
   feedLoading = false;
@@ -64,6 +78,7 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
   lightboxPhotos: string[] = [];
   lightboxIndex = 0;
   lightboxOpen = false;
+  lightboxTransitioning = false;
   private touchStartX = 0;
 
   // Reactions
@@ -80,6 +95,8 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
   settingsName = '';
   settingsDescription = '';
   settingsDriveFolderId = '';
+  settingsCoverUrl = '';
+  settingsImageUrl = '';
   settingsSaving = false;
   settingsSuccess = false;
 
@@ -94,7 +111,8 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     private communityService: CommunityService,
     private feedService: FeedService,
     private chatService: ChatService,
-    private authService: AuthService
+    private authService: AuthService,
+    private eventService: EventService
   ) {}
 
   ngOnInit(): void {
@@ -116,6 +134,8 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
         this.settingsName = c.name;
         this.settingsDescription = c.description;
         this.settingsDriveFolderId = c.driveFolderId || '';
+        this.settingsCoverUrl = c.coverUrl || '';
+        this.settingsImageUrl = c.imageUrl || '';
         this.loading = false;
         this.loadFeed();
         this.loadMembers();
@@ -137,6 +157,14 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
       },
       error: () => { this.feedLoading = false; }
     });
+    if (!this.eventsLoaded) this.loadEvents();
+  }
+
+  switchTab(tab: 'feed' | 'members' | 'invites' | 'settings' | 'events' | 'calendar' | 'chat' | 'rooms'): void {
+    this.activeTab = tab;
+    if (tab === 'feed' && !this.eventsLoaded) this.loadEvents();
+    if (tab === 'events' && !this.eventsLoaded) this.loadEvents();
+    if (tab === 'chat' && !this.chatLoaded) this.loadChat();
   }
 
   loadMembers(): void {
@@ -369,7 +397,9 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     this.communityService.update(this.communityId, {
       name: this.settingsName,
       description: this.settingsDescription,
-      driveFolderId: this.settingsDriveFolderId
+      driveFolderId: this.settingsDriveFolderId,
+      coverUrl: this.settingsCoverUrl,
+      imageUrl: this.settingsImageUrl
     }).subscribe({
       next: (updated) => {
         this.community = updated;
@@ -422,12 +452,21 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     document.body.style.overflow = '';
   }
 
+  goToPhoto(index: number): void {
+    if (index === this.lightboxIndex) return;
+    this.lightboxTransitioning = true;
+    setTimeout(() => {
+      this.lightboxIndex = index;
+      this.lightboxTransitioning = false;
+    }, 150);
+  }
+
   prevPhoto(): void {
-    this.lightboxIndex = (this.lightboxIndex - 1 + this.lightboxPhotos.length) % this.lightboxPhotos.length;
+    this.goToPhoto((this.lightboxIndex - 1 + this.lightboxPhotos.length) % this.lightboxPhotos.length);
   }
 
   nextPhoto(): void {
-    this.lightboxIndex = (this.lightboxIndex + 1) % this.lightboxPhotos.length;
+    this.goToPhoto((this.lightboxIndex + 1) % this.lightboxPhotos.length);
   }
 
   onTouchStart(e: TouchEvent): void {
@@ -514,7 +553,8 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
 
   openCreateEvent(): void {
     this.editingEvent = null;
-    this.eventForm = { name: '', description: '', eventDate: '', location: '', distanceKm: 0, price: 0 };
+    this.eventForm = { name: '', description: '', eventDate: '', location: '', distanceKm: 0, price: 0, photoUrls: [] };
+    this.eventPhotoInput = '';
     this.eventError = '';
     this.showEventForm = true;
   }
@@ -530,8 +570,10 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
       location: event.location,
       distanceKm: event.distanceKm,
       price: event.price,
-      maxParticipants: event.maxParticipants
+      maxParticipants: event.maxParticipants,
+      photoUrls: event.photoUrls ? [...event.photoUrls] : []
     };
+    this.eventPhotoInput = '';
     this.eventError = '';
     this.showEventForm = true;
   }
@@ -592,15 +634,6 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  sendChatMessage(): void {
-    if (!this.chatInput.trim() || this.sendingChat) return;
-    this.sendingChat = true;
-    this.chatService.sendMessage({ communityId: this.communityId, content: this.chatInput.trim() }).subscribe({
-      next: (msg) => { this.chatMessages.push(msg); this.chatInput = ''; this.sendingChat = false; },
-      error: () => { this.sendingChat = false; }
-    });
-  }
-
   onChatKeyDown(e: KeyboardEvent): void {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.sendChatMessage(); }
   }
@@ -615,5 +648,107 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
       case 'MODERATOR': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
       default: return 'bg-slate-500/20 text-slate-400 border-slate-500/30';
     }
+  }
+
+  getMemberRole(username: string): string | null {
+    const member = this.members.find(m => m.username === username);
+    if (!member) return null;
+    const role = member.role?.toUpperCase();
+    if (role === 'ADMIN') return 'Admin';
+    if (role === 'MODERATOR') return 'Crew';
+    return null;
+  }
+
+  // ── Event Photo helpers ─────────────────────────────────────────────────────
+
+  addEventPhoto(): void {
+    const url = this.eventPhotoInput.trim();
+    if (!url) return;
+    if (!this.eventForm.photoUrls) this.eventForm.photoUrls = [];
+    this.eventForm.photoUrls.push(url);
+    this.eventPhotoInput = '';
+  }
+
+  removeEventPhoto(index: number): void {
+    if (this.eventForm.photoUrls) {
+      this.eventForm.photoUrls.splice(index, 1);
+    }
+  }
+
+  // ── Event Detail Modal ──────────────────────────────────────────────────────
+
+  openEventDetail(event: RunEvent): void {
+    this.selectedEvent = event;
+    this.loadingEventDetail = true;
+    this.eventParticipants = [];
+    this.eventMessages = [];
+
+    this.eventService.getParticipants(event.id).subscribe({
+      next: (participants) => { this.eventParticipants = participants; },
+      error: () => {}
+    });
+
+    this.chatService.getMessages(undefined, event.id).subscribe({
+      next: (msgs) => { this.eventMessages = msgs; this.loadingEventDetail = false; },
+      error: () => { this.loadingEventDetail = false; }
+    });
+  }
+
+  closeEventDetail(): void {
+    this.selectedEvent = null;
+  }
+
+  sendEventMessage(): void {
+    if (!this.selectedEvent || (!this.eventChatInput.trim() && !this.chatMediaUrl.trim()) || this.sendingEventChat) return;
+    this.sendingEventChat = true;
+    this.chatService.sendMessage({
+      eventId: this.selectedEvent.id,
+      content: this.eventChatInput.trim()
+    }).subscribe({
+      next: (msg) => {
+        this.eventMessages.push(msg);
+        this.eventChatInput = '';
+        this.sendingEventChat = false;
+      },
+      error: () => { this.sendingEventChat = false; }
+    });
+  }
+
+  onEventChatKeyDown(e: KeyboardEvent): void {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.sendEventMessage(); }
+  }
+
+  registerForEvent(event: RunEvent): void {
+    this.eventService.register(event.id).subscribe({
+      next: () => {
+        this.eventRegistered[event.id] = true;
+        event.participantCount = (event.participantCount || 0) + 1;
+      },
+      error: (err) => alert(err.error?.message || 'Failed to register for event')
+    });
+  }
+
+  // ── Chat Media ──────────────────────────────────────────────────────────────
+
+  sendChatMessage(): void {
+    const hasContent = this.chatInput.trim();
+    const hasMedia = this.chatMediaUrl.trim();
+    if ((!hasContent && !hasMedia) || this.sendingChat) return;
+    this.sendingChat = true;
+    this.chatService.sendMessage({
+      communityId: this.communityId,
+      content: this.chatInput.trim(),
+      mediaUrl: hasMedia || undefined,
+      mediaType: hasMedia ? this.chatMediaType : undefined
+    }).subscribe({
+      next: (msg) => {
+        this.chatMessages.push(msg);
+        this.chatInput = '';
+        this.chatMediaUrl = '';
+        this.showChatMediaInput = false;
+        this.sendingChat = false;
+      },
+      error: () => { this.sendingChat = false; }
+    });
   }
 }

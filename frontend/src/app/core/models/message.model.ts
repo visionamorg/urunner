@@ -6,6 +6,8 @@ export interface Message {
   eventId?: number;
   roomId?: number;
   content: string;
+  mediaUrl?: string;
+  mediaType?: string;
   sentAt: string;
 }
 
@@ -14,4 +16,6 @@ export interface SendMessageRequest {
   eventId?: number;
   roomId?: number;
   content: string;
+  mediaUrl?: string;
+  mediaType?: string;
 }

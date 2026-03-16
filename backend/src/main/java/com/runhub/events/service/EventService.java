@@ -1,5 +1,7 @@
 package com.runhub.events.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.runhub.communities.model.Community;
 import com.runhub.communities.model.CommunityMember;
 import com.runhub.communities.repository.CommunityMemberRepository;
@@ -21,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -33,12 +36,26 @@ public class EventService {
     private final UserService userService;
     private final CommunityRepository communityRepository;
     private final CommunityMemberRepository communityMemberRepository;
+    private final ObjectMapper objectMapper;
+
+    private List<String> parsePhotoUrls(String json) {
+        if (json == null || json.isBlank()) return Collections.emptyList();
+        try { return objectMapper.readValue(json, new TypeReference<List<String>>() {}); }
+        catch (Exception e) { return Collections.emptyList(); }
+    }
+
+    private String serializePhotoUrls(List<String> urls) {
+        if (urls == null || urls.isEmpty()) return null;
+        try { return objectMapper.writeValueAsString(urls); }
+        catch (Exception e) { return null; }
+    }
 
     public List<EventDto> getAllEvents() {
         return eventRepository.findAllByOrderByEventDateAsc().stream()
                 .map(e -> {
                     EventDto dto = eventMapper.toDto(e);
                     dto.setParticipantCount(registrationRepository.countActiveByEventId(e.getId()));
+                    dto.setPhotoUrls(parsePhotoUrls(e.getPhotoUrls()));
                     return dto;
                 }).toList();
     }
@@ -47,6 +64,7 @@ public class EventService {
         Event event = findById(id);
         EventDto dto = eventMapper.toDto(event);
         dto.setParticipantCount(registrationRepository.countActiveByEventId(id));
+        dto.setPhotoUrls(parsePhotoUrls(event.getPhotoUrls()));
         return dto;
     }
 
@@ -70,9 +88,11 @@ public class EventService {
                 .community(community)
                 .build();
 
+        event.setPhotoUrls(serializePhotoUrls(request.getPhotoUrls()));
         event = eventRepository.save(event);
         EventDto dto = eventMapper.toDto(event);
         dto.setParticipantCount(0L);
+        dto.setPhotoUrls(parsePhotoUrls(event.getPhotoUrls()));
         return dto;
     }
 
@@ -113,6 +133,7 @@ public class EventService {
                 .stream().map(e -> {
                     EventDto dto = eventMapper.toDto(e);
                     dto.setParticipantCount(registrationRepository.countActiveByEventId(e.getId()));
+                    dto.setPhotoUrls(parsePhotoUrls(e.getPhotoUrls()));
                     return dto;
                 }).toList();
     }
@@ -139,9 +160,11 @@ public class EventService {
                 .community(community)
                 .build();
 
+        event.setPhotoUrls(serializePhotoUrls(request.getPhotoUrls()));
         event = eventRepository.save(event);
         EventDto dto = eventMapper.toDto(event);
         dto.setParticipantCount(0L);
+        dto.setPhotoUrls(parsePhotoUrls(event.getPhotoUrls()));
         return dto;
     }
 
@@ -161,10 +184,12 @@ public class EventService {
         if (request.getDistanceKm() != null) event.setDistanceKm(request.getDistanceKm());
         if (request.getPrice() != null) event.setPrice(request.getPrice());
         if (request.getMaxParticipants() != null) event.setMaxParticipants(request.getMaxParticipants());
+        if (request.getPhotoUrls() != null) event.setPhotoUrls(serializePhotoUrls(request.getPhotoUrls()));
 
         event = eventRepository.save(event);
         EventDto dto = eventMapper.toDto(event);
         dto.setParticipantCount(registrationRepository.countActiveByEventId(event.getId()));
+        dto.setPhotoUrls(parsePhotoUrls(event.getPhotoUrls()));
         return dto;
     }
 

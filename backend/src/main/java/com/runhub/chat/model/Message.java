@@ -41,6 +41,12 @@ public class Message {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @Column(name = "media_url", length = 1000)
+    private String mediaUrl;
+
+    @Column(name = "media_type", length = 20)
+    private String mediaType;
+
     @Column(name = "sent_at", nullable = false, updatable = false)
     @Builder.Default
     private LocalDateTime sentAt = LocalDateTime.now();

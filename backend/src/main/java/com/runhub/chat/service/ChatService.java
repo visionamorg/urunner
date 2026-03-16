@@ -51,8 +51,9 @@ public class ChatService {
     public MessageDto sendMessage(String email, SendMessageRequest request) {
         User sender = userService.getUserEntityByEmail(email);
 
-        if (request.getContent() == null || request.getContent().isBlank()) {
-            throw new BadRequestException("Message content cannot be empty");
+        if ((request.getContent() == null || request.getContent().isBlank()) &&
+            (request.getMediaUrl() == null || request.getMediaUrl().isBlank())) {
+            throw new BadRequestException("Message must have content or media");
         }
 
         Community community = null;
@@ -80,7 +81,9 @@ public class ChatService {
                 .community(community)
                 .event(event)
                 .room(room)
-                .content(request.getContent())
+                .content(request.getContent() != null ? request.getContent() : "")
+                .mediaUrl(request.getMediaUrl())
+                .mediaType(request.getMediaType())
                 .build();
 
         return messageMapper.toDto(messageRepository.save(message));

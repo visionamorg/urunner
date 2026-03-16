@@ -11,6 +11,17 @@ export interface User {
   role: 'USER' | 'ADMIN' | 'ORGANIZER';
   authProvider: AuthProvider;
   createdAt: string;
+  location?: string;
+  runningCategory?: string;
+  passion?: string;
+  gender?: string;
+  yearsRunning?: number;
+  weeklyGoalKm?: number;
+  pb5k?: string;
+  pb10k?: string;
+  pbHalfMarathon?: string;
+  pbMarathon?: string;
+  instagramHandle?: string;
 }
 
 export interface AuthResponse {
