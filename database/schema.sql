@@ -10,12 +10,10 @@
 -- ENUMS
 -- ============================================================
 
-CREATE TYPE user_role AS ENUM ('USER', 'ADMIN', 'ORGANIZER');
--- Note: auth_provider and activity_source are stored as VARCHAR by JPA/Hibernate
+-- Note: All enums stored as VARCHAR to avoid Hibernate named-enum cast conflicts
 CREATE TYPE registration_status AS ENUM ('REGISTERED', 'CANCELLED', 'COMPLETED');
 CREATE TYPE program_level AS ENUM ('BEGINNER', 'INTERMEDIATE', 'ADVANCED');
 CREATE TYPE progress_status AS ENUM ('ACTIVE', 'COMPLETED', 'PAUSED');
-CREATE TYPE community_member_role AS ENUM ('MEMBER', 'MODERATOR', 'ADMIN');
 
 -- ============================================================
 -- USERS
@@ -30,7 +28,7 @@ CREATE TABLE users (
     last_name VARCHAR(100) NOT NULL,
     bio TEXT,
     profile_image_url VARCHAR(500),
-    role user_role NOT NULL DEFAULT 'USER',
+    role VARCHAR(20) NOT NULL DEFAULT 'USER',
     auth_provider VARCHAR(20) NOT NULL DEFAULT 'LOCAL',
     provider_id VARCHAR(255),
     provider_access_token VARCHAR(1000),
@@ -88,6 +86,9 @@ CREATE TABLE communities (
     name VARCHAR(100) NOT NULL,
     description TEXT,
     image_url VARCHAR(500),
+    cover_url VARCHAR(500),
+    drive_folder_id VARCHAR(500),
+    is_private BOOLEAN NOT NULL DEFAULT FALSE,
     creator_id BIGINT NOT NULL REFERENCES users(id),
     member_count INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
@@ -98,7 +99,7 @@ CREATE INDEX idx_communities_creator ON communities(creator_id);
 CREATE TABLE community_members (
     community_id BIGINT NOT NULL REFERENCES communities(id) ON DELETE CASCADE,
     user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    role community_member_role NOT NULL DEFAULT 'MEMBER',
+    role VARCHAR(20) NOT NULL DEFAULT 'MEMBER',
     joined_at TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY (community_id, user_id)
 );
@@ -118,6 +119,8 @@ CREATE TABLE events (
     distance_km DECIMAL(8,2),
     price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     max_participants INTEGER,
+    is_cancelled BOOLEAN NOT NULL DEFAULT FALSE,
+    photo_urls TEXT,
     organizer_id BIGINT NOT NULL REFERENCES users(id),
     community_id BIGINT REFERENCES communities(id),
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
@@ -148,9 +151,13 @@ CREATE TABLE posts (
     author_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     content TEXT NOT NULL,
     image_url VARCHAR(500),
+    photo_urls TEXT,
+    post_type VARCHAR(20) NOT NULL DEFAULT 'TEXT',
     community_id BIGINT REFERENCES communities(id),
     likes_count INTEGER NOT NULL DEFAULT 0,
     comments_count INTEGER NOT NULL DEFAULT 0,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    pinned BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
@@ -183,18 +190,83 @@ CREATE INDEX idx_likes_user ON likes(user_id);
 -- CHAT MESSAGES
 -- ============================================================
 
+-- ============================================================
+-- ROOMS (private channels within communities)
+-- ============================================================
+
+CREATE TABLE rooms (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    community_id BIGINT NOT NULL REFERENCES communities(id) ON DELETE CASCADE,
+    created_by BIGINT NOT NULL REFERENCES users(id),
+    is_private BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_rooms_community ON rooms(community_id);
+
+CREATE TABLE room_members (
+    room_id BIGINT NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
+    user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    role VARCHAR(20) NOT NULL DEFAULT 'MEMBER',
+    joined_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (room_id, user_id)
+);
+
+-- ============================================================
+-- CHAT MESSAGES
+-- ============================================================
+
 CREATE TABLE messages (
     id BIGSERIAL PRIMARY KEY,
     sender_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     community_id BIGINT REFERENCES communities(id),
     event_id BIGINT REFERENCES events(id),
-    content TEXT NOT NULL,
+    room_id BIGINT REFERENCES rooms(id),
+    content TEXT NOT NULL DEFAULT '',
+    media_url VARCHAR(1000),
+    media_type VARCHAR(20),
     sent_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX idx_messages_community ON messages(community_id, sent_at DESC);
 CREATE INDEX idx_messages_event ON messages(event_id, sent_at DESC);
+CREATE INDEX idx_messages_room ON messages(room_id, sent_at DESC);
 CREATE INDEX idx_messages_sender ON messages(sender_id);
+
+-- ============================================================
+-- POST REACTIONS (emoji reactions)
+-- ============================================================
+
+CREATE TABLE post_reactions (
+    id BIGSERIAL PRIMARY KEY,
+    post_id BIGINT NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+    user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    emoji VARCHAR(10) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    UNIQUE (post_id, user_id)
+);
+
+CREATE INDEX idx_post_reactions_post ON post_reactions(post_id);
+
+-- ============================================================
+-- COMMUNITY INVITES
+-- ============================================================
+
+CREATE TABLE community_invites (
+    id BIGSERIAL PRIMARY KEY,
+    community_id BIGINT NOT NULL REFERENCES communities(id) ON DELETE CASCADE,
+    invited_user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    invited_by_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token VARCHAR(36) NOT NULL UNIQUE,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    expires_at TIMESTAMP NOT NULL DEFAULT (NOW() + INTERVAL '7 days')
+);
+
+CREATE INDEX idx_invites_community ON community_invites(community_id);
+CREATE INDEX idx_invites_token ON community_invites(token);
 
 -- ============================================================
 -- BADGES
