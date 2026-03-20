@@ -1,23 +1,23 @@
 @if (loading) {
   <div class="flex justify-center items-center py-32">
-    <div class="animate-spin rounded-full h-12 w-12 border-2 border-orange-500 border-t-transparent"></div>
+    <div class="animate-spin rounded-full h-12 w-12 border-2 border-primary border-t-transparent"></div>
   </div>
 } @else if (event) {
   <div class="max-w-4xl mx-auto space-y-6 animate-fade-in">
 
     <!-- Back -->
     <button (click)="goBack()"
-      class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm">
+      class="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm">
       <span class="material-icons text-base">arrow_back</span>
       Back to Events
     </button>
 
     <!-- Hero Banner -->
     <div class="card overflow-hidden !p-0">
-      <div class="h-36 bg-gradient-to-br from-orange-600 via-red-600 to-pink-600 relative">
+      <div class="h-36 bg-primary relative">
         <div class="absolute inset-0 bg-black/30"></div>
         @if (event.isCancelled) {
-          <div class="absolute top-4 right-4 bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full">
+          <div class="absolute top-4 right-4 bg-destructive text-white text-xs font-bold px-3 py-1.5 rounded-full">
             Cancelled
           </div>
         } @else if (isUpcoming()) {
@@ -25,7 +25,7 @@
             Upcoming
           </div>
         } @else {
-          <div class="absolute top-4 right-4 bg-slate-600 text-slate-300 text-xs font-bold px-3 py-1.5 rounded-full">
+          <div class="absolute top-4 right-4 bg-muted-foreground text-white text-xs font-bold px-3 py-1.5 rounded-full">
             Past Event
           </div>
         }
@@ -36,28 +36,28 @@
       </div>
 
       <!-- Stats Row -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 divide-x divide-brand-border border-t border-brand-border">
+      <div class="grid grid-cols-2 sm:grid-cols-4 divide-x divide-border border-t border-border">
         <div class="flex flex-col items-center py-4 px-3 gap-1">
-          <span class="material-icons text-orange-400 text-xl">location_on</span>
-          <p class="text-white text-xs font-semibold text-center truncate w-full text-center">{{ event.location }}</p>
-          <p class="text-slate-500 text-xs">Location</p>
+          <span class="material-icons text-primary text-xl">location_on</span>
+          <p class="text-foreground text-xs font-semibold text-center truncate w-full text-center">{{ event.location }}</p>
+          <p class="text-muted-foreground text-xs">Location</p>
         </div>
         <div class="flex flex-col items-center py-4 px-3 gap-1">
-          <span class="material-icons text-orange-400 text-xl">directions_run</span>
-          <p class="text-white text-sm font-bold">{{ event.distanceKm || '–' }} km</p>
-          <p class="text-slate-500 text-xs">Distance</p>
+          <span class="material-icons text-primary text-xl">directions_run</span>
+          <p class="text-foreground text-sm font-bold">{{ event.distanceKm || '–' }} km</p>
+          <p class="text-muted-foreground text-xs">Distance</p>
         </div>
         <div class="flex flex-col items-center py-4 px-3 gap-1">
-          <span class="material-icons text-orange-400 text-xl">people</span>
-          <p class="text-white text-sm font-bold">
+          <span class="material-icons text-primary text-xl">people</span>
+          <p class="text-foreground text-sm font-bold">
             {{ event.participantCount }}{{ event.maxParticipants ? ' / ' + event.maxParticipants : '' }}
           </p>
-          <p class="text-slate-500 text-xs">Participants</p>
+          <p class="text-muted-foreground text-xs">Participants</p>
         </div>
         <div class="flex flex-col items-center py-4 px-3 gap-1">
           <span class="material-icons text-green-400 text-xl">{{ event.price === 0 ? 'card_giftcard' : 'attach_money' }}</span>
-          <p class="text-white text-sm font-bold">{{ event.price === 0 ? 'Free' : '$' + event.price }}</p>
-          <p class="text-slate-500 text-xs">Entry</p>
+          <p class="text-foreground text-sm font-bold">{{ event.price === 0 ? 'Free' : '$' + event.price }}</p>
+          <p class="text-muted-foreground text-xs">Entry</p>
         </div>
       </div>
     </div>
@@ -72,10 +72,10 @@
         @if (event.description) {
           <div class="card">
             <div class="flex items-center gap-3 mb-3">
-              <span class="material-icons text-orange-400">description</span>
-              <h2 class="text-white font-bold">About this Event</h2>
+              <span class="material-icons text-primary">description</span>
+              <h2 class="text-foreground font-bold">About this Event</h2>
             </div>
-            <p class="text-slate-300 text-sm leading-relaxed whitespace-pre-line">{{ event.description }}</p>
+            <p class="text-foreground text-sm leading-relaxed whitespace-pre-line">{{ event.description }}</p>
           </div>
         }
 
@@ -83,8 +83,8 @@
         @if (event.photoUrls && event.photoUrls.length > 0) {
           <div class="card">
             <div class="flex items-center gap-3 mb-4">
-              <span class="material-icons text-orange-400">photo_library</span>
-              <h2 class="text-white font-bold">Photos</h2>
+              <span class="material-icons text-primary">photo_library</span>
+              <h2 class="text-foreground font-bold">Photos</h2>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
               @for (photo of event.photoUrls; track photo) {
@@ -97,29 +97,29 @@
         <!-- Participants -->
         <div class="card">
           <div class="flex items-center gap-3 mb-4">
-            <span class="material-icons text-orange-400">group</span>
-            <h2 class="text-white font-bold">Participants</h2>
-            <span class="ml-auto text-slate-500 text-sm">{{ participants.length }} registered</span>
+            <span class="material-icons text-primary">group</span>
+            <h2 class="text-foreground font-bold">Participants</h2>
+            <span class="ml-auto text-muted-foreground text-sm">{{ participants.length }} registered</span>
           </div>
           @if (participants.length === 0) {
             <div class="text-center py-8">
-              <span class="material-icons text-slate-600 text-3xl">person_add</span>
-              <p class="text-slate-500 text-sm mt-2">No participants yet. Be the first!</p>
+              <span class="material-icons text-muted-foreground text-3xl">person_add</span>
+              <p class="text-muted-foreground text-sm mt-2">No participants yet. Be the first!</p>
             </div>
           } @else {
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
               @for (p of participants; track p.userId) {
-                <div class="flex items-center gap-3 p-3 bg-brand-surface rounded-xl border border-brand-border">
+                <div class="flex items-center gap-3 p-3 bg-secondary rounded-xl border border-border">
                   @if (p.profileImageUrl) {
                     <img [src]="p.profileImageUrl" class="w-9 h-9 rounded-full object-cover flex-shrink-0" />
                   } @else {
-                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                    <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                       {{ getInitials((p.firstName || '') + ' ' + (p.lastName || '')) || getInitials(p.username) }}
                     </div>
                   }
                   <div class="min-w-0">
-                    <p class="text-white text-xs font-semibold truncate">{{ p.username }}</p>
-                    <p class="text-slate-500 text-xs">{{ p.status || 'Registered' }}</p>
+                    <p class="text-foreground text-xs font-semibold truncate">{{ p.username }}</p>
+                    <p class="text-muted-foreground text-xs">{{ p.status || 'Registered' }}</p>
                   </div>
                 </div>
               }
@@ -135,8 +135,8 @@
         <!-- Register Card -->
         @if (!event.isCancelled) {
           <div class="card">
-            <h2 class="text-white font-bold mb-1">Join this Event</h2>
-            <p class="text-slate-500 text-xs mb-4">
+            <h2 class="text-foreground font-bold mb-1">Join this Event</h2>
+            <p class="text-muted-foreground text-xs mb-4">
               {{ event.maxParticipants
                 ? (event.maxParticipants - event.participantCount) + ' spots remaining'
                 : 'Unlimited spots' }}
@@ -155,11 +155,11 @@
                 Register Now
               </button>
             } @else {
-              <span class="badge bg-brand-surface border border-brand-border text-slate-500 w-full justify-center py-2.5">Past Event</span>
+              <span class="badge bg-secondary border border-border text-muted-foreground w-full justify-center py-2.5">Past Event</span>
             }
 
             @if (event.communityName) {
-              <div class="mt-4 pt-4 border-t border-brand-border flex items-center gap-2 text-slate-400 text-xs">
+              <div class="mt-4 pt-4 border-t border-border flex items-center gap-2 text-muted-foreground text-xs">
                 <span class="material-icons text-sm">group</span>
                 Organised by {{ event.communityName }}
               </div>
@@ -170,34 +170,34 @@
         <!-- Discussion -->
         <div class="card flex flex-col" style="min-height: 340px">
           <div class="flex items-center gap-3 mb-4">
-            <span class="material-icons text-orange-400">chat</span>
-            <h2 class="text-white font-bold">Discussion</h2>
+            <span class="material-icons text-primary">chat</span>
+            <h2 class="text-foreground font-bold">Discussion</h2>
           </div>
 
           <!-- Messages -->
           <div class="flex-1 overflow-y-auto space-y-3 mb-4 max-h-52 pr-1">
             @if (messages.length === 0) {
               <div class="text-center py-6">
-                <span class="material-icons text-slate-600 text-2xl">chat_bubble_outline</span>
-                <p class="text-slate-500 text-xs mt-1">No messages yet. Start the conversation!</p>
+                <span class="material-icons text-muted-foreground text-2xl">chat_bubble_outline</span>
+                <p class="text-muted-foreground text-xs mt-1">No messages yet. Start the conversation!</p>
               </div>
             }
             @for (msg of messages; track msg.id) {
               <div class="flex gap-2" [class.flex-row-reverse]="msg.senderUsername === currentUsername">
-                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                <div class="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                   {{ getInitials(msg.senderUsername) }}
                 </div>
                 <div [class.items-end]="msg.senderUsername === currentUsername" class="flex flex-col max-w-[75%]">
                   @if (msg.senderUsername !== currentUsername) {
-                    <span class="text-slate-500 text-xs mb-0.5">{{ msg.senderUsername }}</span>
+                    <span class="text-muted-foreground text-xs mb-0.5">{{ msg.senderUsername }}</span>
                   }
                   <div class="px-3 py-2 rounded-2xl text-sm"
                     [class]="msg.senderUsername === currentUsername
-                      ? 'bg-orange-500 text-white rounded-tr-sm'
-                      : 'bg-brand-surface border border-brand-border text-slate-200 rounded-tl-sm'">
+                      ? 'bg-primary text-foreground rounded-tr-sm'
+                      : 'bg-secondary border border-border text-foreground rounded-tl-sm'">
                     {{ msg.content }}
                   </div>
-                  <span class="text-slate-600 text-xs mt-0.5">{{ timeAgo(msg.sentAt) }}</span>
+                  <span class="text-muted-foreground text-xs mt-0.5">{{ timeAgo(msg.sentAt) }}</span>
                 </div>
               </div>
             }

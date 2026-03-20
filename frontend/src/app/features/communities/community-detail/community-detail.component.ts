@@ -644,9 +644,9 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
 
   getRoleBadgeClass(role: string): string {
     switch (role?.toUpperCase()) {
-      case 'ADMIN': return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+      case 'ADMIN': return 'bg-primary/20 text-primary border-primary/30';
       case 'MODERATOR': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
-      default: return 'bg-slate-500/20 text-slate-400 border-slate-500/30';
+      default: return 'bg-muted text-muted-foreground border-border';
     }
   }
 

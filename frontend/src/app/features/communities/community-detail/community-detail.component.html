@@ -1,7 +1,7 @@
 <!-- Loading State -->
 @if (loading) {
   <div class="flex justify-center items-center py-32">
-    <div class="animate-spin rounded-full h-12 w-12 border-2 border-orange-500 border-t-transparent"></div>
+    <div class="animate-spin rounded-full h-12 w-12 border-2 border-primary border-t-transparent"></div>
   </div>
 } @else if (community) {
   <div class="max-w-4xl mx-auto space-y-0 animate-fade-in">
@@ -13,7 +13,7 @@
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
         </div>
       } @else {
-        <div class="h-48 sm:h-64 w-full bg-gradient-to-br from-orange-600/40 via-red-600/30 to-pink-600/20">
+        <div class="h-48 sm:h-64 w-full bg-gradient-to-br from-primary/30 via-primary/20 to-primary/10">
           <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
         </div>
       }
@@ -22,14 +22,14 @@
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <h1 class="text-3xl font-black text-white mb-1">{{ community.name }}</h1>
-            <p class="text-slate-300 text-sm max-w-2xl line-clamp-2">{{ community.description }}</p>
+            <p class="text-white text-sm max-w-2xl line-clamp-2">{{ community.description }}</p>
             <div class="flex items-center gap-4 mt-2">
-              <div class="flex items-center gap-1 text-slate-400 text-sm">
+              <div class="flex items-center gap-1 text-muted-foreground text-sm">
                 <span class="material-icons text-sm">group</span>
                 <span>{{ community.memberCount }} members</span>
               </div>
               @if (community.joined) {
-                <span class="bg-orange-500/20 border border-orange-500/40 text-orange-400 text-xs font-semibold px-2.5 py-1 rounded-full">
+                <span class="bg-primary/20 border border-primary/40 text-primary text-xs font-semibold px-2.5 py-1 rounded-full">
                   Joined
                 </span>
               }
@@ -47,7 +47,7 @@
             @if (community.isAdmin) {
               <button
                 (click)="openDrivePicker()"
-                class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors inline-flex items-center gap-2">
+                class="bg-blue-600 hover:bg-blue-500 text-foreground text-sm font-semibold px-4 py-2 rounded-xl transition-colors inline-flex items-center gap-2">
                 <span class="material-icons text-base">cloud_sync</span>
                 Sync Drive
               </button>
@@ -55,8 +55,8 @@
             <button
               (click)="joinOrLeave()"
               [class]="community.joined
-                ? 'bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm font-semibold px-4 py-2 rounded-xl transition-colors inline-flex items-center gap-2'
-                : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-400 hover:to-red-400 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all inline-flex items-center gap-2'">
+                ? 'bg-secondary hover:bg-muted text-foreground text-sm font-semibold px-4 py-2 rounded-xl transition-colors inline-flex items-center gap-2'
+                : 'bg-primary  text-foreground text-sm font-semibold px-4 py-2 rounded-xl transition-all inline-flex items-center gap-2'">
               <span class="material-icons text-base">{{ community.joined ? 'logout' : 'person_add' }}</span>
               {{ community.joined ? 'Leave' : 'Join Community' }}
             </button>
@@ -66,28 +66,28 @@
     </div>
 
     <!-- Tab Bar -->
-    <div class="flex items-center gap-1 mb-6 bg-brand-surface border border-brand-border rounded-2xl p-1 overflow-x-auto">
+    <div class="flex items-center gap-1 mb-6 bg-secondary border border-border rounded-2xl p-1 overflow-x-auto">
       <button
         (click)="switchTab('feed')"
         [class]="activeTab === 'feed'
-          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-orange-500/20 text-orange-400 font-semibold text-sm transition-all whitespace-nowrap'
-          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-slate-400 hover:text-slate-200 font-medium text-sm transition-all whitespace-nowrap'">
+          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
+          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
         <span class="material-icons text-base">dynamic_feed</span>
         Feed
       </button>
       <button
         (click)="switchTab('events')"
         [class]="activeTab === 'events'
-          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-orange-500/20 text-orange-400 font-semibold text-sm transition-all whitespace-nowrap'
-          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-slate-400 hover:text-slate-200 font-medium text-sm transition-all whitespace-nowrap'">
+          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
+          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
         <span class="material-icons text-base">event</span>
         Events
       </button>
       <button
         (click)="switchTab('calendar')"
         [class]="activeTab === 'calendar'
-          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-orange-500/20 text-orange-400 font-semibold text-sm transition-all whitespace-nowrap'
-          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-slate-400 hover:text-slate-200 font-medium text-sm transition-all whitespace-nowrap'">
+          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
+          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
         <span class="material-icons text-base">calendar_month</span>
         Calendar
       </button>
@@ -95,16 +95,16 @@
         <button
           (click)="switchTab('chat')"
           [class]="activeTab === 'chat'
-            ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-orange-500/20 text-orange-400 font-semibold text-sm transition-all whitespace-nowrap'
-            : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-slate-400 hover:text-slate-200 font-medium text-sm transition-all whitespace-nowrap'">
+            ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
+            : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
           <span class="material-icons text-base">chat</span>
           Chat
         </button>
         <button
           (click)="switchTab('rooms')"
           [class]="activeTab === 'rooms'
-            ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-orange-500/20 text-orange-400 font-semibold text-sm transition-all whitespace-nowrap'
-            : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-slate-400 hover:text-slate-200 font-medium text-sm transition-all whitespace-nowrap'">
+            ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
+            : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
           <span class="material-icons text-base">meeting_room</span>
           Rooms
         </button>
@@ -112,8 +112,8 @@
       <button
         (click)="switchTab('members')"
         [class]="activeTab === 'members'
-          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-orange-500/20 text-orange-400 font-semibold text-sm transition-all whitespace-nowrap'
-          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-slate-400 hover:text-slate-200 font-medium text-sm transition-all whitespace-nowrap'">
+          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
+          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
         <span class="material-icons text-base">group</span>
         Members
       </button>
@@ -121,12 +121,12 @@
         <button
           (click)="switchTab('invites'); loadInvites()"
           [class]="activeTab === 'invites'
-            ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-orange-500/20 text-orange-400 font-semibold text-sm transition-all whitespace-nowrap'
-            : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-slate-400 hover:text-slate-200 font-medium text-sm transition-all whitespace-nowrap'">
+            ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
+            : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
           <span class="material-icons text-base">mail</span>
           Invites
           @if (community.pendingInviteCount && community.pendingInviteCount > 0) {
-            <span class="bg-orange-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+            <span class="bg-primary text-foreground text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
               {{ community.pendingInviteCount }}
             </span>
           }
@@ -134,8 +134,8 @@
         <button
           (click)="switchTab('settings')"
           [class]="activeTab === 'settings'
-            ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-orange-500/20 text-orange-400 font-semibold text-sm transition-all whitespace-nowrap'
-            : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-slate-400 hover:text-slate-200 font-medium text-sm transition-all whitespace-nowrap'">
+            ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
+            : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
           <span class="material-icons text-base">settings</span>
           Settings
         </button>
@@ -171,20 +171,20 @@
             @for (event of communityEvents.slice(0, 3); track event.id) {
               @if (!event.isCancelled) {
                 <div (click)="openEventDetail(event)"
-                  class="cursor-pointer rounded-xl overflow-hidden bg-gradient-to-r from-orange-600/30 to-red-600/20 border border-orange-500/30 hover:border-orange-500/60 transition-all p-4">
+                  class="cursor-pointer rounded-xl overflow-hidden bg-primary/20 border border-primary/30 hover:border-primary/60 transition-all p-4">
                   <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex flex-col items-center justify-center flex-shrink-0">
-                      <span class="text-white text-xs font-bold leading-none">{{ event.eventDate | date:'MMM' }}</span>
-                      <span class="text-white text-lg font-black leading-none">{{ event.eventDate | date:'d' }}</span>
+                    <div class="w-12 h-12 rounded-xl bg-primary flex flex-col items-center justify-center flex-shrink-0">
+                      <span class="text-foreground text-xs font-bold leading-none">{{ event.eventDate | date:'MMM' }}</span>
+                      <span class="text-foreground text-lg font-black leading-none">{{ event.eventDate | date:'d' }}</span>
                     </div>
                     <div class="flex-1 min-w-0">
-                      <p class="text-white font-bold text-sm truncate">{{ event.name }}</p>
-                      <p class="text-orange-300 text-xs mt-0.5 truncate">
+                      <p class="text-foreground font-bold text-sm truncate">{{ event.name }}</p>
+                      <p class="text-primary text-xs mt-0.5 truncate">
                         <span class="material-icons text-xs align-middle">location_on</span> {{ event.location }}
                         @if (event.distanceKm) { · {{ event.distanceKm }} km }
                       </p>
                     </div>
-                    <span class="material-icons text-orange-400 flex-shrink-0">chevron_right</span>
+                    <span class="material-icons text-primary flex-shrink-0">chevron_right</span>
                   </div>
                 </div>
               }
@@ -195,43 +195,43 @@
         <!-- Feed Loading -->
         @if (feedLoading) {
           <div class="flex justify-center py-12">
-            <div class="animate-spin rounded-full h-8 w-8 border-2 border-orange-500 border-t-transparent"></div>
+            <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
           </div>
         } @else if (posts.length === 0) {
           <div class="card flex flex-col items-center justify-center py-16 gap-4 text-center">
-            <div class="w-16 h-16 rounded-2xl bg-brand-surface border border-brand-border flex items-center justify-center">
-              <span class="material-icons text-slate-600 text-3xl">article</span>
+            <div class="w-16 h-16 rounded-2xl bg-secondary border border-border flex items-center justify-center">
+              <span class="material-icons text-muted-foreground text-3xl">article</span>
             </div>
             <div>
-              <p class="text-white font-semibold">No posts yet</p>
-              <p class="text-slate-400 mt-1 text-sm">Be the first to post in this community!</p>
+              <p class="text-foreground font-semibold">No posts yet</p>
+              <p class="text-muted-foreground mt-1 text-sm">Be the first to post in this community!</p>
             </div>
           </div>
         } @else {
           @for (post of posts; track post.id) {
-            <div class="card space-y-4" [class]="post.pinned ? 'border-orange-500/40 bg-orange-500/5' : ''">
+            <div class="card space-y-4" [class]="post.pinned ? 'border-primary/40 bg-primary/5' : ''">
               <!-- Post Header -->
               <div class="flex items-start gap-3">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                   {{ post.authorInitials || getInitials(post.authorUsername) }}
                 </div>
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2 flex-wrap">
-                    <p class="text-white font-semibold text-sm">{{ post.authorUsername }}</p>
+                    <p class="text-foreground font-semibold text-sm">{{ post.authorUsername }}</p>
                     @if (getMemberRole(post.authorUsername); as role) {
                       <span class="text-xs font-semibold px-1.5 py-0.5 rounded-full border"
-                        [class]="role === 'Admin' ? 'bg-orange-500/20 text-orange-400 border-orange-500/30' : 'bg-blue-500/20 text-blue-400 border-blue-500/30'">
+                        [class]="role === 'Admin' ? 'bg-primary/20 text-primary border-primary/30' : 'bg-blue-500/20 text-blue-400 border-blue-500/30'">
                         {{ role }}
                       </span>
                     }
                     @if (post.pinned) {
-                      <span class="flex items-center gap-1 text-orange-400 text-xs">
+                      <span class="flex items-center gap-1 text-primary text-xs">
                         <span class="material-icons text-xs">push_pin</span>
                         Pinned
                       </span>
                     }
                   </div>
-                  <p class="text-slate-500 text-xs">{{ timeAgo(post.createdAt) }}</p>
+                  <p class="text-muted-foreground text-xs">{{ timeAgo(post.createdAt) }}</p>
                 </div>
                 <!-- Admin Post Controls -->
                 @if (community.isAdmin) {
@@ -239,13 +239,13 @@
                     <button
                       (click)="pinPost(post)"
                       class="p-1.5 rounded-lg transition-colors"
-                      [class]="post.pinned ? 'text-orange-400 bg-orange-500/10 hover:bg-orange-500/20' : 'text-slate-500 hover:text-orange-400 hover:bg-orange-500/10'"
+                      [class]="post.pinned ? 'text-primary bg-primary/10 hover:bg-primary/20' : 'text-muted-foreground hover:text-primary hover:bg-primary/10'"
                       title="{{ post.pinned ? 'Unpin post' : 'Pin post' }}">
                       <span class="material-icons text-sm">push_pin</span>
                     </button>
                     <button
                       (click)="deletePost(post.id)"
-                      class="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                      class="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                       title="Delete post">
                       <span class="material-icons text-sm">delete</span>
                     </button>
@@ -255,7 +255,7 @@
 
               <!-- Post Content -->
               @if (post.content) {
-                <p class="text-slate-200 text-sm leading-relaxed">{{ post.content }}</p>
+                <p class="text-foreground text-sm leading-relaxed">{{ post.content }}</p>
               }
 
               <!-- Photo Grid -->
@@ -314,8 +314,8 @@
                     <button (click)="sendReaction(post, r.emoji)"
                       class="flex items-center gap-1 text-xs px-2 py-1 rounded-full border transition-all"
                       [class]="post.myReaction === r.emoji
-                        ? 'bg-orange-500/20 border-orange-500/40 text-white'
-                        : 'bg-brand-surface border-brand-border text-slate-400 hover:border-slate-500'">
+                        ? 'bg-primary/20 border-primary/40 text-foreground'
+                        : 'bg-secondary border-border text-muted-foreground hover:border-slate-500'">
                       <span>{{ r.emoji }}</span>
                       <span>{{ r.count }}</span>
                     </button>
@@ -324,23 +324,23 @@
               }
 
               <!-- Action Bar -->
-              <div class="flex items-center gap-2 pt-2 border-t border-brand-border" (click)="closeAllPickers()">
+              <div class="flex items-center gap-2 pt-2 border-t border-border" (click)="closeAllPickers()">
                 <!-- Reaction button -->
                 <div class="relative">
                   <button (click)="toggleReactionPicker(post.id, $event)"
                     class="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-xl transition-all"
-                    [class]="post.myReaction ? 'text-orange-400 bg-orange-500/10' : 'text-slate-400 hover:text-orange-400 hover:bg-orange-500/10'">
+                    [class]="post.myReaction ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-primary hover:bg-primary/10'">
                     <span class="text-base leading-none">{{ post.myReaction || '🤍' }}</span>
                     <span class="text-xs">React</span>
                   </button>
 
                   <!-- Emoji picker popup -->
                   @if (showReactionPicker[post.id]) {
-                    <div class="absolute bottom-full left-0 mb-2 bg-brand-card border border-brand-border rounded-2xl px-3 py-2 flex gap-1 shadow-xl z-10 animate-fade-in">
+                    <div class="absolute bottom-full left-0 mb-2 bg-card border border-border rounded-2xl px-3 py-2 flex gap-1 shadow-xl z-10 animate-fade-in">
                       @for (emoji of EMOJIS; track emoji) {
                         <button (click)="sendReaction(post, emoji); $event.stopPropagation()"
                           class="text-2xl hover:scale-125 transition-transform w-9 h-9 flex items-center justify-center rounded-xl"
-                          [class]="post.myReaction === emoji ? 'bg-orange-500/20 scale-110' : 'hover:bg-brand-surface'">
+                          [class]="post.myReaction === emoji ? 'bg-primary/20 scale-110' : 'hover:bg-secondary'">
                           {{ emoji }}
                         </button>
                       }
@@ -349,7 +349,7 @@
                 </div>
 
                 <button (click)="toggleComments(post.id)"
-                  class="flex items-center gap-1.5 text-sm text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 px-3 py-1.5 rounded-xl transition-all">
+                  class="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-blue-400 hover:bg-blue-500/10 px-3 py-1.5 rounded-xl transition-all">
                   <span class="material-icons text-base">chat_bubble_outline</span>
                   <span>{{ post.commentsCount }}</span>
                 </button>
@@ -357,24 +357,24 @@
 
               <!-- Comments Section -->
               @if (showComments[post.id]) {
-                <div class="space-y-3 pt-2 border-t border-brand-border">
+                <div class="space-y-3 pt-2 border-t border-border">
                   @if (post.comments && post.comments.length > 0) {
                     @for (comment of post.comments; track comment.id) {
                       <div class="flex items-start gap-2.5">
-                        <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
+                        <div class="w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center text-foreground font-bold text-xs flex-shrink-0">
                           {{ comment.authorInitials || comment.authorUsername.substring(0, 2).toUpperCase() }}
                         </div>
-                        <div class="flex-1 bg-brand-surface rounded-xl px-3 py-2">
+                        <div class="flex-1 bg-secondary rounded-xl px-3 py-2">
                           <div class="flex items-center gap-2 mb-0.5">
-                            <span class="text-white text-xs font-semibold">{{ comment.authorUsername }}</span>
-                            <span class="text-slate-600 text-xs">{{ timeAgo(comment.createdAt) }}</span>
+                            <span class="text-foreground text-xs font-semibold">{{ comment.authorUsername }}</span>
+                            <span class="text-muted-foreground text-xs">{{ timeAgo(comment.createdAt) }}</span>
                           </div>
-                          <p class="text-slate-300 text-sm">{{ comment.content }}</p>
+                          <p class="text-foreground text-sm">{{ comment.content }}</p>
                         </div>
                       </div>
                     }
                   } @else {
-                    <p class="text-slate-600 text-xs text-center py-2">No comments yet. Be the first!</p>
+                    <p class="text-muted-foreground text-xs text-center py-2">No comments yet. Be the first!</p>
                   }
                   <div class="flex items-center gap-2 mt-3">
                     <input
@@ -417,10 +417,10 @@
         <!-- Event Form -->
         @if (showEventForm && community.isAdmin) {
           <div class="card space-y-4">
-            <h3 class="text-white font-bold">{{ editingEvent ? 'Edit Event' : 'Create Event' }}</h3>
+            <h3 class="text-foreground font-bold">{{ editingEvent ? 'Edit Event' : 'Create Event' }}</h3>
 
             @if (eventError) {
-              <div class="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl">{{ eventError }}</div>
+              <div class="bg-destructive/10 border border-destructive/30 text-destructive text-sm px-4 py-3 rounded-xl">{{ eventError }}</div>
             }
 
             <input type="text" [(ngModel)]="eventForm.name" placeholder="Event name *" class="input-field" />
@@ -444,7 +444,7 @@
 
             <!-- Photos Section -->
             <div>
-              <label class="label">Photos <span class="text-slate-500 font-normal">(optional)</span></label>
+              <label class="label">Photos <span class="text-muted-foreground font-normal">(optional)</span></label>
               <div class="flex gap-2">
                 <input type="url" [(ngModel)]="eventPhotoInput" placeholder="https://example.com/photo.jpg" class="input-field flex-1 !text-sm" />
                 <button type="button" (click)="addEventPhoto()"
@@ -454,9 +454,9 @@
                 <div class="flex gap-2 flex-wrap mt-2">
                   @for (url of eventForm.photoUrls; track url; let i = $index) {
                     <div class="relative group">
-                      <img [src]="url" alt="Event photo" class="w-16 h-16 object-cover rounded-lg border border-brand-border" />
+                      <img [src]="url" alt="Event photo" class="w-16 h-16 object-cover rounded-lg border border-border" />
                       <button (click)="removeEventPhoto(i)"
-                        class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-foreground text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <span class="material-icons text-xs">close</span>
                       </button>
                     </div>
@@ -474,7 +474,7 @@
                 {{ editingEvent ? 'Save Changes' : 'Create Event' }}
               </button>
               <button (click)="showEventForm = false"
-                class="py-2.5 px-5 text-sm text-slate-400 hover:text-white bg-brand-surface border border-brand-border rounded-xl transition-colors">
+                class="py-2.5 px-5 text-sm text-muted-foreground hover:text-foreground bg-secondary border border-border rounded-xl transition-colors">
                 Cancel
               </button>
             </div>
@@ -484,14 +484,14 @@
         <!-- Events List -->
         @if (eventsLoading) {
           <div class="flex justify-center py-16">
-            <div class="animate-spin rounded-full h-10 w-10 border-2 border-orange-500 border-t-transparent"></div>
+            <div class="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent"></div>
           </div>
         } @else if (communityEvents.length === 0) {
           <div class="card flex flex-col items-center justify-center py-16 gap-4 text-center">
-            <span class="material-icons text-slate-600 text-4xl">event_busy</span>
+            <span class="material-icons text-muted-foreground text-4xl">event_busy</span>
             <div>
-              <p class="text-white font-semibold">No events yet</p>
-              <p class="text-slate-400 mt-1 text-sm">
+              <p class="text-foreground font-semibold">No events yet</p>
+              <p class="text-muted-foreground mt-1 text-sm">
                 @if (community.isAdmin) { Create the first event for this community! }
                 @else { Events will appear here when the admin creates them. }
               </p>
@@ -500,49 +500,49 @@
         } @else {
           <div class="space-y-4">
             @for (event of communityEvents; track event.id) {
-              <div (click)="openEventDetail(event)" class="card cursor-pointer hover:border-orange-500/30 transition-all" [class]="event.isCancelled ? 'opacity-60' : ''">
+              <div (click)="openEventDetail(event)" class="card cursor-pointer hover:border-primary/30 transition-all" [class]="event.isCancelled ? 'opacity-60' : ''">
                 <div class="flex items-start gap-4">
                   <div class="w-14 h-14 rounded-2xl flex flex-col items-center justify-center flex-shrink-0 text-center"
-                    [class]="event.isCancelled ? 'bg-red-500/20' : 'bg-orange-500/20'">
-                    <span class="text-xs font-bold" [class]="event.isCancelled ? 'text-red-400' : 'text-orange-400'">
+                    [class]="event.isCancelled ? 'bg-destructive/20' : 'bg-primary/20'">
+                    <span class="text-xs font-bold" [class]="event.isCancelled ? 'text-destructive' : 'text-primary'">
                       {{ (event.eventDate | date:'MMM') }}
                     </span>
-                    <span class="text-lg font-black text-white leading-tight">
+                    <span class="text-lg font-black text-foreground leading-tight">
                       {{ (event.eventDate | date:'d') }}
                     </span>
                   </div>
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2 flex-wrap">
-                      <h3 class="text-white font-bold text-base">{{ event.name }}</h3>
+                      <h3 class="text-foreground font-bold text-base">{{ event.name }}</h3>
                       @if (event.isCancelled) {
-                        <span class="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full border border-red-500/30">Cancelled</span>
+                        <span class="text-xs bg-destructive/20 text-destructive px-2 py-0.5 rounded-full border border-destructive/30">Cancelled</span>
                       }
                     </div>
-                    <p class="text-slate-400 text-sm mt-0.5">
+                    <p class="text-muted-foreground text-sm mt-0.5">
                       {{ formatEventDate(event.eventDate) }}
                     </p>
-                    <p class="text-slate-500 text-sm">
+                    <p class="text-muted-foreground text-sm">
                       <span class="material-icons text-xs align-middle mr-1">location_on</span>{{ event.location }}
                     </p>
                     @if (event.description) {
-                      <p class="text-slate-300 text-sm mt-2 line-clamp-2">{{ event.description }}</p>
+                      <p class="text-foreground text-sm mt-2 line-clamp-2">{{ event.description }}</p>
                     }
                     <div class="flex items-center gap-4 mt-3 flex-wrap">
                       @if (event.distanceKm) {
-                        <span class="text-xs text-slate-400 flex items-center gap-1">
+                        <span class="text-xs text-muted-foreground flex items-center gap-1">
                           <span class="material-icons text-xs">directions_run</span>
                           {{ event.distanceKm }} km
                         </span>
                       }
                       @if (event.price > 0) {
-                        <span class="text-xs text-slate-400 flex items-center gap-1">
+                        <span class="text-xs text-muted-foreground flex items-center gap-1">
                           <span class="material-icons text-xs">payments</span>
                           {{ event.price | currency }}
                         </span>
                       } @else {
                         <span class="text-xs text-green-400">Free</span>
                       }
-                      <span class="text-xs text-slate-400 flex items-center gap-1">
+                      <span class="text-xs text-muted-foreground flex items-center gap-1">
                         <span class="material-icons text-xs">group</span>
                         {{ event.participantCount }} registered
                         @if (event.maxParticipants) { / {{ event.maxParticipants }} }
@@ -552,12 +552,12 @@
                   @if (community.isAdmin && !event.isCancelled) {
                     <div class="flex items-center gap-1 flex-shrink-0">
                       <button (click)="openEditEvent(event); $event.stopPropagation()"
-                        class="p-1.5 rounded-lg text-slate-500 hover:text-blue-400 hover:bg-blue-500/10 transition-colors"
+                        class="p-1.5 rounded-lg text-muted-foreground hover:text-blue-400 hover:bg-blue-500/10 transition-colors"
                         title="Edit event">
                         <span class="material-icons text-sm">edit</span>
                       </button>
                       <button (click)="cancelEvent(event); $event.stopPropagation()"
-                        class="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                        class="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                         title="Cancel event">
                         <span class="material-icons text-sm">event_busy</span>
                       </button>
@@ -587,29 +587,29 @@
         <div class="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
           @if (chatLoading) {
             <div class="flex justify-center py-8">
-              <div class="animate-spin rounded-full h-8 w-8 border-2 border-orange-500 border-t-transparent"></div>
+              <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
             </div>
           } @else if (chatMessages.length === 0) {
             <div class="flex flex-col items-center justify-center h-full gap-3 text-center">
-              <span class="material-icons text-slate-600 text-4xl">chat_bubble_outline</span>
-              <p class="text-slate-500">No messages yet. Start the conversation!</p>
+              <span class="material-icons text-muted-foreground text-4xl">chat_bubble_outline</span>
+              <p class="text-muted-foreground">No messages yet. Start the conversation!</p>
             </div>
           } @else {
             @for (msg of chatMessages; track msg.id) {
               <div class="flex items-end gap-2" [class]="isOwnMessage(msg) ? 'flex-row-reverse' : ''">
                 @if (!isOwnMessage(msg)) {
-                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                  <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                     {{ msg.senderUsername.substring(0, 2).toUpperCase() }}
                   </div>
                 }
                 <div class="max-w-[70%] space-y-1">
                   @if (!isOwnMessage(msg)) {
-                    <p class="text-slate-500 text-xs px-1">{{ msg.senderUsername }}</p>
+                    <p class="text-muted-foreground text-xs px-1">{{ msg.senderUsername }}</p>
                   }
                   <div class="rounded-2xl text-sm overflow-hidden"
                     [class]="isOwnMessage(msg)
-                      ? 'bg-gradient-to-br from-orange-500 to-red-500 text-white rounded-br-sm'
-                      : 'bg-brand-surface border border-brand-border text-slate-200 rounded-bl-sm'">
+                      ? 'bg-primary text-foreground rounded-br-sm'
+                      : 'bg-secondary border border-border text-foreground rounded-bl-sm'">
                     @if (msg.content) {
                       <div class="px-3 py-2">{{ msg.content }}</div>
                     }
@@ -621,7 +621,7 @@
                       <div class="px-3 py-2"><audio [src]="msg.mediaUrl" controls class="w-full"></audio></div>
                     }
                   </div>
-                  <p class="text-slate-600 text-xs px-1" [class]="isOwnMessage(msg) ? 'text-right' : ''">
+                  <p class="text-muted-foreground text-xs px-1" [class]="isOwnMessage(msg) ? 'text-right' : ''">
                     {{ timeAgo(msg.sentAt) }}
                   </p>
                 </div>
@@ -630,12 +630,12 @@
           }
         </div>
         <!-- Input -->
-        <div class="p-4 border-t border-brand-border space-y-2">
+        <div class="p-4 border-t border-border space-y-2">
           @if (showChatMediaInput) {
             <div class="flex gap-2 items-center">
               <input type="url" [(ngModel)]="chatMediaUrl" placeholder="https://example.com/image.jpg" class="input-field flex-1 !text-sm !py-2" />
               <select [(ngModel)]="chatMediaType"
-                class="bg-brand-surface border border-brand-border text-slate-300 text-sm rounded-xl px-2 py-2 focus:outline-none focus:border-orange-500">
+                class="bg-secondary border border-border text-foreground text-sm rounded-xl px-2 py-2 focus:outline-none focus:border-primary">
                 <option value="image">Image</option>
                 <option value="gif">GIF</option>
                 <option value="video">Video</option>
@@ -646,7 +646,7 @@
           <div class="flex items-center gap-2">
             <button (click)="showChatMediaInput = !showChatMediaInput"
               class="w-11 h-11 rounded-xl flex items-center justify-center transition-colors flex-shrink-0"
-              [class]="showChatMediaInput ? 'bg-orange-500/20 text-orange-400' : 'bg-brand-surface border border-brand-border text-slate-400 hover:text-white'">
+              [class]="showChatMediaInput ? 'bg-primary/20 text-primary' : 'bg-secondary border border-border text-muted-foreground hover:text-foreground'">
               <span class="material-icons text-xl">attach_file</span>
             </button>
             <input
@@ -658,7 +658,7 @@
             />
             <button (click)="sendChatMessage()"
               [disabled]="(!chatInput.trim() && !chatMediaUrl.trim()) || sendingChat"
-              class="w-11 h-11 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center disabled:opacity-40 hover:from-orange-400 hover:to-red-400 transition-all flex-shrink-0">
+              class="w-11 h-11 rounded-xl bg-primary flex items-center justify-center disabled:opacity-40  transition-all flex-shrink-0">
               <span class="material-icons text-white">send</span>
             </button>
           </div>
@@ -680,21 +680,21 @@
       <div>
         @if (members.length === 0) {
           <div class="card flex flex-col items-center justify-center py-16 gap-4 text-center">
-            <span class="material-icons text-slate-600 text-4xl">group</span>
-            <p class="text-slate-400">No members found</p>
+            <span class="material-icons text-muted-foreground text-4xl">group</span>
+            <p class="text-muted-foreground">No members found</p>
           </div>
         } @else {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             @for (member of members; track member.userId) {
               <div class="card flex items-center gap-4">
                 <!-- Avatar -->
-                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white font-bold text-base flex-shrink-0">
+                <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-bold text-base flex-shrink-0">
                   {{ member.initials || (member.firstName ? member.firstName[0] : '?') }}
                 </div>
                 <!-- Info -->
                 <div class="flex-1 min-w-0">
-                  <p class="text-white font-semibold text-sm truncate">{{ member.firstName }} {{ member.lastName }}</p>
-                  <p class="text-slate-500 text-xs">&#64;{{ member.username }}</p>
+                  <p class="text-foreground font-semibold text-sm truncate">{{ member.firstName }} {{ member.lastName }}</p>
+                  <p class="text-muted-foreground text-xs">&#64;{{ member.username }}</p>
                 </div>
                 <!-- Role badge / selector -->
                 @if (community.isAdmin) {
@@ -703,14 +703,14 @@
                       [value]="member.role"
                       (change)="changeRole(member.userId, $any($event.target).value)"
                       [disabled]="changingRole[member.userId]"
-                      class="bg-brand-surface border border-brand-border text-slate-300 text-xs rounded-lg px-2 py-1 focus:outline-none focus:border-orange-500">
+                      class="bg-secondary border border-border text-foreground text-xs rounded-lg px-2 py-1 focus:outline-none focus:border-primary">
                       <option value="MEMBER">MEMBER</option>
                       <option value="MODERATOR">MODERATOR</option>
                       <option value="ADMIN">ADMIN</option>
                     </select>
                     <button
                       (click)="kickMember(member.userId, member.username)"
-                      class="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                      class="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                       title="Kick member">
                       <span class="material-icons text-sm">person_remove</span>
                     </button>
@@ -736,10 +736,10 @@
         <!-- Invite Form -->
         <div class="card">
           <div class="flex items-center gap-3 mb-5">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
-              <span class="material-icons text-white text-xl">person_add</span>
+            <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
+              <span class="material-icons text-foreground text-xl">person_add</span>
             </div>
-            <h2 class="text-white font-bold text-lg">Invite a Member</h2>
+            <h2 class="text-foreground font-bold text-lg">Invite a Member</h2>
           </div>
 
           <div class="flex gap-3">
@@ -764,7 +764,7 @@
           </div>
 
           @if (inviteError) {
-            <div class="mt-3 bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl">
+            <div class="mt-3 bg-destructive/10 border border-destructive/30 text-destructive text-sm px-4 py-3 rounded-xl">
               {{ inviteError }}
             </div>
           }
@@ -778,29 +778,29 @@
 
         <!-- Pending Invites List -->
         <div class="card">
-          <h3 class="text-white font-bold mb-4 flex items-center gap-2">
-            <span class="material-icons text-orange-400">schedule</span>
+          <h3 class="text-foreground font-bold mb-4 flex items-center gap-2">
+            <span class="material-icons text-primary">schedule</span>
             Pending Invites
             @if (invites.length > 0) {
-              <span class="bg-orange-500/20 text-orange-400 text-xs font-bold px-2 py-0.5 rounded-full">{{ invites.length }}</span>
+              <span class="bg-primary/20 text-primary text-xs font-bold px-2 py-0.5 rounded-full">{{ invites.length }}</span>
             }
           </h3>
 
           @if (invites.length === 0) {
             <div class="flex flex-col items-center justify-center py-10 gap-3 text-center">
-              <span class="material-icons text-slate-600 text-4xl">mail_outline</span>
-              <p class="text-slate-500 text-sm">No pending invites</p>
+              <span class="material-icons text-muted-foreground text-4xl">mail_outline</span>
+              <p class="text-muted-foreground text-sm">No pending invites</p>
             </div>
           } @else {
             <div class="space-y-3">
               @for (invite of invites; track invite.id) {
-                <div class="flex items-center gap-4 p-4 bg-brand-surface rounded-xl border border-brand-border">
-                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                <div class="flex items-center gap-4 p-4 bg-secondary rounded-xl border border-border">
+                  <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-foreground font-bold text-sm flex-shrink-0">
                     {{ invite.invitedUsername.substring(0, 2).toUpperCase() }}
                   </div>
                   <div class="flex-1 min-w-0">
-                    <p class="text-white font-semibold text-sm">&#64;{{ invite.invitedUsername }}</p>
-                    <p class="text-slate-500 text-xs">Invited by &#64;{{ invite.invitedByUsername }} · {{ timeAgo(invite.createdAt) }}</p>
+                    <p class="text-foreground font-semibold text-sm">&#64;{{ invite.invitedUsername }}</p>
+                    <p class="text-muted-foreground text-xs">Invited by &#64;{{ invite.invitedByUsername }} · {{ timeAgo(invite.createdAt) }}</p>
                   </div>
                   <div class="flex items-center gap-2 flex-shrink-0">
                     <span class="bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 text-xs font-semibold px-2.5 py-1 rounded-full">
@@ -808,7 +808,7 @@
                     </span>
                     <button
                       (click)="cancelInvite(invite.id)"
-                      class="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                      class="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                       title="Cancel invite">
                       <span class="material-icons text-sm">close</span>
                     </button>
@@ -828,10 +828,10 @@
         <!-- Community Settings Card -->
         <div class="card">
           <div class="flex items-center gap-3 mb-6">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
-              <span class="material-icons text-white text-xl">settings</span>
+            <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
+              <span class="material-icons text-foreground text-xl">settings</span>
             </div>
-            <h2 class="text-white font-bold text-lg">Community Settings</h2>
+            <h2 class="text-foreground font-bold text-lg">Community Settings</h2>
           </div>
 
           <div class="space-y-4">
@@ -846,17 +846,17 @@
             <div>
               <label class="label">Google Drive Folder ID</label>
               <input type="text" [(ngModel)]="settingsDriveFolderId" placeholder="e.g. 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs" class="input-field" />
-              <p class="text-slate-500 text-xs mt-1">
+              <p class="text-muted-foreground text-xs mt-1">
                 Paste your public Google Drive folder ID to enable photo syncing.
                 Open your folder in Google Drive and copy the ID from the URL.
               </p>
             </div>
             <div>
-              <label class="label">Cover Image URL <span class="text-slate-500 font-normal">(optional)</span></label>
+              <label class="label">Cover Image URL <span class="text-muted-foreground font-normal">(optional)</span></label>
               <input type="url" [(ngModel)]="settingsCoverUrl" placeholder="https://example.com/cover.jpg" class="input-field" />
             </div>
             <div>
-              <label class="label">Community Icon URL <span class="text-slate-500 font-normal">(optional)</span></label>
+              <label class="label">Community Icon URL <span class="text-muted-foreground font-normal">(optional)</span></label>
               <input type="url" [(ngModel)]="settingsImageUrl" placeholder="https://example.com/icon.png" class="input-field" />
             </div>
 
@@ -887,23 +887,23 @@
               <span class="material-icons text-blue-400 text-xl">cloud_sync</span>
             </div>
             <div>
-              <h2 class="text-white font-bold">Sync Drive Photos</h2>
-              <p class="text-slate-500 text-sm">Fetches all images from the Drive folder and creates a photo post</p>
+              <h2 class="text-foreground font-bold">Sync Drive Photos</h2>
+              <p class="text-muted-foreground text-sm">Fetches all images from the Drive folder and creates a photo post</p>
             </div>
           </div>
-          <p class="text-slate-400 text-sm mb-4">
+          <p class="text-muted-foreground text-sm mb-4">
             When you click "Sync Drive Photos", we'll fetch all images from your configured Google Drive folder
             and automatically create a Photo Album post in this community's feed.
           </p>
           <button
             (click)="openDrivePicker()"
             [disabled]="!community.driveFolderId"
-            class="bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors inline-flex items-center gap-2">
+            class="bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-foreground font-semibold px-5 py-2.5 rounded-xl transition-colors inline-flex items-center gap-2">
             <span class="material-icons text-base">cloud_sync</span>
             Browse & Sync Drive Folders
           </button>
           @if (!community.driveFolderId) {
-            <p class="text-slate-500 text-xs mt-2">Set a Google Drive Folder ID in Community Settings to enable syncing.</p>
+            <p class="text-muted-foreground text-xs mt-2">Set a Google Drive Folder ID in Community Settings to enable syncing.</p>
           }
         </div>
 
@@ -954,7 +954,7 @@
             @for (p of lightboxPhotos; track p; let i = $index) {
               <button (click)="goToPhoto(i)"
                 class="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden transition-all"
-                [class]="i === lightboxIndex ? 'ring-2 ring-orange-400 ring-offset-1 ring-offset-black opacity-100' : 'opacity-50 hover:opacity-75'">
+                [class]="i === lightboxIndex ? 'ring-2 ring-primary ring-offset-1 ring-offset-black opacity-100' : 'opacity-50 hover:opacity-75'">
                 <img [src]="p" alt="Thumb" class="w-full h-full object-cover" />
               </button>
             }
@@ -970,11 +970,11 @@
     <div class="fixed inset-0 bg-black/70 z-40" (click)="closeEventDetail()"></div>
 
     <!-- Slide-in panel -->
-    <div class="fixed inset-y-0 right-0 z-50 w-full max-w-lg flex flex-col bg-brand-card border-l border-brand-border shadow-2xl overflow-hidden animate-slide-up">
+    <div class="fixed inset-y-0 right-0 z-50 w-full max-w-lg flex flex-col bg-card border-l border-border shadow-2xl overflow-hidden animate-slide-up">
 
       <!-- Header Banner -->
-      <div class="relative h-36 bg-gradient-to-br from-orange-600/60 to-red-600/40 flex-shrink-0">
-        <div class="absolute inset-0 bg-gradient-to-t from-brand-card via-transparent to-transparent"></div>
+      <div class="relative h-36 bg-gradient-to-br from-primary/40 to-primary/20 flex-shrink-0">
+        <div class="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent"></div>
         <div class="absolute top-4 right-4">
           <button (click)="closeEventDetail()" class="w-9 h-9 rounded-full bg-black/30 hover:bg-black/50 flex items-center justify-center transition-colors">
             <span class="material-icons text-white">close</span>
@@ -993,12 +993,12 @@
 
           <!-- Date, Location -->
           <div class="flex flex-col gap-2 text-sm">
-            <div class="flex items-center gap-2 text-slate-300">
-              <span class="material-icons text-orange-400 text-base">schedule</span>
+            <div class="flex items-center gap-2 text-foreground">
+              <span class="material-icons text-primary text-base">schedule</span>
               {{ formatEventDate(selectedEvent.eventDate) }}
             </div>
-            <div class="flex items-center gap-2 text-slate-300">
-              <span class="material-icons text-orange-400 text-base">location_on</span>
+            <div class="flex items-center gap-2 text-foreground">
+              <span class="material-icons text-primary text-base">location_on</span>
               {{ selectedEvent.location }}
             </div>
           </div>
@@ -1006,30 +1006,30 @@
           <!-- Stats Row -->
           <div class="grid grid-cols-3 gap-3">
             @if (selectedEvent.distanceKm) {
-              <div class="bg-brand-surface rounded-xl p-3 text-center border border-brand-border">
-                <span class="material-icons text-orange-400 text-lg">directions_run</span>
-                <p class="text-white font-bold text-sm mt-1">{{ selectedEvent.distanceKm }} km</p>
-                <p class="text-slate-500 text-xs">Distance</p>
+              <div class="bg-secondary rounded-xl p-3 text-center border border-border">
+                <span class="material-icons text-primary text-lg">directions_run</span>
+                <p class="text-foreground font-bold text-sm mt-1">{{ selectedEvent.distanceKm }} km</p>
+                <p class="text-muted-foreground text-xs">Distance</p>
               </div>
             }
-            <div class="bg-brand-surface rounded-xl p-3 text-center border border-brand-border">
+            <div class="bg-secondary rounded-xl p-3 text-center border border-border">
               <span class="material-icons text-green-400 text-lg">payments</span>
-              <p class="text-white font-bold text-sm mt-1">{{ selectedEvent.price > 0 ? (selectedEvent.price | currency) : 'Free' }}</p>
-              <p class="text-slate-500 text-xs">Entry</p>
+              <p class="text-foreground font-bold text-sm mt-1">{{ selectedEvent.price > 0 ? (selectedEvent.price | currency) : 'Free' }}</p>
+              <p class="text-muted-foreground text-xs">Entry</p>
             </div>
-            <div class="bg-brand-surface rounded-xl p-3 text-center border border-brand-border">
+            <div class="bg-secondary rounded-xl p-3 text-center border border-border">
               <span class="material-icons text-blue-400 text-lg">group</span>
-              <p class="text-white font-bold text-sm mt-1">
+              <p class="text-foreground font-bold text-sm mt-1">
                 {{ selectedEvent.participantCount }}
                 @if (selectedEvent.maxParticipants) { / {{ selectedEvent.maxParticipants }} }
               </p>
-              <p class="text-slate-500 text-xs">Registered</p>
+              <p class="text-muted-foreground text-xs">Registered</p>
             </div>
           </div>
 
           <!-- Description -->
           @if (selectedEvent.description) {
-            <p class="text-slate-300 text-sm leading-relaxed">{{ selectedEvent.description }}</p>
+            <p class="text-foreground text-sm leading-relaxed">{{ selectedEvent.description }}</p>
           }
 
           <!-- Register button -->
@@ -1045,17 +1045,17 @@
         <!-- Participants -->
         @if (eventParticipants.length > 0) {
           <div class="px-5 pb-4">
-            <h3 class="text-white font-bold mb-3 flex items-center gap-2">
-              <span class="material-icons text-orange-400 text-base">people</span>
+            <h3 class="text-foreground font-bold mb-3 flex items-center gap-2">
+              <span class="material-icons text-primary text-base">people</span>
               Participants ({{ eventParticipants.length }})
             </h3>
             <div class="flex flex-wrap gap-2">
               @for (p of eventParticipants; track p.userId) {
-                <div class="flex items-center gap-1.5 bg-brand-surface border border-brand-border rounded-full px-3 py-1.5">
-                  <div class="w-5 h-5 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white text-xs font-bold">
+                <div class="flex items-center gap-1.5 bg-secondary border border-border rounded-full px-3 py-1.5">
+                  <div class="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
                     {{ (p.username || '?').substring(0, 1).toUpperCase() }}
                   </div>
-                  <span class="text-slate-300 text-xs">{{ p.username }}</span>
+                  <span class="text-foreground text-xs">{{ p.username }}</span>
                 </div>
               }
             </div>
@@ -1065,8 +1065,8 @@
         <!-- Event Photos -->
         @if (selectedEvent.photoUrls && selectedEvent.photoUrls.length > 0) {
           <div class="px-5 pb-4">
-            <h3 class="text-white font-bold mb-3 flex items-center gap-2">
-              <span class="material-icons text-orange-400 text-base">photo_library</span>
+            <h3 class="text-foreground font-bold mb-3 flex items-center gap-2">
+              <span class="material-icons text-primary text-base">photo_library</span>
               Photos
             </h3>
             <div class="grid grid-cols-3 gap-2">
@@ -1081,30 +1081,30 @@
 
         <!-- Event Discussion -->
         <div class="px-5 pb-5">
-          <h3 class="text-white font-bold mb-3 flex items-center gap-2">
-            <span class="material-icons text-orange-400 text-base">chat_bubble</span>
+          <h3 class="text-foreground font-bold mb-3 flex items-center gap-2">
+            <span class="material-icons text-primary text-base">chat_bubble</span>
             Discussion
           </h3>
 
           @if (loadingEventDetail) {
             <div class="flex justify-center py-6">
-              <div class="animate-spin rounded-full h-8 w-8 border-2 border-orange-500 border-t-transparent"></div>
+              <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
             </div>
           } @else if (eventMessages.length === 0) {
-            <p class="text-slate-600 text-sm text-center py-6">No messages yet. Be the first!</p>
+            <p class="text-muted-foreground text-sm text-center py-6">No messages yet. Be the first!</p>
           } @else {
             <div class="space-y-3 mb-4 max-h-60 overflow-y-auto">
               @for (msg of eventMessages; track msg.id) {
                 <div class="flex items-start gap-2">
-                  <div class="w-7 h-7 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                  <div class="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                     {{ msg.senderUsername.substring(0, 1).toUpperCase() }}
                   </div>
-                  <div class="flex-1 bg-brand-surface border border-brand-border rounded-xl px-3 py-2">
+                  <div class="flex-1 bg-secondary border border-border rounded-xl px-3 py-2">
                     <div class="flex items-center gap-2 mb-0.5">
-                      <span class="text-white text-xs font-semibold">{{ msg.senderUsername }}</span>
-                      <span class="text-slate-600 text-xs">{{ timeAgo(msg.sentAt) }}</span>
+                      <span class="text-foreground text-xs font-semibold">{{ msg.senderUsername }}</span>
+                      <span class="text-muted-foreground text-xs">{{ timeAgo(msg.sentAt) }}</span>
                     </div>
-                    <p class="text-slate-300 text-sm">{{ msg.content }}</p>
+                    <p class="text-foreground text-sm">{{ msg.content }}</p>
                   </div>
                 </div>
               }
@@ -1112,14 +1112,14 @@
           }
 
           <!-- Chat Input -->
-          <div class="flex items-center gap-2 border-t border-brand-border pt-3">
+          <div class="flex items-center gap-2 border-t border-border pt-3">
             <input type="text" [(ngModel)]="eventChatInput"
               (keydown)="onEventChatKeyDown($event)"
               placeholder="Write a message..."
               class="input-field flex-1 !py-2 !text-sm" />
             <button (click)="sendEventMessage()"
               [disabled]="!eventChatInput.trim() || sendingEventChat"
-              class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center disabled:opacity-40 flex-shrink-0">
+              class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center disabled:opacity-40 flex-shrink-0">
               <span class="material-icons text-white text-sm">send</span>
             </button>
           </div>
@@ -1136,20 +1136,20 @@
 
     <!-- Modal -->
     <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div class="bg-brand-card border border-brand-border rounded-2xl w-full max-w-lg shadow-2xl animate-fade-in">
+      <div class="bg-card border border-border rounded-2xl w-full max-w-lg shadow-2xl animate-fade-in">
 
         <!-- Header -->
-        <div class="flex items-center justify-between p-6 border-b border-brand-border">
+        <div class="flex items-center justify-between p-6 border-b border-border">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-blue-600/20 flex items-center justify-center">
               <span class="material-icons text-blue-400">folder</span>
             </div>
             <div>
-              <h2 class="text-white font-bold text-lg">Select Event Folder</h2>
-              <p class="text-slate-500 text-xs">Pick a folder to sync its photos as a community post</p>
+              <h2 class="text-foreground font-bold text-lg">Select Event Folder</h2>
+              <p class="text-muted-foreground text-xs">Pick a folder to sync its photos as a community post</p>
             </div>
           </div>
-          <button (click)="closeDrivePicker()" class="text-slate-500 hover:text-white transition-colors">
+          <button (click)="closeDrivePicker()" class="text-muted-foreground hover:text-foreground transition-colors">
             <span class="material-icons">close</span>
           </button>
         </div>
@@ -1158,7 +1158,7 @@
         <div class="p-6">
 
           @if (driveError) {
-            <div class="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl mb-4">
+            <div class="bg-destructive/10 border border-destructive/30 text-destructive text-sm px-4 py-3 rounded-xl mb-4">
               {{ driveError }}
             </div>
           }
@@ -1166,13 +1166,13 @@
           @if (loadingFolders) {
             <div class="flex flex-col items-center justify-center py-12 gap-3">
               <div class="animate-spin rounded-full h-10 w-10 border-2 border-blue-500 border-t-transparent"></div>
-              <p class="text-slate-400 text-sm">Loading folders from Google Drive...</p>
+              <p class="text-muted-foreground text-sm">Loading folders from Google Drive...</p>
             </div>
           } @else if (driveFolders.length === 0 && !driveError) {
             <div class="flex flex-col items-center justify-center py-12 gap-3 text-center">
-              <span class="material-icons text-slate-600 text-5xl">folder_off</span>
-              <p class="text-slate-400">No event folders found.</p>
-              <p class="text-slate-600 text-sm">Make sure your Drive folder contains subfolders named after events.</p>
+              <span class="material-icons text-muted-foreground text-5xl">folder_off</span>
+              <p class="text-muted-foreground">No event folders found.</p>
+              <p class="text-muted-foreground text-sm">Make sure your Drive folder contains subfolders named after events.</p>
             </div>
           } @else {
             <div class="space-y-3 max-h-80 overflow-y-auto pr-1">
@@ -1180,7 +1180,7 @@
                 <button
                   (click)="syncFolder(folder)"
                   [disabled]="syncingFolderId !== null"
-                  class="w-full flex items-center gap-4 p-4 bg-brand-surface border border-brand-border hover:border-blue-500/50 rounded-xl transition-all disabled:opacity-50 text-left group">
+                  class="w-full flex items-center gap-4 p-4 bg-secondary border border-border hover:border-blue-500/50 rounded-xl transition-all disabled:opacity-50 text-left group">
                   <div class="w-12 h-12 rounded-xl bg-blue-600/15 flex items-center justify-center flex-shrink-0">
                     @if (syncingFolderId === folder.id) {
                       <div class="animate-spin rounded-full h-5 w-5 border-2 border-blue-400 border-t-transparent"></div>
@@ -1189,8 +1189,8 @@
                     }
                   </div>
                   <div class="flex-1 min-w-0">
-                    <p class="text-white font-semibold text-sm truncate">{{ folder.name }}</p>
-                    <p class="text-slate-500 text-xs mt-0.5">
+                    <p class="text-foreground font-semibold text-sm truncate">{{ folder.name }}</p>
+                    <p class="text-muted-foreground text-xs mt-0.5">
                       @if (folder.imageCount > 0) {
                         {{ folder.imageCount }} photo{{ folder.imageCount !== 1 ? 's' : '' }}
                       } @else {
@@ -1198,7 +1198,7 @@
                       }
                     </p>
                   </div>
-                  <span class="material-icons text-slate-600 group-hover:text-blue-400 transition-colors flex-shrink-0">chevron_right</span>
+                  <span class="material-icons text-muted-foreground group-hover:text-blue-400 transition-colors flex-shrink-0">chevron_right</span>
                 </button>
               }
             </div>

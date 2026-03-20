@@ -162,11 +162,11 @@ export class ProfileComponent implements OnInit {
       MARATHON: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
       SPRINT: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
       ULTRA: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-      ROAD: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-      CASUAL: 'bg-slate-500/20 text-slate-400 border-slate-500/30',
+      ROAD: 'bg-primary/20 text-primary border-primary/30',
+      CASUAL: 'bg-muted text-muted-foreground border-border',
       TRACK: 'bg-red-500/20 text-red-400 border-red-500/30'
     };
-    return map[cat || ''] || 'bg-brand-surface text-slate-400 border-brand-border';
+    return map[cat || ''] || 'bg-secondary text-muted-foreground border-border';
   }
 
   getCategoryIcon(cat?: string): string {
@@ -188,9 +188,9 @@ export class ProfileComponent implements OnInit {
 
   getProviderColor(): string {
     const p = this.authUser?.provider;
-    if (p === 'STRAVA') return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+    if (p === 'STRAVA') return 'bg-primary/20 text-primary border-primary/30';
     if (p === 'GARMIN') return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
-    return 'bg-brand-surface text-slate-400 border-brand-border';
+    return 'bg-secondary text-muted-foreground border-border';
   }
 
   get previewImageUrl(): string {

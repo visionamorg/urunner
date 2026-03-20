@@ -3,6 +3,7 @@ import { RouterOutlet, RouterLink, RouterLinkActive, Router, RouterModule } from
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { AuthResponse } from '../../../core/models/user.model';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-layout',
@@ -35,7 +36,7 @@ export class LayoutComponent implements OnInit {
     { path: '/profile', icon: 'person', label: 'Profile' }
   ];
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router, public themeService: ThemeService) {}
 
   ngOnInit(): void {
     this.authService.currentUser$.subscribe(user => {

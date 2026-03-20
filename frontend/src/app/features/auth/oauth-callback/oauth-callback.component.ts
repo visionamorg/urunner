@@ -8,20 +8,20 @@ import { AuthService } from '../../../core/services/auth.service';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="min-h-screen bg-brand-bg flex flex-col items-center justify-center gap-6">
+    <div class="min-h-screen bg-background flex flex-col items-center justify-center gap-6">
       @if (error) {
         <div class="flex flex-col items-center gap-4 animate-fade-in">
-          <div class="w-16 h-16 rounded-full bg-red-500/20 border border-red-500/30 flex items-center justify-center">
-            <span class="material-icons text-red-400 text-3xl">error_outline</span>
+          <div class="w-16 h-16 rounded-full bg-destructive/20 border border-destructive/30 flex items-center justify-center">
+            <span class="material-icons text-destructive text-3xl">error_outline</span>
           </div>
-          <h2 class="text-xl font-bold text-red-400">Authentication failed</h2>
-          <p class="text-slate-400 text-center max-w-sm">{{ error }}</p>
+          <h2 class="text-xl font-bold text-destructive">Authentication failed</h2>
+          <p class="text-muted-foreground text-center max-w-sm">{{ error }}</p>
           <a href="/login" class="btn-primary">Back to login</a>
         </div>
       } @else {
         <div class="flex flex-col items-center gap-4 animate-fade-in">
-          <div class="animate-spin rounded-full h-12 w-12 border-2 border-orange-500 border-t-transparent"></div>
-          <p class="text-slate-400 font-medium">Completing sign-in…</p>
+          <div class="animate-spin rounded-full h-12 w-12 border-2 border-primary border-t-transparent"></div>
+          <p class="text-muted-foreground font-medium">Completing sign-in…</p>
         </div>
       }
     </div>

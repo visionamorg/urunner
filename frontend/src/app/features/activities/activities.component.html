@@ -3,8 +3,8 @@
   <!-- Page Header -->
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
     <div>
-      <h1 class="text-3xl font-black text-white">Activities</h1>
-      <p class="text-slate-400 mt-1">Track and review your running history</p>
+      <h1 class="text-3xl font-black text-foreground">Activities</h1>
+      <p class="text-muted-foreground mt-1">Track and review your running history</p>
     </div>
     <button (click)="showForm = !showForm" class="btn-primary inline-flex items-center gap-2 self-start">
       <span class="material-icons text-xl">{{ showForm ? 'close' : 'add' }}</span>
@@ -17,19 +17,19 @@
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="card text-center">
         <div class="stat-value">{{ stats.totalDistanceKm?.toFixed(1) }}</div>
-        <p class="text-slate-400 text-xs uppercase tracking-wider mt-1">Total KM</p>
+        <p class="text-muted-foreground text-xs uppercase tracking-wider mt-1">Total KM</p>
       </div>
       <div class="card text-center">
         <div class="stat-value">{{ stats.weeklyDistanceKm?.toFixed(1) }}</div>
-        <p class="text-slate-400 text-xs uppercase tracking-wider mt-1">Weekly KM</p>
+        <p class="text-muted-foreground text-xs uppercase tracking-wider mt-1">Weekly KM</p>
       </div>
       <div class="card text-center">
         <div class="stat-value">{{ stats.monthlyDistanceKm?.toFixed(1) }}</div>
-        <p class="text-slate-400 text-xs uppercase tracking-wider mt-1">Monthly KM</p>
+        <p class="text-muted-foreground text-xs uppercase tracking-wider mt-1">Monthly KM</p>
       </div>
       <div class="card text-center">
         <div class="stat-value">{{ stats.totalRuns }}</div>
-        <p class="text-slate-400 text-xs uppercase tracking-wider mt-1">Total Runs</p>
+        <p class="text-muted-foreground text-xs uppercase tracking-wider mt-1">Total Runs</p>
       </div>
     </div>
   }
@@ -38,10 +38,10 @@
   @if (showForm) {
     <div class="card animate-slide-up">
       <div class="flex items-center gap-3 mb-6">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
-          <span class="material-icons text-white text-xl">add</span>
+        <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
+          <span class="material-icons text-foreground text-xl">add</span>
         </div>
-        <h2 class="text-white font-bold text-lg">Log New Run</h2>
+        <h2 class="text-foreground font-bold text-lg">Log New Run</h2>
       </div>
 
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
@@ -50,7 +50,7 @@
             <label class="label">Title *</label>
             <input type="text" formControlName="title" placeholder="Morning Run" class="input-field">
             @if (form.get('title')?.hasError('required') && form.get('title')?.touched) {
-              <p class="text-red-400 text-xs mt-1">Title is required</p>
+              <p class="text-destructive text-xs mt-1">Title is required</p>
             }
           </div>
           <div>
@@ -64,17 +64,17 @@
             <label class="label">Distance (km) *</label>
             <input type="number" step="0.1" formControlName="distanceKm" placeholder="5.0" class="input-field">
             @if (form.get('distanceKm')?.hasError('required') && form.get('distanceKm')?.touched) {
-              <p class="text-red-400 text-xs mt-1">Distance is required</p>
+              <p class="text-destructive text-xs mt-1">Distance is required</p>
             }
             @if (form.get('distanceKm')?.hasError('min') && form.get('distanceKm')?.touched) {
-              <p class="text-red-400 text-xs mt-1">Must be at least 0.1 km</p>
+              <p class="text-destructive text-xs mt-1">Must be at least 0.1 km</p>
             }
           </div>
           <div>
             <label class="label">Duration (minutes) *</label>
             <input type="number" formControlName="durationMinutes" placeholder="30" class="input-field">
             @if (form.get('durationMinutes')?.hasError('required') && form.get('durationMinutes')?.touched) {
-              <p class="text-red-400 text-xs mt-1">Duration is required</p>
+              <p class="text-destructive text-xs mt-1">Duration is required</p>
             }
           </div>
         </div>
@@ -105,16 +105,16 @@
   <!-- Activities List -->
   @if (loading) {
     <div class="flex justify-center py-16">
-      <div class="animate-spin rounded-full h-10 w-10 border-2 border-orange-500 border-t-transparent"></div>
+      <div class="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent"></div>
     </div>
   } @else if (activities.length === 0) {
     <div class="card flex flex-col items-center justify-center py-20 gap-4 text-center">
-      <div class="w-20 h-20 rounded-2xl bg-brand-surface border border-brand-border flex items-center justify-center">
-        <span class="material-icons text-slate-600 text-4xl">directions_run</span>
+      <div class="w-20 h-20 rounded-2xl bg-secondary border border-border flex items-center justify-center">
+        <span class="material-icons text-muted-foreground text-4xl">directions_run</span>
       </div>
       <div>
-        <p class="text-white font-semibold text-lg">No activities yet</p>
-        <p class="text-slate-400 mt-1">Start logging your runs to track your progress</p>
+        <p class="text-foreground font-semibold text-lg">No activities yet</p>
+        <p class="text-muted-foreground mt-1">Start logging your runs to track your progress</p>
       </div>
       <button (click)="showForm = true" class="btn-primary inline-flex items-center gap-2">
         <span class="material-icons text-xl">add</span>
@@ -124,14 +124,14 @@
   } @else {
     <div class="space-y-3">
       @for (activity of activities; track activity.id) {
-        <div class="card hover:border-orange-500/20 transition-colors">
+        <div class="card hover:border-primary/20 transition-colors">
           <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 border border-orange-500/20 flex items-center justify-center flex-shrink-0">
-              <span class="material-icons text-orange-400 text-2xl">directions_run</span>
+            <div class="w-12 h-12 rounded-xl bg-primary/20 border border-primary/20 flex items-center justify-center flex-shrink-0">
+              <span class="material-icons text-primary text-2xl">directions_run</span>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-white font-bold truncate">{{ activity.title }}</p>
-              <p class="text-slate-500 text-sm mt-0.5">
+              <p class="text-foreground font-bold truncate">{{ activity.title }}</p>
+              <p class="text-muted-foreground text-sm mt-0.5">
                 {{ activity.activityDate | date:'MMMM d, yyyy' }}
                 @if (activity.location) {
                   · <span class="material-icons text-xs align-middle">location_on</span> {{ activity.location }}
@@ -139,13 +139,13 @@
               </p>
             </div>
             <div class="flex items-center gap-3 flex-shrink-0">
-              <span class="badge bg-orange-500/15 text-orange-400 border border-orange-500/20">{{ activity.distanceKm.toFixed(2) }} km</span>
-              <span class="badge bg-brand-surface text-slate-400 border border-brand-border hidden sm:inline-flex">{{ formatDuration(activity.durationMinutes) }}</span>
-              <span class="badge bg-brand-surface text-slate-400 border border-brand-border hidden md:inline-flex">{{ formatPace(activity.paceMinPerKm) }}</span>
+              <span class="badge bg-primary/15 text-primary border border-primary/20">{{ activity.distanceKm.toFixed(2) }} km</span>
+              <span class="badge bg-secondary text-muted-foreground border border-border hidden sm:inline-flex">{{ formatDuration(activity.durationMinutes) }}</span>
+              <span class="badge bg-secondary text-muted-foreground border border-border hidden md:inline-flex">{{ formatPace(activity.paceMinPerKm) }}</span>
             </div>
           </div>
           @if (activity.notes) {
-            <p class="text-slate-400 text-sm mt-3 pt-3 border-t border-brand-border">{{ activity.notes }}</p>
+            <p class="text-muted-foreground text-sm mt-3 pt-3 border-t border-border">{{ activity.notes }}</p>
           }
         </div>
       }

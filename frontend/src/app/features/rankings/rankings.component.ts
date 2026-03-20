@@ -63,7 +63,7 @@ export class RankingsComponent implements OnInit {
   getRankStyle(rank: number): string {
     if (rank === 1) return 'bg-gradient-to-r from-yellow-500/20 to-transparent border-yellow-500/30';
     if (rank === 2) return 'bg-gradient-to-r from-slate-400/10 to-transparent border-slate-400/20';
-    if (rank === 3) return 'bg-gradient-to-r from-orange-700/20 to-transparent border-orange-700/30';
-    return 'border-transparent hover:border-brand-border';
+    if (rank === 3) return 'bg-gradient-to-r from-amber-700/20 to-transparent border-amber-700/30';
+    return 'border-transparent hover:border-border';
   }
 }

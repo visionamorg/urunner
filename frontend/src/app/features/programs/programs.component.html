@@ -2,41 +2,41 @@
 
   <!-- Page Header -->
   <div>
-    <h1 class="text-3xl font-black text-white">Training Programs</h1>
-    <p class="text-slate-400 mt-1">Structured plans to reach your running goals</p>
+    <h1 class="text-3xl font-black text-foreground">Training Programs</h1>
+    <p class="text-muted-foreground mt-1">Structured plans to reach your running goals</p>
   </div>
 
   <!-- Active Programs -->
   @if (getActivePrograms().length > 0) {
     <div class="card">
       <div class="flex items-center gap-3 mb-5">
-        <span class="material-icons text-orange-400">fitness_center</span>
-        <h2 class="text-white font-bold text-lg">My Active Programs</h2>
+        <span class="material-icons text-primary">fitness_center</span>
+        <h2 class="text-foreground font-bold text-lg">My Active Programs</h2>
       </div>
       <div class="space-y-4">
         @for (p of myProgress; track p.id) {
           @if (p.status === 'ACTIVE') {
-            <div class="p-4 bg-brand-surface rounded-xl border border-brand-border">
+            <div class="p-4 bg-secondary rounded-xl border border-border">
               <div class="flex items-center justify-between mb-3">
                 <div>
-                  <p class="text-white font-semibold">{{ p.programName }}</p>
+                  <p class="text-foreground font-semibold">{{ p.programName }}</p>
                   <div class="flex items-center gap-3 mt-1">
                     <span class="badge border text-xs {{ getLevelColor(p.programLevel) }}">{{ p.programLevel }}</span>
-                    <span class="text-slate-500 text-xs">Week {{ Math.ceil((p.completedSessions + 1) / 7) }} of {{ p.durationWeeks }}</span>
+                    <span class="text-muted-foreground text-xs">Week {{ Math.ceil((p.completedSessions + 1) / 7) }} of {{ p.durationWeeks }}</span>
                   </div>
                 </div>
-                <span class="text-orange-400 font-black text-xl">{{ progressPercent(p) }}%</span>
+                <span class="text-primary font-black text-xl">{{ progressPercent(p) }}%</span>
               </div>
               <!-- Progress Bar -->
-              <div class="w-full h-2 bg-brand-border rounded-full overflow-hidden">
+              <div class="w-full h-2 bg-border rounded-full overflow-hidden">
                 <div
-                  class="h-full bg-gradient-to-r from-orange-500 to-red-500 rounded-full transition-all duration-500"
+                  class="h-full bg-primary rounded-full transition-all duration-500"
                   [style.width.%]="progressPercent(p)">
                 </div>
               </div>
               <div class="flex justify-between mt-2">
-                <span class="text-slate-500 text-xs">{{ p.completedSessions }} sessions done</span>
-                <span class="text-slate-500 text-xs">{{ p.totalSessions }} total</span>
+                <span class="text-muted-foreground text-xs">{{ p.completedSessions }} sessions done</span>
+                <span class="text-muted-foreground text-xs">{{ p.totalSessions }} total</span>
               </div>
             </div>
           }
@@ -48,20 +48,20 @@
   <!-- Loading -->
   @if (loading) {
     <div class="flex justify-center py-16">
-      <div class="animate-spin rounded-full h-10 w-10 border-2 border-orange-500 border-t-transparent"></div>
+      <div class="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent"></div>
     </div>
   } @else if (programs.length === 0) {
     <div class="card flex flex-col items-center justify-center py-16 gap-4 text-center">
-      <div class="w-16 h-16 rounded-2xl bg-brand-surface border border-brand-border flex items-center justify-center">
-        <span class="material-icons text-slate-600 text-3xl">fitness_center</span>
+      <div class="w-16 h-16 rounded-2xl bg-secondary border border-border flex items-center justify-center">
+        <span class="material-icons text-muted-foreground text-3xl">fitness_center</span>
       </div>
-      <p class="text-white font-semibold">No programs available</p>
+      <p class="text-foreground font-semibold">No programs available</p>
     </div>
   } @else {
-    <h2 class="text-white font-bold text-lg">All Programs</h2>
+    <h2 class="text-foreground font-bold text-lg">All Programs</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
       @for (program of programs; track program.id) {
-        <div class="card flex flex-col hover:border-orange-500/20 transition-colors">
+        <div class="card flex flex-col hover:border-primary/20 transition-colors">
           <!-- Header -->
           <div class="flex items-start justify-between mb-3">
             <span class="badge border text-xs {{ getLevelColor(program.level) }}">
@@ -76,21 +76,21 @@
           </div>
 
           <!-- Name + Description -->
-          <h3 class="text-white font-bold text-lg mb-2">{{ program.name }}</h3>
-          <p class="text-slate-400 text-sm leading-relaxed flex-1 mb-5">{{ program.description }}</p>
+          <h3 class="text-foreground font-bold text-lg mb-2">{{ program.name }}</h3>
+          <p class="text-muted-foreground text-sm leading-relaxed flex-1 mb-5">{{ program.description }}</p>
 
           <!-- Stats -->
           <div class="flex flex-wrap gap-3 mb-5">
-            <div class="flex items-center gap-1.5 text-slate-400 text-sm">
-              <span class="material-icons text-orange-400 text-base">schedule</span>
+            <div class="flex items-center gap-1.5 text-muted-foreground text-sm">
+              <span class="material-icons text-primary text-base">schedule</span>
               <span>{{ program.durationWeeks }} weeks</span>
             </div>
-            <div class="flex items-center gap-1.5 text-slate-400 text-sm">
-              <span class="material-icons text-orange-400 text-base">directions_run</span>
+            <div class="flex items-center gap-1.5 text-muted-foreground text-sm">
+              <span class="material-icons text-primary text-base">directions_run</span>
               <span>{{ program.targetDistanceKm }} km goal</span>
             </div>
-            <div class="flex items-center gap-1.5 text-slate-400 text-sm">
-              <span class="material-icons text-orange-400 text-base">checklist</span>
+            <div class="flex items-center gap-1.5 text-muted-foreground text-sm">
+              <span class="material-icons text-primary text-base">checklist</span>
               <span>{{ program.sessionsCount }} sessions</span>
             </div>
           </div>
