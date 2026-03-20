@@ -1,0 +1,421 @@
+<div class="min-h-screen bg-background overflow-x-hidden">
+
+  <!-- ===================== NAVBAR ===================== -->
+  <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-background/80 backdrop-blur-xl border-b border-border/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 lg:h-20">
+
+        <!-- Logo -->
+        <a routerLink="/home" class="flex items-center gap-2.5 group">
+          <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/25 group-hover:shadow-primary/40 transition-shadow">
+            <span class="material-icons text-white text-xl">bolt</span>
+          </div>
+          <span class="text-2xl font-black text-primary tracking-wider">RUNHUB</span>
+        </a>
+
+        <!-- Desktop Nav Links -->
+        <div class="hidden md:flex items-center gap-1">
+          <a href="#features" class="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary">Features</a>
+          <a href="#how-it-works" class="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary">How It Works</a>
+          <a href="#integrations" class="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary">Integrations</a>
+        </div>
+
+        <!-- Desktop Actions -->
+        <div class="hidden md:flex items-center gap-3">
+          <button (click)="toggleTheme()" class="p-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary transition-all" aria-label="Toggle theme">
+            <span class="material-icons text-xl">{{ isDark ? 'light_mode' : 'dark_mode' }}</span>
+          </button>
+          <a routerLink="/login" class="px-5 py-2.5 text-sm font-semibold text-foreground hover:text-primary transition-colors">Log In</a>
+          <a routerLink="/register" class="btn-primary !py-2.5 !px-6 !text-sm">Get Started</a>
+        </div>
+
+        <!-- Mobile Menu Toggle -->
+        <div class="flex md:hidden items-center gap-2">
+          <button (click)="toggleTheme()" class="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary transition-all" aria-label="Toggle theme">
+            <span class="material-icons text-xl">{{ isDark ? 'light_mode' : 'dark_mode' }}</span>
+          </button>
+          <button (click)="toggleMobileMenu()" class="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary transition-all" aria-label="Menu">
+            <span class="material-icons text-2xl">{{ mobileMenuOpen ? 'close' : 'menu' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu Dropdown -->
+    @if (mobileMenuOpen) {
+      <div class="md:hidden border-t border-border/50 bg-background/95 backdrop-blur-xl animate-slide-down">
+        <div class="px-4 py-4 space-y-1">
+          <a href="#features" (click)="mobileMenuOpen = false" class="block px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground rounded-xl hover:bg-secondary transition-all">Features</a>
+          <a href="#how-it-works" (click)="mobileMenuOpen = false" class="block px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground rounded-xl hover:bg-secondary transition-all">How It Works</a>
+          <a href="#integrations" (click)="mobileMenuOpen = false" class="block px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground rounded-xl hover:bg-secondary transition-all">Integrations</a>
+          <div class="pt-3 border-t border-border/50 flex flex-col gap-2">
+            <a routerLink="/login" class="btn-secondary !text-center !text-sm">Log In</a>
+            <a routerLink="/register" class="btn-primary !text-center !text-sm">Get Started</a>
+          </div>
+        </div>
+      </div>
+    }
+  </nav>
+
+
+  <!-- ===================== HERO SECTION ===================== -->
+  <section class="relative pt-32 lg:pt-40 pb-20 lg:pb-32 px-4 sm:px-6 lg:px-8">
+    <!-- Animated background -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute top-20 left-1/4 w-[500px] h-[500px] bg-primary/8 rounded-full blur-[120px] animate-pulse-slow"></div>
+      <div class="absolute bottom-20 right-1/4 w-[400px] h-[400px] bg-destructive/6 rounded-full blur-[100px] animate-pulse-slow animation-delay-2000"></div>
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/4 rounded-full blur-[150px]"></div>
+    </div>
+
+    <div class="relative z-10 max-w-7xl mx-auto">
+      <div class="text-center max-w-4xl mx-auto">
+        <!-- Badge -->
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8 animate-fade-in">
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
+          </span>
+          <span class="text-sm font-medium text-primary">Join 10,000+ runners worldwide</span>
+        </div>
+
+        <!-- Headline -->
+        <h1 class="text-5xl sm:text-6xl lg:text-8xl font-black text-foreground leading-[1.05] tracking-tight mb-6 animate-fade-in animation-delay-100">
+          Run Together.<br>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-amber-400 to-primary">Achieve More.</span>
+        </h1>
+
+        <!-- Subtitle -->
+        <p class="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 animate-fade-in animation-delay-200">
+          The all-in-one social running platform. Track activities, join communities, compete in rankings, and train smarter with AI coaching.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 animate-fade-in animation-delay-300">
+          <a routerLink="/register" class="btn-primary !py-4 !px-10 !text-base !rounded-2xl flex items-center gap-2 w-full sm:w-auto justify-center">
+            <span class="material-icons text-xl">rocket_launch</span>
+            Start Running Free
+          </a>
+          <a routerLink="/login" class="btn-secondary !py-4 !px-10 !text-base !rounded-2xl flex items-center gap-2 w-full sm:w-auto justify-center">
+            <span class="material-icons text-xl">login</span>
+            Sign In
+          </a>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-3xl mx-auto animate-fade-in animation-delay-400">
+          @for (stat of stats; track stat.label; let i = $index) {
+            <div class="group relative p-4 lg:p-6 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm hover:border-primary/30 hover:bg-card transition-all duration-300">
+              <div class="flex flex-col items-center text-center gap-1">
+                <span class="material-icons text-2xl text-primary mb-1">{{ stat.icon }}</span>
+                <span class="text-2xl lg:text-3xl font-black text-foreground">{{ stat.value }}</span>
+                <span class="text-xs lg:text-sm text-muted-foreground font-medium">{{ stat.label }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== FEATURES SECTION ===================== -->
+  <section id="features" class="relative py-20 lg:py-32 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+      <!-- Section Header -->
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+          <span class="material-icons text-primary text-sm">auto_awesome</span>
+          <span class="text-sm font-medium text-primary">Platform Features</span>
+        </div>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground mb-4">
+          Everything You Need to<br>
+          <span class="text-primary">Run Better</span>
+        </h2>
+        <p class="text-muted-foreground text-lg">
+          From tracking your first kilometer to leading a community of thousands, RunHub has you covered.
+        </p>
+      </div>
+
+      <!-- Feature Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+        @for (feature of features; track feature.title; let i = $index) {
+          <div class="group relative p-6 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm hover:border-primary/30 hover:bg-card hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 hover:-translate-y-1">
+            <!-- Icon -->
+            <div class="w-12 h-12 rounded-xl {{ getFeatureColorClasses(feature.color).bg }} border {{ getFeatureColorClasses(feature.color).border }} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+              <span class="material-icons text-2xl {{ getFeatureColorClasses(feature.color).text }}">{{ feature.icon }}</span>
+            </div>
+
+            <!-- Content -->
+            <h3 class="text-lg font-bold text-foreground mb-2">{{ feature.title }}</h3>
+            <p class="text-sm text-muted-foreground leading-relaxed">{{ feature.description }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== HOW IT WORKS ===================== -->
+  <section id="how-it-works" class="relative py-20 lg:py-32 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+      <!-- Section Header -->
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+          <span class="material-icons text-primary text-sm">play_circle</span>
+          <span class="text-sm font-medium text-primary">Quick Start</span>
+        </div>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground mb-4">
+          Up and Running in<br>
+          <span class="text-primary">Three Steps</span>
+        </h2>
+        <p class="text-muted-foreground text-lg">
+          Getting started with RunHub takes less than a minute.
+        </p>
+      </div>
+
+      <!-- Steps -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
+        @for (step of steps; track step.number; let i = $index) {
+          <div class="relative group">
+            <!-- Connector line (desktop only) -->
+            @if (i < steps.length - 1) {
+              <div class="hidden md:block absolute top-12 left-[calc(50%+40px)] w-[calc(100%-40px)] h-px bg-gradient-to-r from-border via-primary/30 to-border"></div>
+            }
+
+            <div class="relative p-8 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm hover:border-primary/30 hover:bg-card transition-all duration-500 text-center">
+              <!-- Step Number -->
+              <div class="w-20 h-20 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-6 group-hover:bg-primary/20 group-hover:border-primary/40 transition-all duration-300">
+                <span class="material-icons text-3xl text-primary">{{ step.icon }}</span>
+              </div>
+
+              <!-- Number badge -->
+              <div class="absolute top-4 right-4 w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
+                <span class="text-xs font-bold text-primary">{{ step.number }}</span>
+              </div>
+
+              <h3 class="text-xl font-bold text-foreground mb-3">{{ step.title }}</h3>
+              <p class="text-sm text-muted-foreground leading-relaxed">{{ step.description }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== INTEGRATIONS ===================== -->
+  <section id="integrations" class="relative py-20 lg:py-32 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+      <div class="relative rounded-3xl bg-card/50 border border-border/50 backdrop-blur-sm p-8 lg:p-16 overflow-hidden">
+        <!-- Background decoration -->
+        <div class="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full blur-[80px] pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 w-60 h-60 bg-destructive/5 rounded-full blur-[60px] pointer-events-none"></div>
+
+        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <!-- Left Content -->
+          <div>
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+              <span class="material-icons text-primary text-sm">sync</span>
+              <span class="text-sm font-medium text-primary">Seamless Sync</span>
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-black text-foreground mb-4">
+              Connect Your <span class="text-primary">Favorite Apps</span>
+            </h2>
+            <p class="text-muted-foreground text-lg mb-8">
+              Automatically import your runs from Strava and Garmin. No manual entry needed — just run and your data flows in.
+            </p>
+
+            <div class="space-y-4">
+              <div class="flex items-center gap-4 p-4 rounded-xl bg-secondary/50 border border-border/50">
+                <div class="w-12 h-12 rounded-xl bg-[#FC4C02]/15 border border-[#FC4C02]/30 flex items-center justify-center flex-shrink-0">
+                  <svg viewBox="0 0 24 24" class="w-6 h-6 text-[#FC4C02]" fill="currentColor">
+                    <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/>
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-semibold text-foreground">Strava</p>
+                  <p class="text-sm text-muted-foreground">OAuth 2.0 integration — one-click connect</p>
+                </div>
+                <span class="material-icons text-emerald-500 ml-auto">check_circle</span>
+              </div>
+
+              <div class="flex items-center gap-4 p-4 rounded-xl bg-secondary/50 border border-border/50">
+                <div class="w-12 h-12 rounded-xl bg-[#007cc1]/15 border border-[#007cc1]/30 flex items-center justify-center flex-shrink-0">
+                  <svg viewBox="0 0 24 24" class="w-6 h-6 text-[#007cc1]" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-semibold text-foreground">Garmin Connect</p>
+                  <p class="text-sm text-muted-foreground">OAuth 1.0a integration — full activity sync</p>
+                </div>
+                <span class="material-icons text-emerald-500 ml-auto">check_circle</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Visual -->
+          <div class="relative flex items-center justify-center">
+            <div class="relative w-full max-w-sm mx-auto">
+              <!-- Phone Mockup -->
+              <div class="relative rounded-3xl bg-card border-2 border-border p-6 shadow-2xl">
+                <!-- Mock Dashboard Header -->
+                <div class="flex items-center gap-3 mb-6">
+                  <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                    <span class="material-icons text-primary text-lg">person</span>
+                  </div>
+                  <div>
+                    <p class="text-sm font-bold text-foreground">Good morning, Runner!</p>
+                    <p class="text-xs text-muted-foreground">Let's hit the road</p>
+                  </div>
+                </div>
+
+                <!-- Mock Stats -->
+                <div class="grid grid-cols-3 gap-3 mb-6">
+                  <div class="p-3 rounded-xl bg-secondary/50 border border-border/50 text-center">
+                    <p class="text-lg font-black text-primary">247</p>
+                    <p class="text-[10px] text-muted-foreground">Total KM</p>
+                  </div>
+                  <div class="p-3 rounded-xl bg-secondary/50 border border-border/50 text-center">
+                    <p class="text-lg font-black text-destructive">32</p>
+                    <p class="text-[10px] text-muted-foreground">Runs</p>
+                  </div>
+                  <div class="p-3 rounded-xl bg-secondary/50 border border-border/50 text-center">
+                    <p class="text-lg font-black text-blue-500">5:24</p>
+                    <p class="text-[10px] text-muted-foreground">Avg Pace</p>
+                  </div>
+                </div>
+
+                <!-- Mock Activity -->
+                <div class="p-4 rounded-xl bg-secondary/50 border border-border/50 mb-4">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-semibold text-foreground">Morning Run</span>
+                    <span class="px-2 py-0.5 rounded-full bg-primary/15 text-primary text-[10px] font-bold">Strava</span>
+                  </div>
+                  <div class="flex items-center gap-4 text-xs text-muted-foreground">
+                    <span>8.2 km</span>
+                    <span>42:15</span>
+                    <span>5:09 /km</span>
+                  </div>
+                </div>
+
+                <!-- Mock Weekly Chart -->
+                <div class="flex items-end gap-1.5 h-16">
+                  <div class="flex-1 bg-primary/20 rounded-t-sm" style="height: 40%"></div>
+                  <div class="flex-1 bg-primary/20 rounded-t-sm" style="height: 65%"></div>
+                  <div class="flex-1 bg-primary/30 rounded-t-sm" style="height: 45%"></div>
+                  <div class="flex-1 bg-primary/20 rounded-t-sm" style="height: 80%"></div>
+                  <div class="flex-1 bg-primary rounded-t-sm" style="height: 100%"></div>
+                  <div class="flex-1 bg-primary/20 rounded-t-sm" style="height: 30%"></div>
+                  <div class="flex-1 bg-primary/10 rounded-t-sm" style="height: 15%"></div>
+                </div>
+                <div class="flex gap-1.5 mt-1">
+                  <span class="flex-1 text-[8px] text-muted-foreground text-center">M</span>
+                  <span class="flex-1 text-[8px] text-muted-foreground text-center">T</span>
+                  <span class="flex-1 text-[8px] text-muted-foreground text-center">W</span>
+                  <span class="flex-1 text-[8px] text-muted-foreground text-center">T</span>
+                  <span class="flex-1 text-[8px] text-primary text-center font-bold">F</span>
+                  <span class="flex-1 text-[8px] text-muted-foreground text-center">S</span>
+                  <span class="flex-1 text-[8px] text-muted-foreground text-center">S</span>
+                </div>
+              </div>
+
+              <!-- Floating badges -->
+              <div class="absolute -top-4 -right-4 p-3 rounded-xl bg-card border border-border shadow-lg animate-float">
+                <div class="flex items-center gap-2">
+                  <span class="material-icons text-amber-500 text-lg">military_tech</span>
+                  <span class="text-xs font-bold text-foreground">100km Badge!</span>
+                </div>
+              </div>
+              <div class="absolute -bottom-4 -left-4 p-3 rounded-xl bg-card border border-border shadow-lg animate-float animation-delay-1000">
+                <div class="flex items-center gap-2">
+                  <span class="text-lg">🥇</span>
+                  <span class="text-xs font-bold text-foreground">#1 Weekly</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== FINAL CTA ===================== -->
+  <section class="relative py-20 lg:py-32 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto text-center">
+      <!-- Background glow -->
+      <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div class="w-[600px] h-[400px] bg-primary/8 rounded-full blur-[120px]"></div>
+      </div>
+
+      <div class="relative z-10">
+        <span class="material-icons text-6xl text-primary mb-6 block">directions_run</span>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground mb-6">
+          Ready to Start Your<br>
+          <span class="text-primary">Running Journey?</span>
+        </h2>
+        <p class="text-lg text-muted-foreground mb-10 max-w-xl mx-auto">
+          Join a community of passionate runners. Track your progress, compete with friends, and achieve your goals.
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a routerLink="/register" class="btn-primary !py-4 !px-10 !text-base !rounded-2xl flex items-center gap-2 w-full sm:w-auto justify-center">
+            <span class="material-icons text-xl">arrow_forward</span>
+            Create Free Account
+          </a>
+          <a routerLink="/login" class="btn-secondary !py-4 !px-10 !text-base !rounded-2xl flex items-center gap-2 w-full sm:w-auto justify-center">
+            Already a member? Sign In
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="border-t border-border/50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+        <!-- Brand -->
+        <div class="md:col-span-2">
+          <div class="flex items-center gap-2.5 mb-4">
+            <div class="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
+              <span class="material-icons text-white text-lg">bolt</span>
+            </div>
+            <span class="text-xl font-black text-primary tracking-wider">RUNHUB</span>
+          </div>
+          <p class="text-sm text-muted-foreground max-w-sm leading-relaxed">
+            The social running platform that helps you track, connect, and achieve. Built for runners, by runners.
+          </p>
+        </div>
+
+        <!-- Platform Links -->
+        <div>
+          <h4 class="text-sm font-semibold text-foreground mb-4">Platform</h4>
+          <ul class="space-y-2.5">
+            <li><a href="#features" class="text-sm text-muted-foreground hover:text-primary transition-colors">Features</a></li>
+            <li><a href="#how-it-works" class="text-sm text-muted-foreground hover:text-primary transition-colors">How It Works</a></li>
+            <li><a href="#integrations" class="text-sm text-muted-foreground hover:text-primary transition-colors">Integrations</a></li>
+            <li><a routerLink="/register" class="text-sm text-muted-foreground hover:text-primary transition-colors">Get Started</a></li>
+          </ul>
+        </div>
+
+        <!-- Connect -->
+        <div>
+          <h4 class="text-sm font-semibold text-foreground mb-4">Connect</h4>
+          <ul class="space-y-2.5">
+            <li><a routerLink="/login" class="text-sm text-muted-foreground hover:text-primary transition-colors">Sign In</a></li>
+            <li><a routerLink="/register" class="text-sm text-muted-foreground hover:text-primary transition-colors">Create Account</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Bottom bar -->
+      <div class="pt-8 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p class="text-xs text-muted-foreground">&copy; 2026 RunHub. All rights reserved.</p>
+        <p class="text-xs text-muted-foreground">Made with <span class="text-destructive">&#9829;</span> for runners</p>
+      </div>
+    </div>
+  </footer>
+
+</div>

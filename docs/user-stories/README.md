@@ -14,4 +14,4 @@ Each story lives in its own file named `US-XXX-short-title.md`.
 
 | ID | Title | Status |
 |----|-------|--------|
-| — | *(stories will be added here)* | — |
+| US-001 | [Modern Home Page](US-001-modern-home-page.md) | [x] Done |
