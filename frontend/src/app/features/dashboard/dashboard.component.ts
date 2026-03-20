@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { CommonModule, NgClass } from '@angular/common';
+import { RouterModule, Router } from '@angular/router';
 import { ActivityService } from '../../core/services/activity.service';
 import { EventService } from '../../core/services/event.service';
 import { RankingService } from '../../core/services/ranking.service';
@@ -9,6 +9,17 @@ import { Activity, ActivityStats } from '../../core/models/activity.model';
 import { RunEvent } from '../../core/models/event.model';
 import { Ranking } from '../../core/models/ranking.model';
 import { AuthService } from '../../core/services/auth.service';
+
+export interface ScheduleItem {
+  id: string;
+  type: 'activity' | 'event' | 'training';
+  title: string;
+  subtitle: string;
+  time?: string;
+  icon: string;
+  color: string;
+  routerLink: string | any[];
+}
 
 @Component({
   selector: 'app-dashboard',
@@ -24,6 +35,7 @@ export class DashboardComponent implements OnInit {
   topRankings: Ranking[] = [];
   programProgress: any[] = [];
   todayActivities: Activity[] = [];
+  todaySchedule: ScheduleItem[] = [];
   loading = false;
   currentUser = this.authService.getCurrentUser();
 
@@ -41,6 +53,7 @@ export class DashboardComponent implements OnInit {
     private rankingService: RankingService,
     private programService: ProgramService,
     private authService: AuthService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -59,6 +72,7 @@ export class DashboardComponent implements OnInit {
           return d.toDateString() === today.toDateString();
         });
         this.buildThisWeek();
+        this.buildTodaySchedule();
         this.cdr.detectChanges();
       },
       error: () => {}
@@ -70,6 +84,7 @@ export class DashboardComponent implements OnInit {
           .filter(ev => !ev.isCancelled)
           .sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime())
           .slice(0, 3);
+        this.buildTodaySchedule();
         this.cdr.detectChanges();
       },
       error: (err) => { console.error('Events error:', err); }
@@ -99,6 +114,93 @@ export class DashboardComponent implements OnInit {
       const hasActivity = this.recentActivities.some(a => new Date(a.activityDate).toDateString() === d.toDateString());
       this.thisWeekDays.push({ date: d, isToday: d.toDateString() === today.toDateString(), hasActivity });
     }
+  }
+
+  buildTodaySchedule(): void {
+    const items: ScheduleItem[] = [];
+    const today = new Date();
+
+    // Real activities today
+    for (const a of this.todayActivities) {
+      items.push({
+        id: `activity-${a.id}`,
+        type: 'activity',
+        title: a.title,
+        subtitle: `${a.distanceKm?.toFixed(1)} km · ${this.formatDuration(a.durationMinutes)}`,
+        icon: 'directions_run',
+        color: 'primary',
+        routerLink: '/activities'
+      });
+    }
+
+    // Real events today
+    for (const e of this.upcomingEvents) {
+      if (new Date(e.eventDate).toDateString() === today.toDateString()) {
+        items.push({
+          id: `event-${e.id}`,
+          type: 'event',
+          title: e.name,
+          subtitle: e.location || '',
+          icon: 'event',
+          color: 'blue',
+          routerLink: ['/events', e.id]
+        });
+      }
+    }
+
+    // Demo schedule items for alice_runner when nothing is logged today
+    if (items.length === 0 && this.currentUser?.username === 'alice_runner') {
+      items.push(
+        {
+          id: 'demo-1',
+          type: 'training',
+          title: 'Marathon Prep — Tempo Run',
+          subtitle: '8 km at 5:10 /km · Session 8/20',
+          time: '07:00',
+          icon: 'fitness_center',
+          color: 'primary',
+          routerLink: '/programs'
+        },
+        {
+          id: 'demo-2',
+          type: 'training',
+          title: 'Evening Stretching',
+          subtitle: '30 min mobility · Recovery',
+          time: '19:00',
+          icon: 'self_improvement',
+          color: 'purple',
+          routerLink: '/programs'
+        }
+      );
+    }
+
+    this.todaySchedule = items;
+    this.cdr.detectChanges();
+  }
+
+  getScheduleItemClass(item: ScheduleItem): string {
+    const base = 'flex items-center gap-3 p-2 rounded-xl border transition-all cursor-pointer bg-secondary ';
+    if (item.color === 'primary') return base + 'border-primary border-opacity-30 hover:border-opacity-60';
+    if (item.color === 'blue') return base + 'border-blue-400 border-opacity-30 hover:border-opacity-60';
+    return base + 'border-purple-400 border-opacity-30 hover:border-opacity-60';
+  }
+
+  getScheduleIconWrapClass(item: ScheduleItem): string {
+    const base = 'w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ';
+    if (item.color === 'primary') return base + 'bg-primary bg-opacity-20';
+    if (item.color === 'blue') return base + 'bg-blue-500 bg-opacity-20';
+    return base + 'bg-purple-500 bg-opacity-20';
+  }
+
+  navigateToCalendar(date?: Date): void {
+    const d = date || new Date();
+    this.router.navigate(['/calendar'], {
+      queryParams: { date: d.toISOString().split('T')[0] }
+    });
+  }
+
+  navigateTo(path: string): void {
+    this.router.navigate([path]);
   }
 
   getChallengeProgress(challenge: any): number {

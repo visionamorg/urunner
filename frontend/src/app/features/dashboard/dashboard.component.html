@@ -12,10 +12,10 @@
       </a>
     </div>
 
-    <!-- Stats Grid (6 cards) -->
+    <!-- Stats Grid (6 cards) — all navigate to /activities -->
     <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-      <!-- Total Distance -->
-      <div class="card relative overflow-hidden hover:border-primary/30 transition-colors">
+
+      <a routerLink="/activities" class="card relative overflow-hidden hover:border-primary/40 hover:scale-[1.02] transition-all cursor-pointer block">
         <div class="absolute inset-0 bg-primary/5 pointer-events-none"></div>
         <div class="relative">
           <div class="w-9 h-9 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center mb-3">
@@ -24,10 +24,9 @@
           <div class="stat-value">{{ stats?.totalDistanceKm?.toFixed(1) || '0.0' }}</div>
           <p class="text-muted-foreground text-xs font-medium uppercase tracking-wider mt-1">Total KM</p>
         </div>
-      </div>
+      </a>
 
-      <!-- Weekly KM -->
-      <div class="card relative overflow-hidden hover:border-primary/30 transition-colors">
+      <a routerLink="/activities" class="card relative overflow-hidden hover:border-primary/40 hover:scale-[1.02] transition-all cursor-pointer block">
         <div class="absolute inset-0 bg-destructive/5 pointer-events-none"></div>
         <div class="relative">
           <div class="w-9 h-9 rounded-xl bg-destructive/20 border border-destructive/30 flex items-center justify-center mb-3">
@@ -36,10 +35,9 @@
           <div class="stat-value">{{ stats?.weeklyDistanceKm?.toFixed(1) || '0.0' }}</div>
           <p class="text-muted-foreground text-xs font-medium uppercase tracking-wider mt-1">This Week KM</p>
         </div>
-      </div>
+      </a>
 
-      <!-- Monthly KM -->
-      <div class="card relative overflow-hidden hover:border-primary/30 transition-colors">
+      <a routerLink="/activities" class="card relative overflow-hidden hover:border-primary/40 hover:scale-[1.02] transition-all cursor-pointer block">
         <div class="absolute inset-0 bg-primary/5 pointer-events-none"></div>
         <div class="relative">
           <div class="w-9 h-9 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center mb-3">
@@ -48,10 +46,9 @@
           <div class="stat-value">{{ stats?.monthlyDistanceKm?.toFixed(1) || '0.0' }}</div>
           <p class="text-muted-foreground text-xs font-medium uppercase tracking-wider mt-1">This Month KM</p>
         </div>
-      </div>
+      </a>
 
-      <!-- Total Runs -->
-      <div class="card relative overflow-hidden hover:border-primary/30 transition-colors">
+      <a routerLink="/activities" class="card relative overflow-hidden hover:border-primary/40 hover:scale-[1.02] transition-all cursor-pointer block">
         <div class="absolute inset-0 bg-destructive/5 pointer-events-none"></div>
         <div class="relative">
           <div class="w-9 h-9 rounded-xl bg-destructive/20 border border-destructive/30 flex items-center justify-center mb-3">
@@ -60,10 +57,9 @@
           <div class="stat-value">{{ stats?.totalRuns || 0 }}</div>
           <p class="text-muted-foreground text-xs font-medium uppercase tracking-wider mt-1">Total Runs</p>
         </div>
-      </div>
+      </a>
 
-      <!-- Avg Pace -->
-      <div class="card relative overflow-hidden hover:border-primary/30 transition-colors">
+      <a routerLink="/activities" class="card relative overflow-hidden hover:border-primary/40 hover:scale-[1.02] transition-all cursor-pointer block">
         <div class="absolute inset-0 bg-blue-500/5 pointer-events-none"></div>
         <div class="relative">
           <div class="w-9 h-9 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center mb-3">
@@ -72,10 +68,9 @@
           <div class="stat-value">{{ formatPace(stats?.avgPaceMinPerKm || 0).split(' ')[0] }}</div>
           <p class="text-muted-foreground text-xs font-medium uppercase tracking-wider mt-1">Avg Pace /km</p>
         </div>
-      </div>
+      </a>
 
-      <!-- Total Hours -->
-      <div class="card relative overflow-hidden hover:border-primary/30 transition-colors">
+      <a routerLink="/activities" class="card relative overflow-hidden hover:border-primary/40 hover:scale-[1.02] transition-all cursor-pointer block">
         <div class="absolute inset-0 bg-purple-500/5 pointer-events-none"></div>
         <div class="relative">
           <div class="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center mb-3">
@@ -84,23 +79,27 @@
           <div class="stat-value">{{ getTotalHours() }}</div>
           <p class="text-muted-foreground text-xs font-medium uppercase tracking-wider mt-1">Total Time</p>
         </div>
-      </div>
+      </a>
+
     </div>
 
     <!-- Row 1: This Week + Today's Schedule -->
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
-      <!-- This Week (2/3) -->
-      <div class="xl:col-span-2 card">
+      <!-- This Week → navigate to /calendar -->
+      <div class="xl:col-span-2 card cursor-pointer hover:border-primary/30 transition-colors group"
+           (click)="navigateToCalendar()">
         <h2 class="text-foreground font-bold mb-4 flex items-center gap-2">
           <span class="material-icons text-primary">calendar_view_week</span>
           This Week
+          <span class="ml-auto text-primary text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity">View calendar →</span>
         </h2>
         <div class="grid grid-cols-7 gap-2">
           @for (day of thisWeekDays; track day.date.toISOString()) {
-            <div class="flex flex-col items-center gap-1.5">
+            <div class="flex flex-col items-center gap-1.5 cursor-pointer"
+                 (click)="$event.stopPropagation(); navigateToCalendar(day.date)">
               <span class="text-xs text-muted-foreground font-medium">{{ day.date | date:'EEE' }}</span>
-              <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold"
+              <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold hover:ring-2 hover:ring-primary/40 transition-all"
                 [class]="day.isToday ? 'bg-primary text-foreground' : day.hasActivity ? 'bg-primary/20 text-primary border border-primary/30' : 'bg-secondary text-muted-foreground border border-border'">
                 {{ day.date | date:'d' }}
               </div>
@@ -114,44 +113,40 @@
         </div>
       </div>
 
-      <!-- Today's Schedule (1/3) -->
-      <div class="card">
+      <!-- Today's Schedule -->
+      <div class="card cursor-pointer hover:border-primary/30 transition-colors group"
+           (click)="navigateToCalendar()">
         <div class="flex items-center gap-3 mb-4">
           <span class="material-icons text-primary">today</span>
           <h2 class="text-foreground font-bold">Today's Schedule</h2>
+          <span class="ml-auto text-primary text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity">View →</span>
         </div>
 
-        @if (todayActivities.length === 0 && upcomingEvents.length === 0) {
+        @if (todaySchedule.length === 0) {
           <div class="text-center py-6">
             <span class="material-icons text-muted-foreground text-3xl">wb_sunny</span>
             <p class="text-muted-foreground mt-2 text-sm">Nothing scheduled today. Rest day?</p>
-            <a routerLink="/activities" class="text-primary text-sm hover:underline mt-1 inline-block">Log a run</a>
+            <a routerLink="/activities" (click)="$event.stopPropagation()" class="text-primary text-sm hover:underline mt-1 inline-block">Log a run</a>
           </div>
         } @else {
           <div class="space-y-2">
-            @for (a of todayActivities; track a.id) {
-              <div class="flex items-center gap-3 p-2 bg-secondary rounded-xl border border-border">
-                <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
-                  <span class="material-icons text-primary text-sm">directions_run</span>
+            @for (item of todaySchedule; track item.id) {
+              <a [routerLink]="item.routerLink" (click)="$event.stopPropagation()"
+                [ngClass]="getScheduleItemClass(item)">
+                <div [ngClass]="getScheduleIconWrapClass(item)">
+                  <span class="material-icons text-sm"
+                    [class.text-primary]="item.color === 'primary'"
+                    [class.text-blue-400]="item.color === 'blue'"
+                    [class.text-purple-400]="item.color === 'purple'">{{ item.icon }}</span>
                 </div>
                 <div class="flex-1 min-w-0">
-                  <p class="text-foreground text-xs font-semibold truncate">{{ a.title }}</p>
-                  <p class="text-muted-foreground text-xs">{{ a.distanceKm?.toFixed(1) }} km</p>
+                  <p class="text-foreground text-xs font-semibold truncate">{{ item.title }}</p>
+                  <p class="text-muted-foreground text-xs">{{ item.subtitle }}</p>
                 </div>
-              </div>
-            }
-            @for (e of upcomingEvents.slice(0, 2); track e.id) {
-              @if ((e.eventDate | date:'d MMM y') === ('today' | date:'d MMM y')) {
-                <div class="flex items-center gap-3 p-2 bg-secondary rounded-xl border border-primary/30">
-                  <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
-                    <span class="material-icons text-primary text-sm">event</span>
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <p class="text-foreground text-xs font-semibold truncate">{{ e.name }}</p>
-                    <p class="text-muted-foreground text-xs">{{ e.location }}</p>
-                  </div>
-                </div>
-              }
+                @if (item.time) {
+                  <span class="text-muted-foreground text-xs flex-shrink-0">{{ item.time }}</span>
+                }
+              </a>
             }
           </div>
         }
@@ -161,7 +156,7 @@
     <!-- Row 2: Recent Activities + Right Column -->
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
-      <!-- Recent Activities (2/3) -->
+      <!-- Recent Activities -->
       <div class="xl:col-span-2 card">
         <div class="flex items-center justify-between mb-5">
           <div class="flex items-center gap-3">
@@ -183,18 +178,19 @@
 
         <div class="space-y-3">
           @for (activity of recentActivities; track activity.id) {
-            <div class="flex items-center gap-4 p-4 bg-secondary rounded-xl border border-border hover:border-primary/20 transition-colors">
+            <a routerLink="/activities"
+              class="flex items-center gap-4 p-4 bg-secondary rounded-xl border border-border hover:border-primary/30 hover:scale-[1.01] transition-all cursor-pointer group">
               <div class="w-10 h-10 rounded-xl bg-primary/20 border border-primary/20 flex items-center justify-center flex-shrink-0">
                 <span class="material-icons text-primary text-xl">directions_run</span>
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-foreground font-semibold text-sm truncate">{{ activity.title }}</p>
+                <p class="text-foreground font-semibold text-sm truncate group-hover:text-primary transition-colors">{{ activity.title }}</p>
                 <p class="text-muted-foreground text-xs mt-0.5">{{ activity.activityDate | date:'MMM d' }} · {{ formatDuration(activity.durationMinutes) }} · {{ formatPace(activity.paceMinPerKm) }}</p>
               </div>
               <div class="flex-shrink-0">
                 <span class="badge bg-primary/15 text-primary border border-primary/20">{{ activity.distanceKm.toFixed(1) }} km</span>
               </div>
-            </div>
+            </a>
           }
         </div>
       </div>
@@ -218,7 +214,7 @@
 
           <div class="space-y-3">
             @for (event of upcomingEvents; track event.id) {
-              <a [routerLink]="['/events', event.id]" class="flex items-center gap-3 group">
+              <a [routerLink]="['/events', event.id]" class="flex items-center gap-3 group hover:scale-[1.01] transition-all cursor-pointer">
                 <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-primary flex flex-col items-center justify-center">
                   <span class="text-foreground font-black text-lg leading-none">{{ event.eventDate | date:'d' }}</span>
                   <span class="text-white/80 text-[10px] uppercase tracking-wider">{{ event.eventDate | date:'MMM' }}</span>
@@ -243,7 +239,9 @@
           </div>
           <div class="space-y-2">
             @for (r of topRankings; track r.rank) {
-              <div class="flex items-center gap-3 p-2 rounded-lg" [class.bg-primary]="r.rank === 1" [class.bg-opacity-10]="r.rank === 1">
+              <a routerLink="/rankings"
+                class="flex items-center gap-3 p-2 rounded-lg hover:bg-secondary transition-colors cursor-pointer group"
+                [class.bg-primary]="r.rank === 1" [class.bg-opacity-10]="r.rank === 1">
                 <div class="w-7 text-center text-sm font-bold flex-shrink-0">
                   @if (r.rank === 1) { <span>🥇</span> }
                   @else if (r.rank === 2) { <span>🥈</span> }
@@ -253,9 +251,9 @@
                 <div class="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                   {{ getInitials(r.username) }}
                 </div>
-                <span class="flex-1 text-foreground text-sm font-medium truncate">{{ r.username }}</span>
+                <span class="flex-1 text-foreground text-sm font-medium truncate group-hover:text-primary transition-colors">{{ r.username }}</span>
                 <span class="text-primary font-bold text-sm">{{ r.totalDistanceKm?.toFixed(1) }} km</span>
-              </div>
+              </a>
             }
           </div>
         </div>
@@ -266,7 +264,7 @@
     <!-- Row 3: Challenges + Active Programs -->
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
 
-      <!-- Challenges -->
+      <!-- Challenges → navigate to /activities -->
       <div class="card">
         <div class="flex items-center gap-3 mb-5">
           <span class="material-icons text-primary">emoji_events</span>
@@ -274,7 +272,8 @@
         </div>
         <div class="space-y-5">
           @for (challenge of challenges; track challenge.id) {
-            <div class="space-y-2">
+            <a routerLink="/activities"
+              class="block space-y-2 p-3 -mx-3 rounded-xl hover:bg-secondary transition-colors cursor-pointer group">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                   <span class="material-icons text-xl"
@@ -284,7 +283,7 @@
                       'text-blue-400': challenge.color === 'blue'
                     }">{{ challenge.icon }}</span>
                   <div>
-                    <p class="text-foreground text-sm font-semibold">{{ challenge.title }}</p>
+                    <p class="text-foreground text-sm font-semibold group-hover:text-primary transition-colors">{{ challenge.title }}</p>
                     <p class="text-muted-foreground text-xs">{{ challenge.description }}</p>
                   </div>
                 </div>
@@ -294,7 +293,7 @@
                 <div class="h-2 rounded-full bg-primary transition-all duration-500"
                   [style.width.%]="getChallengeProgress(challenge)"></div>
               </div>
-            </div>
+            </a>
           }
         </div>
       </div>
@@ -316,10 +315,11 @@
         } @else {
           <div class="space-y-3">
             @for (prog of programProgress; track prog.id) {
-              <div class="p-3 bg-secondary rounded-xl border border-border space-y-2">
+              <a routerLink="/programs"
+                class="block p-3 bg-secondary rounded-xl border border-border space-y-2 hover:border-primary/30 hover:scale-[1.01] transition-all cursor-pointer group">
                 <div class="flex items-center justify-between">
                   <div class="min-w-0 flex-1">
-                    <p class="text-foreground font-semibold text-sm truncate">{{ prog.programName || 'Training Program' }}</p>
+                    <p class="text-foreground font-semibold text-sm truncate group-hover:text-primary transition-colors">{{ prog.programName || 'Training Program' }}</p>
                     <span class="text-muted-foreground text-xs uppercase">{{ prog.status || 'Active' }}</span>
                   </div>
                   <span class="text-primary font-bold text-sm flex-shrink-0 ml-3">
@@ -331,7 +331,7 @@
                     [style.width.%]="getProgramProgress(prog)">
                   </div>
                 </div>
-              </div>
+              </a>
             }
           </div>
         }
