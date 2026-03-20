@@ -6,9 +6,9 @@
     <!-- Logo -->
     <div class="flex items-center gap-3 px-6 py-5 border-b border-sidebar-border">
       <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-        <span class="material-icons text-white text-base">bolt</span>
+        <span class="material-icons text-white text-base">directions_run</span>
       </div>
-      <span class="text-xl font-black text-primary tracking-wider">RUNHUB</span>
+      <span class="text-xl font-black text-primary tracking-wider">UR</span>
     </div>
 
     <!-- Nav Items -->
@@ -58,7 +58,7 @@
     <button (click)="toggleSidebar()" class="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-all">
       <span class="material-icons">menu</span>
     </button>
-    <span class="text-lg font-black text-primary tracking-wider">RUNHUB</span>
+    <span class="text-lg font-black text-primary tracking-wider">UR</span>
     <div class="flex items-center gap-2">
       <button (click)="themeService.toggle()" class="p-2 rounded-lg text-muted-foreground hover:text-foreground transition-all">
         <span class="material-icons text-xl">{{ themeService.isDark() ? 'light_mode' : 'dark_mode' }}</span>
@@ -75,7 +75,7 @@
       <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" (click)="toggleSidebar()"></div>
       <aside class="relative flex flex-col w-72 h-full bg-card border-r border-border z-10 animate-slide-up">
         <div class="flex items-center justify-between px-6 py-5 border-b border-border">
-          <span class="text-xl font-black text-primary tracking-wider">RUNHUB</span>
+          <span class="text-xl font-black text-primary tracking-wider">UR</span>
           <button (click)="toggleSidebar()" class="p-1 text-muted-foreground hover:text-foreground">
             <span class="material-icons">close</span>
           </button>
