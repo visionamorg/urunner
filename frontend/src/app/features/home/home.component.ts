@@ -18,10 +18,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   private observerEntries: IntersectionObserver[] = [];
 
   stats = [
-    { value: '10K+', label: 'Active Runners', icon: 'directions_run' },
-    { value: '500+', label: 'Communities', icon: 'groups' },
-    { value: '1M+', label: 'KM Tracked', icon: 'route' },
-    { value: '200+', label: 'Events', icon: 'event' }
+    { value: '10K+', label: 'Active Runners', icon: 'directions_run', link: '/register' },
+    { value: '500+', label: 'Communities', icon: 'groups', link: '/register' },
+    { value: '1M+', label: 'KM Tracked', icon: 'route', link: '/register' },
+    { value: '200+', label: 'Events', icon: 'event', link: '/register' }
   ];
 
   features = [
@@ -29,56 +29,75 @@ export class HomeComponent implements OnInit, OnDestroy {
       icon: 'directions_run',
       title: 'Activity Tracking',
       description: 'Log your runs manually or auto-sync from Strava and Garmin. Track distance, pace, elevation, and more.',
-      color: 'primary'
+      color: 'primary',
+      link: '/register'
     },
     {
       icon: 'groups',
       title: 'Communities',
       description: 'Create or join running groups. Share photos, post updates, and stay connected with fellow runners.',
-      color: 'blue'
+      color: 'blue',
+      link: '/register'
     },
     {
       icon: 'leaderboard',
       title: 'Rankings',
       description: 'Compete on weekly, monthly, and all-time leaderboards. See where you stand among the best.',
-      color: 'destructive'
+      color: 'destructive',
+      link: '/register'
     },
     {
       icon: 'event',
       title: 'Events',
       description: 'Discover and register for races, group runs, and community events near you.',
-      color: 'green'
+      color: 'green',
+      link: '/register'
     },
     {
       icon: 'fitness_center',
       title: 'Training Programs',
       description: 'Follow structured training plans for 5K to ultra-marathons. Track your session progress.',
-      color: 'purple'
+      color: 'purple',
+      link: '/register'
     },
     {
       icon: 'chat',
       title: 'Chat & Rooms',
       description: 'Direct messages and community group chats. Stay in touch with your running crew.',
-      color: 'cyan'
+      color: 'cyan',
+      link: '/register'
     },
     {
       icon: 'military_tech',
       title: 'Badges & Awards',
       description: 'Earn badges for achievements — distance milestones, streak records, event completions.',
-      color: 'amber'
+      color: 'amber',
+      link: '/register'
     },
     {
       icon: 'smart_toy',
       title: 'AI Coach',
       description: 'Get personalized training advice and race strategy from our AI-powered running coach.',
-      color: 'pink'
+      color: 'pink',
+      link: '/register'
     }
   ];
 
   steps = [
-    { number: '01', title: 'Create Your Account', description: 'Sign up in seconds with email or connect your Strava/Garmin account.', icon: 'person_add' },
-    { number: '02', title: 'Track Your Runs', description: 'Log activities, sync data, and watch your stats grow over time.', icon: 'timeline' },
-    { number: '03', title: 'Join the Community', description: 'Connect with runners, join events, and climb the leaderboards.', icon: 'emoji_events' }
+    { number: '01', title: 'Create Your Account', description: 'Sign up in seconds with email or connect your Strava/Garmin account.', icon: 'person_add', link: '/register' },
+    { number: '02', title: 'Track Your Runs', description: 'Log activities, sync data, and watch your stats grow over time.', icon: 'timeline', link: '/register' },
+    { number: '03', title: 'Join the Community', description: 'Connect with runners, join events, and climb the leaderboards.', icon: 'emoji_events', link: '/register' }
+  ];
+
+  communityPhotos = [
+    { src: '/community/1.jpg', alt: 'Runner after finishing the race', caption: 'Casablanca Marathon 2024' },
+    { src: '/community/2.jpg', alt: 'Never Give Up — Adidas Runners Casablanca', caption: 'Community support' },
+    { src: '/community/3.jpg', alt: 'High five during the race', caption: 'Race day energy' },
+    { src: '/community/4.jpg', alt: 'DJ at marathon start line', caption: 'Start line atmosphere' },
+    { src: '/community/5.jpg', alt: 'Adidas Lightstrike Pro shoes', caption: '"To run is to live"' },
+    { src: '/community/6.jpg', alt: 'Runner making a heart shape', caption: 'AR Casablanca pride' },
+    { src: '/community/7.jpg', alt: 'Runner in yellow shirt', caption: 'Stride in style' },
+    { src: '/community/8.jpg', alt: 'Tu es au top — supporter sign', caption: 'You are at the top!' }
   ];
 
   get isDark() {

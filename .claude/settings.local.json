@@ -10,7 +10,10 @@
       "Bash(git add:*)",
       "Bash(wc -l /private/tmp/claude-502/-Users-macbook-Documents-CODE-urunner-runhub/36f8cbc8-ff0f-4ec1-aa90-2393ae551a64/tasks/*.output)",
       "Bash(mkdir -p /Users/macbook/Documents/CODE/urunner/runhub/frontend/src/app/features/calendar)",
-      "Bash(touch /Users/macbook/Documents/CODE/urunner/runhub/frontend/src/app/features/calendar/calendar.component.ts /Users/macbook/Documents/CODE/urunner/runhub/frontend/src/app/features/calendar/calendar.component.html /Users/macbook/Documents/CODE/urunner/runhub/frontend/src/app/features/calendar/calendar.component.scss)"
+      "Bash(touch /Users/macbook/Documents/CODE/urunner/runhub/frontend/src/app/features/calendar/calendar.component.ts /Users/macbook/Documents/CODE/urunner/runhub/frontend/src/app/features/calendar/calendar.component.html /Users/macbook/Documents/CODE/urunner/runhub/frontend/src/app/features/calendar/calendar.component.scss)",
+      "Bash(python3 -c \"import sys,json; cfg=json.load\\(sys.stdin\\); assets=cfg[''''projects''''][''''frontend''''][''''architect''''][''''build''''][''''options''''].get\\(''''assets'''',[]\\); print\\(assets\\)\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d[''''projects''''][''''runhub-frontend''''][''''architect''''][''''build''''][''''options''''], indent=2\\)\\)\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(d[''''projects''''][''''runhub-frontend''''][''''architect''''][''''build''''][''''builder'''']\\)\")"
     ]
   }
 }

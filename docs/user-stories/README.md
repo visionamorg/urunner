@@ -16,3 +16,4 @@ Each story lives in its own file named `US-XXX-short-title.md`.
 |----|-------|--------|
 | US-001 | [Modern Home Page](US-001-modern-home-page.md) | [x] Done |
 | US-002 | [Dashboard Clickable Widgets & Calendar](US-002-dashboard-clickable-widgets.md) | [x] Done |
+| US-003 | [Home Page Clickable Cards & Community Gallery](US-003-home-page-clickable-gallery.md) | [x] Done |
