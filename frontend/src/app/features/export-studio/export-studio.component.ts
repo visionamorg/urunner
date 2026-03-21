@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActivityService } from '../../core/services/activity.service';
 import { Activity } from '../../core/models/activity.model';
+import { ExportTemplateService, ExportTemplateDto } from '../../core/services/export-template.service';
 import html2canvas from 'html2canvas';
 
 export type TemplateName = 'clear-info' | 'large-stat' | 'aesthetic-text' | 'typography-poster';
@@ -60,6 +61,11 @@ export class ExportStudioComponent implements OnInit {
   showCaptions = false;
   captions: { style: string; text: string }[] = [];
 
+  // Marketplace
+  showMarketplace = false;
+  communityTemplates: ExportTemplateDto[] = [];
+  loadingTemplates = false;
+
   // Video export
   exportingVideo = false;
 
@@ -78,6 +84,7 @@ export class ExportStudioComponent implements OnInit {
 
   constructor(
     private activityService: ActivityService,
+    private exportTemplateService: ExportTemplateService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
@@ -392,6 +399,33 @@ export class ExportStudioComponent implements OnInit {
     this.accentColor = '#f59e0b';
     this.accentColorRgb = '245, 158, 11';
     this.secondaryAccent = '#1e293b';
+  }
+
+  toggleMarketplace(): void {
+    this.showMarketplace = !this.showMarketplace;
+    if (this.showMarketplace && this.communityTemplates.length === 0) {
+      this.loadCommunityTemplates();
+    }
+  }
+
+  loadCommunityTemplates(): void {
+    this.loadingTemplates = true;
+    this.exportTemplateService.getAll().subscribe({
+      next: (templates) => {
+        this.communityTemplates = templates;
+        this.loadingTemplates = false;
+      },
+      error: () => { this.loadingTemplates = false; }
+    });
+  }
+
+  voteTemplate(templateId: number): void {
+    this.exportTemplateService.toggleVote(templateId).subscribe({
+      next: (updated) => {
+        const idx = this.communityTemplates.findIndex(t => t.id === templateId);
+        if (idx >= 0) this.communityTemplates[idx] = updated;
+      }
+    });
   }
 
   generateWeatherStamp(): void {

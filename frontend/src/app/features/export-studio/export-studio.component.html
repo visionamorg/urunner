@@ -286,6 +286,42 @@
               </button>
             }
           </div>
+          <button (click)="toggleMarketplace()" class="marketplace-btn">
+            <span class="material-icons text-sm">storefront</span>
+            <span>{{ showMarketplace ? 'Hide' : 'Explore Community Templates' }}</span>
+          </button>
+          @if (showMarketplace) {
+            <div class="marketplace-list">
+              @if (loadingTemplates) {
+                <div class="flex justify-center py-4">
+                  <div class="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent"></div>
+                </div>
+              } @else if (communityTemplates.length === 0) {
+                <p class="text-muted-foreground text-sm text-center py-4">No community templates yet. Be the first to share!</p>
+              } @else {
+                @for (ct of communityTemplates; track ct.id) {
+                  <div class="marketplace-card">
+                    <div class="marketplace-card-header">
+                      <div>
+                        <p class="marketplace-card-name">{{ ct.name }}</p>
+                        <p class="marketplace-card-author">by {{ ct.creatorUsername }}</p>
+                      </div>
+                      <button (click)="voteTemplate(ct.id)" class="vote-btn" [class.voted]="ct.hasVoted">
+                        <span class="material-icons text-sm">{{ ct.hasVoted ? 'favorite' : 'favorite_border' }}</span>
+                        <span>{{ ct.votes }}</span>
+                      </button>
+                    </div>
+                    @if (ct.description) {
+                      <p class="marketplace-card-desc">{{ ct.description }}</p>
+                    }
+                    <div class="marketplace-card-footer">
+                      <span class="text-xs text-muted-foreground">{{ ct.downloads }} downloads</span>
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+          }
         </div>
 
         <!-- Background Photo -->
