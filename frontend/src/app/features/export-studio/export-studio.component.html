@@ -1,0 +1,197 @@
+<div class="export-studio">
+
+  <!-- Header -->
+  <div class="studio-header">
+    <button (click)="goBack()" class="back-btn">
+      <span class="material-icons">arrow_back</span>
+    </button>
+    <h1 class="studio-title">Export Studio</h1>
+    <button (click)="exportToImage()" [disabled]="!selectedActivity || exporting" class="export-btn">
+      @if (exporting) {
+        <div class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+      } @else {
+        <span class="material-icons">download</span>
+      }
+      <span>{{ exporting ? 'Exporting...' : 'Export' }}</span>
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="flex items-center justify-center h-[80vh]">
+      <div class="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent"></div>
+    </div>
+  } @else if (!selectedActivity) {
+    <div class="flex flex-col items-center justify-center h-[80vh] gap-4 text-center px-4">
+      <span class="material-icons text-6xl text-muted-foreground">photo_camera</span>
+      <p class="text-foreground font-semibold text-lg">No activities found</p>
+      <p class="text-muted-foreground">Log a run first to create an export</p>
+      <button (click)="goBack()" class="btn-primary">Go to Activities</button>
+    </div>
+  } @else {
+    <div class="studio-layout">
+
+      <!-- Canvas Preview Area -->
+      <div class="canvas-wrapper">
+        <div class="canvas-frame" #canvasContainer>
+
+          <!-- Default gradient background -->
+          <div class="canvas-bg"></div>
+
+          <!-- Template: Clear Info -->
+          @if (selectedTemplate === 'clear-info') {
+            <div class="template-clear-info">
+              <div class="clear-info-card">
+                <div class="clear-info-profile">
+                  <div class="clear-info-avatar">
+                    <span class="material-icons">directions_run</span>
+                  </div>
+                  <div>
+                    <p class="clear-info-username">{{ selectedActivity.username }}</p>
+                    <p class="clear-info-date">{{ formatDate(selectedActivity.activityDate) }}</p>
+                  </div>
+                </div>
+                <div class="clear-info-stats">
+                  <div class="clear-info-stat">
+                    <span class="clear-info-stat-value">{{ selectedActivity.distanceKm.toFixed(2) }}</span>
+                    <span class="clear-info-stat-label">Distance (km)</span>
+                  </div>
+                  <div class="clear-info-stat">
+                    <span class="clear-info-stat-value">{{ formatPace(selectedActivity.paceMinPerKm) }}</span>
+                    <span class="clear-info-stat-label">Avg Pace (/km)</span>
+                  </div>
+                  <div class="clear-info-stat">
+                    <span class="clear-info-stat-value">{{ formatDuration(selectedActivity.durationMinutes) }}</span>
+                    <span class="clear-info-stat-label">Duration</span>
+                  </div>
+                </div>
+                @if (selectedActivity.location) {
+                  <div class="clear-info-location">
+                    <span class="material-icons text-sm">location_on</span>
+                    <span>{{ selectedActivity.location }}</span>
+                  </div>
+                }
+              </div>
+              <div class="clear-info-title">{{ selectedActivity.title }}</div>
+            </div>
+          }
+
+          <!-- Template: Large Stat -->
+          @if (selectedTemplate === 'large-stat') {
+            <div class="template-large-stat">
+              <div class="large-stat-shapes">
+                <div class="large-stat-circle"></div>
+                <div class="large-stat-triangle"></div>
+              </div>
+              <div class="large-stat-number">{{ selectedActivity.distanceKm.toFixed(0) }}</div>
+              <div class="large-stat-unit">KM</div>
+              <div class="large-stat-details">
+                <span>{{ selectedActivity.title }}</span>
+                <span class="large-stat-separator">|</span>
+                <span>{{ formatPace(selectedActivity.paceMinPerKm) }} /km</span>
+                <span class="large-stat-separator">|</span>
+                <span>{{ formatDuration(selectedActivity.durationMinutes) }}</span>
+              </div>
+              <div class="large-stat-date">{{ formatShortDate(selectedActivity.activityDate) }}</div>
+            </div>
+          }
+
+          <!-- Template: Aesthetic Text -->
+          @if (selectedTemplate === 'aesthetic-text') {
+            <div class="template-aesthetic-text">
+              <div class="aesthetic-top-stats">
+                <span class="aesthetic-username">{{ selectedActivity.username }}</span>
+                <span class="aesthetic-divider">·</span>
+                <span>{{ selectedActivity.distanceKm.toFixed(2) }} km</span>
+                <span class="aesthetic-divider">·</span>
+                <span>{{ formatDuration(selectedActivity.durationMinutes) }}</span>
+              </div>
+              <div class="aesthetic-bold-title">{{ selectedActivity.title?.toUpperCase() || 'MORNING RUN' }}</div>
+              <div class="aesthetic-bottom">
+                <p class="aesthetic-pace">{{ formatPace(selectedActivity.paceMinPerKm) }} /km</p>
+                <p class="aesthetic-date">{{ formatDate(selectedActivity.activityDate) }}</p>
+              </div>
+            </div>
+          }
+
+          <!-- Template: Typography Poster -->
+          @if (selectedTemplate === 'typography-poster') {
+            <div class="template-typography">
+              <div class="typo-main-text">{{ selectedActivity.distanceKm.toFixed(0) }}K</div>
+              <div class="typo-sub-text">RUN</div>
+              <div class="typo-stats-bar">
+                <div class="typo-stat">
+                  <span class="typo-stat-val">{{ formatPace(selectedActivity.paceMinPerKm) }}</span>
+                  <span class="typo-stat-lbl">PACE</span>
+                </div>
+                <div class="typo-stat">
+                  <span class="typo-stat-val">{{ formatDuration(selectedActivity.durationMinutes) }}</span>
+                  <span class="typo-stat-lbl">TIME</span>
+                </div>
+                <div class="typo-stat">
+                  <span class="typo-stat-val">{{ selectedActivity.distanceKm.toFixed(2) }}</span>
+                  <span class="typo-stat-lbl">KM</span>
+                </div>
+              </div>
+              <div class="typo-footer">
+                <span class="typo-username">{{ selectedActivity.username }}</span>
+                <span class="typo-date">{{ formatShortDate(selectedActivity.activityDate) }}</span>
+              </div>
+            </div>
+          }
+
+        </div>
+      </div>
+
+      <!-- Controls Panel -->
+      <div class="controls-panel">
+
+        <!-- Activity Selector -->
+        <div class="control-section">
+          <h3 class="control-label">Activity</h3>
+          <button (click)="showActivityPicker = !showActivityPicker" class="activity-selector-btn">
+            <div class="flex items-center gap-3">
+              <span class="material-icons text-primary">directions_run</span>
+              <div class="text-left">
+                <p class="text-foreground text-sm font-semibold truncate">{{ selectedActivity.title }}</p>
+                <p class="text-muted-foreground text-xs">{{ selectedActivity.distanceKm.toFixed(2) }} km · {{ formatShortDate(selectedActivity.activityDate) }}</p>
+              </div>
+            </div>
+            <span class="material-icons text-muted-foreground">{{ showActivityPicker ? 'expand_less' : 'expand_more' }}</span>
+          </button>
+
+          @if (showActivityPicker) {
+            <div class="activity-picker">
+              @for (activity of activities; track activity.id) {
+                <button
+                  (click)="selectActivity(activity)"
+                  class="activity-pick-item"
+                  [class.active]="activity.id === selectedActivity.id">
+                  <p class="text-sm font-medium truncate">{{ activity.title }}</p>
+                  <p class="text-xs text-muted-foreground">{{ activity.distanceKm.toFixed(2) }} km · {{ formatShortDate(activity.activityDate) }}</p>
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Template Carousel -->
+        <div class="control-section">
+          <h3 class="control-label">Template</h3>
+          <div class="template-carousel">
+            @for (tmpl of templates; track tmpl.id) {
+              <button
+                (click)="selectTemplate(tmpl.id)"
+                class="template-thumb"
+                [class.active]="selectedTemplate === tmpl.id">
+                <span class="material-icons text-2xl">{{ tmpl.icon }}</span>
+                <span class="template-thumb-name">{{ tmpl.name }}</span>
+              </button>
+            }
+          </div>
+        </div>
+
+      </div>
+    </div>
+  }
+
+</div>

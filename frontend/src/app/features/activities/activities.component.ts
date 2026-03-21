@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ActivityService } from '../../core/services/activity.service';
 import { Activity, ActivityStats } from '../../core/models/activity.model';
 
@@ -21,7 +22,8 @@ export class ActivitiesComponent implements OnInit {
 
   constructor(
     private activityService: ActivityService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private router: Router
   ) {
     const today = new Date().toISOString().split('T')[0];
     this.form = this.fb.group({
@@ -74,5 +76,9 @@ export class ActivitiesComponent implements OnInit {
     const h = Math.floor(min / 60);
     const m = min % 60;
     return h > 0 ? `${h}h ${m}m` : `${m}m`;
+  }
+
+  openExportStudio(activity: Activity): void {
+    this.router.navigate(['/export-studio'], { queryParams: { activityId: activity.id } });
   }
 }
