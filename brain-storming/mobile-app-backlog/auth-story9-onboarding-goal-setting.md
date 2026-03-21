@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Auth & Onboarding\n## Story: Setting a Primary Goal\n\n**As a** new user,\n**I want to** declare my primary running goal (e.g. lose weight, run 5k),\n**So that** the app can tailor recommendations.\n\n### Acceptance Criteria:\n- *Given goal screen*, *Whengoal selected*, *Thensave goal intent to User schema*.\n

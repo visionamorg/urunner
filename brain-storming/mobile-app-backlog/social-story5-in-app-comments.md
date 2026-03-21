@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Social Feed & Interaction\n## Story: In-App Comment Threads\n\n**As a** user,\n**I want to** open a bottom-sheet to read and write text comments on a run,\n**So that** I can talk trash or congratulate friends.\n\n### Acceptance Criteria:\n- *Given feed item*, *Whencomment icon tapped*, *Thenslide up keyboard and load comment tree*.\n

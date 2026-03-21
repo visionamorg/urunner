@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Auth & Onboarding\n## Story: Height & Weight Input\n\n**As a** new runner,\n**I want to** input my height, weight, and gender,\n**So that** the app can accurately calculate calorie burn.\n\n### Acceptance Criteria:\n- *Given profile setup*, *Whenprompted*, *Theninput metrics which are saved securely to backend*.\n

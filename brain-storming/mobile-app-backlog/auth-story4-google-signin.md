@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Auth & Onboarding\n## Story: Sign in with Google\n\n**As a** Android user,\n**I want to** sign in using my Google account,\n**So that** I can use my primary email easily.\n\n### Acceptance Criteria:\n- *Given login screen*, *WhenGoogle Sign In tapped*, *Theninvoke native Google Auth SDK*.\n

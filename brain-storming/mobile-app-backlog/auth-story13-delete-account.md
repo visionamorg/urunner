@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Auth & Onboarding\n## Story: GDPR Account Deletion\n\n**As a** user,\n**I want to** permanently delete my account and all GPS data from the app,\n**So that** I control my data privacy.\n\n### Acceptance Criteria:\n- *Given privacy settings*, *Whendelete tapped*, *Thenrequire password confirmation and hard-delete account*.\n

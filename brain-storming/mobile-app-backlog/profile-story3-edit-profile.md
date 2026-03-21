@@ -1,0 +1,1 @@
+# Epic: Mobile Application - User Profile & Settings\n## Story: Edit Profile Screen\n\n**As a** user,\n**I want to** change my bio, location, and profile picture,\n**So that** my identity stays up to date.\n\n### Acceptance Criteria:\n- *Given profile*, *When'Edit' tapped*, *Thenopen form taking camera roll images for avatar*.\n

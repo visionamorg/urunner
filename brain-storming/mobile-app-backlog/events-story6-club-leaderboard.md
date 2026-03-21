@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Communities & Events\n## Story: Club Weekly Leaderboard\n\n**As a** competitive runner,\n**I want to** see who ran the most miles in my club this week,\n**So that** I am motivated to beat Dave from accounting.\n\n### Acceptance Criteria:\n- *Given club view*, *WhenLeaderboard tab selected*, *Thenrank members by weekly distance aggregated via API*.\n

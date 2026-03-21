@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Gear & Wearables Integration\n## Story: Customize Voice Coaching\n\n**As a** user,\n**I want to** choose between a male/female voice and frequency (every 1km vs every 5min),\n**So that** the audio pacing fits my style.\n\n### Acceptance Criteria:\n- *Given settings*, *Whenaudio selected*, *Thenprovide dropdowns to configure native TTS options*.\n

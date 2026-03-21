@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Core Tracking & GPS\n## Story: Audio Kilometer Notification\n\n**As a** runner,\n**I want to** hear an automated voice announce my split time every kilometer,\n**So that** I don't have to look at my phone screen.\n\n### Acceptance Criteria:\n- *Given run active*, *Whendistance % 1000m == 0*, *Thentrigger text-to-speech module to read pace*.\n

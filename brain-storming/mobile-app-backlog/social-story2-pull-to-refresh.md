@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Social Feed & Interaction\n## Story: Pull to Refresh Feed\n\n**As a** user,\n**I want to** pull down at the top of the feed to trigger a hard refresh,\n**So that** I can check for brand new runs.\n\n### Acceptance Criteria:\n- *Given home tab*, *Whenpulled down beyond threshold*, *Thenshow spinner and refetch top of feed*.\n

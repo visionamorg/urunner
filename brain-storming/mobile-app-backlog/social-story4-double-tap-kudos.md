@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Social Feed & Interaction\n## Story: Double Tap to Kudos\n\n**As a** user,\n**I want to** double tap anywhere on a friend's feed card to give Kudos,\n**So that** giving support is extremely fast and intuitive.\n\n### Acceptance Criteria:\n- *Given feed item*, *Whendouble tapped*, *Thenshow heart animation and increment Kudos counter via API*.\n

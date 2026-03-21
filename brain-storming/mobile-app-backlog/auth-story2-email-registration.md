@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Auth & Onboarding\n## Story: Email & Password Registration\n\n**As a** new user,\n**I want to** register with my email address,\n**So that** I can create an account manually.\n\n### Acceptance Criteria:\n- *Given registration screen*, *Whenvalid email/pass entered*, *Thencreate account and send OTP*.\n

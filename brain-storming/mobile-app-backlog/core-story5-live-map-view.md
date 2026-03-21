@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Core Tracking & GPS\n## Story: Live Tracking Map Overlay\n\n**As a** runner,\n**I want to** see my current location moving on a Mapbox/Google Map,\n**So that** I don't get lost.\n\n### Acceptance Criteria:\n- *Given a run is active*, *Whenviewing screen*, *Thenshow a dark-mode map with a pulsing blue dot representing me*.\n

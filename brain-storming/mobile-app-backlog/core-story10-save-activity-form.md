@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Core Tracking & GPS\n## Story: Post-Run Details Form\n\n**As a** runner,\n**I want to** add a title, description, and photos before saving,\n**So that** my feed post is rich and personalized.\n\n### Acceptance Criteria:\n- *Given swipe to finish*, *Whenprocessing done*, *Thenshow form to name run and attach camera roll photos*.\n

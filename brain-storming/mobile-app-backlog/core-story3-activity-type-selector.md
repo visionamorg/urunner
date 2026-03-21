@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Core Tracking & GPS\n## Story: Select Activity Type\n\n**As a** multi-sport athlete,\n**I want to** swipe to change activity from 'Run' to 'Ride' or 'Walk',\n**So that** metadata is accurate before starting.\n\n### Acceptance Criteria:\n- *Given tracking tab*, *Whenswiping horizontally on icon*, *Thenupdate activity type state*.\n

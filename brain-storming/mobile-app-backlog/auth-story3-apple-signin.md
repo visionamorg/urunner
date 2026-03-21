@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Auth & Onboarding\n## Story: Sign in with Apple\n\n**As a** iOS user,\n**I want to** sign in using my Apple ID,\n**So that** I don't have to remember another password.\n\n### Acceptance Criteria:\n- *Given login screen*, *WhenApple Sign In tapped*, *Thenuse native iOS auth UI*.\n

@@ -1,0 +1,1 @@
+# Epic: Mobile Application - User Profile & Settings\n## Story: Profile Header & Stats\n\n**As a** user,\n**I want to** see my avatar, follower counts, and total YTD distance at the top of my profile,\n**So that** I have a quick summary of my identity.\n\n### Acceptance Criteria:\n- *Given profile tab*, *Whenloaded*, *Thenshow circular avatar and flexbox grid of total stats*.\n

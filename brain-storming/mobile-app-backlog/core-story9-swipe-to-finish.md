@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Core Tracking & GPS\n## Story: Swipe to Finish Mechanism\n\n**As a** runner,\n**I want to** swipe a slider to finish the run instead of just tapping,\n**So that** I don't accidentally end my run mid-workout.\n\n### Acceptance Criteria:\n- *Given paused run*, *Whenending*, *Thenrequire a physical horizontal swipe to confirm finish*.\n

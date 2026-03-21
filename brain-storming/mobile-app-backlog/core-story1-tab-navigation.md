@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Core Tracking & GPS\n## Story: Bottom Tab Navigation\n\n**As a** user,\n**I want to** navigate between Feed, Track, Profile, and Events using a bottom bar,\n**So that** I can quickly switch contexts with one hand.\n\n### Acceptance Criteria:\n- *Given app open*, *Wheninteracting*, *Thenbottom tab bar is always visible unless actually running*.\n

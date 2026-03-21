@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Auth & Onboarding\n## Story: Contact Sync to Find Friends\n\n**As a** new user,\n**I want to** allow the app to scan my address book,\n**So that** I can instantly follow friends who already use the app.\n\n### Acceptance Criteria:\n- *Given onboarding*, *Whencontact sync approved*, *Thenquery backend for matching hashed phone numbers*.\n

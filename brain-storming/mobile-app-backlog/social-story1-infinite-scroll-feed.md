@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Social Feed & Interaction\n## Story: Infinite Scroll Activity Feed\n\n**As a** user,\n**I want to** scroll through a paginated feed of my friends' runs,\n**So that** I can consume content endlessly.\n\n### Acceptance Criteria:\n- *Given home tab*, *Whenscrolling down*, *Thenfetch next 10 activities via GraphQL cursor pagination*.\n

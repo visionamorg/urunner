@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Auth & Onboarding\n## Story: Interactive App Tour\n\n**As a** new user,\n**I want to** see a quick 3-slide visual tour of core features,\n**So that** I understand how the feed and tracking tabs work.\n\n### Acceptance Criteria:\n- *Given first login*, *Whenapp opens*, *Thenshow swipable tutorial overlay*.\n

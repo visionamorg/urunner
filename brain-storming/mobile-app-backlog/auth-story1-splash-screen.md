@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Auth & Onboarding\n## Story: App Splash Screen & Loading\n\n**As a** new user,\n**I want to** see a branded splash screen while the app initializes the JS bundle,\n**So that** I know the app is loading and not frozen.\n\n### Acceptance Criteria:\n- *Given app launch*, *WhenJS loads*, *Thenshow brand logo for max 2 seconds*.\n

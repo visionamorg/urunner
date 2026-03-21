@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Auth & Onboarding\n## Story: Secure Logout\n\n**As a** user,\n**I want to** log out and clear local storage,\n**So that** my data is safe if someone else uses my phone.\n\n### Acceptance Criteria:\n- *Given settings menu*, *Whenlogout tapped*, *Thenclear AsyncStorage and redirect to Auth Stack*.\n

@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Social Feed & Interaction\n## Story: Following vs Local Feed Toggle\n\n**As a** user,\n**I want to** toggle the feed between 'People I Follow' and 'Local Area',\n**So that** I can discover new runners in my city.\n\n### Acceptance Criteria:\n- *Given top of feed*, *When'Local' selected*, *Thenquery backend for public runs within 20km radius*.\n

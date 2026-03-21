@@ -1,0 +1,1 @@
+# Epic: Mobile Application - Leaderboards & Gamification\n## Story: Daily Run Streak Flame\n\n**As a** dedicated runner,\n**I want to** see a fire emoji with a number indicating consecutive days run,\n**So that** I am terrified to break the streak.\n\n### Acceptance Criteria:\n- *Given profile header*, *Whenstreak > 2*, *Thenshow 🔥 icon and increment number dynamically*.\n
