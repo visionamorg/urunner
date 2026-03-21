@@ -40,10 +40,12 @@ export class ExportStudioComponent implements OnInit {
   showDistance = true;
   showLocation = true;
 
-  // Background photo
+  // Background photo(s)
   backgroundImageUrl: string | null = null;
+  backgroundImages: string[] = [];
   backgroundOpacity = 100;
   backgroundBlur = 0;
+  collageLayout: 'single' | 'vertical-thirds' | 'diagonal' = 'single';
 
   // Watermark
   showWatermark = true;
@@ -191,23 +193,41 @@ export class ExportStudioComponent implements OnInit {
 
   onBackgroundUpload(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if (!input.files || !input.files[0]) return;
+    if (!input.files || input.files.length === 0) return;
 
-    const file = input.files[0];
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.backgroundImageUrl = reader.result as string;
-      if (this.useAutoColors) {
-        this.extractColors(reader.result as string);
-      }
-    };
-    reader.readAsDataURL(file);
+    const files = Array.from(input.files).slice(0, 3);
+
+    this.backgroundImages = [];
+    let loadedCount = 0;
+
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.backgroundImages.push(reader.result as string);
+        loadedCount++;
+
+        if (loadedCount === files.length) {
+          this.backgroundImageUrl = this.backgroundImages[0];
+          this.collageLayout = this.backgroundImages.length > 1 ? 'vertical-thirds' : 'single';
+
+          if (this.useAutoColors) {
+            this.extractColors(this.backgroundImages[0]);
+          }
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Reset input so same file can be re-selected
+    input.value = '';
   }
 
   removeBackground(): void {
     this.backgroundImageUrl = null;
+    this.backgroundImages = [];
     this.backgroundOpacity = 100;
     this.backgroundBlur = 0;
+    this.collageLayout = 'single';
     this.resetColors();
   }
 

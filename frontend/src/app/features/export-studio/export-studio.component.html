@@ -48,12 +48,20 @@
           <!-- Default gradient background -->
           <div class="canvas-bg"></div>
 
-          <!-- User-uploaded background photo -->
-          @if (backgroundImageUrl) {
+          <!-- User-uploaded background photo(s) -->
+          @if (backgroundImages.length === 1) {
             <div class="canvas-photo-bg"
-              [style.background-image]="'url(' + backgroundImageUrl + ')'"
+              [style.background-image]="'url(' + backgroundImages[0] + ')'"
               [style.opacity]="backgroundOpacity / 100"
               [style.filter]="'blur(' + backgroundBlur + 'px)'">
+            </div>
+          } @else if (backgroundImages.length > 1) {
+            <div class="canvas-collage" [class]="'canvas-collage collage-' + collageLayout"
+              [style.opacity]="backgroundOpacity / 100"
+              [style.filter]="'blur(' + backgroundBlur + 'px)'">
+              @for (img of backgroundImages; track img; let i = $index) {
+                <div class="collage-panel" [style.background-image]="'url(' + img + ')'"></div>
+              }
             </div>
           }
 
@@ -264,19 +272,32 @@
         <!-- Background Photo -->
         <div class="control-section">
           <h3 class="control-label">Background</h3>
-          @if (!backgroundImageUrl) {
+          @if (backgroundImages.length === 0) {
             <label class="bg-upload-btn">
               <span class="material-icons">add_photo_alternate</span>
-              <span>Upload Photo</span>
-              <input type="file" accept="image/*" (change)="onBackgroundUpload($event)" class="hidden">
+              <span>Upload Photos (up to 3)</span>
+              <input type="file" accept="image/*" multiple (change)="onBackgroundUpload($event)" class="hidden">
             </label>
           } @else {
-            <div class="bg-preview">
-              <div class="bg-preview-thumb" [style.background-image]="'url(' + backgroundImageUrl + ')'"></div>
-              <button (click)="removeBackground()" class="bg-remove-btn">
+            <div class="bg-preview-grid">
+              @for (img of backgroundImages; track img) {
+                <div class="bg-preview-thumb" [style.background-image]="'url(' + img + ')'"></div>
+              }
+              <button (click)="removeBackground()" class="bg-remove-all">
                 <span class="material-icons text-sm">close</span>
+                <span>Clear</span>
               </button>
             </div>
+            @if (backgroundImages.length > 1) {
+              <div class="collage-layout-picker">
+                <button (click)="collageLayout = 'vertical-thirds'" class="collage-opt" [class.active]="collageLayout === 'vertical-thirds'">
+                  <span class="material-icons text-sm">view_column</span> Thirds
+                </button>
+                <button (click)="collageLayout = 'diagonal'" class="collage-opt" [class.active]="collageLayout === 'diagonal'">
+                  <span class="material-icons text-sm">view_quilt</span> Diagonal
+                </button>
+              </div>
+            }
             <div class="slider-group">
               <div class="slider-header">
                 <span class="slider-label">Opacity</span>
