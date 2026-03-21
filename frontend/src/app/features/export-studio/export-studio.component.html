@@ -59,20 +59,26 @@
                   </div>
                 </div>
                 <div class="clear-info-stats">
-                  <div class="clear-info-stat">
-                    <span class="clear-info-stat-value">{{ selectedActivity.distanceKm.toFixed(2) }}</span>
-                    <span class="clear-info-stat-label">Distance (km)</span>
-                  </div>
-                  <div class="clear-info-stat">
-                    <span class="clear-info-stat-value">{{ formatPace(selectedActivity.paceMinPerKm) }}</span>
-                    <span class="clear-info-stat-label">Avg Pace (/km)</span>
-                  </div>
-                  <div class="clear-info-stat">
-                    <span class="clear-info-stat-value">{{ formatDuration(selectedActivity.durationMinutes) }}</span>
-                    <span class="clear-info-stat-label">Duration</span>
-                  </div>
+                  @if (showDistance) {
+                    <div class="clear-info-stat">
+                      <span class="clear-info-stat-value">{{ selectedActivity.distanceKm.toFixed(2) }}</span>
+                      <span class="clear-info-stat-label">Distance (km)</span>
+                    </div>
+                  }
+                  @if (showPace) {
+                    <div class="clear-info-stat">
+                      <span class="clear-info-stat-value">{{ formatPace(selectedActivity.paceMinPerKm) }}</span>
+                      <span class="clear-info-stat-label">Avg Pace (/km)</span>
+                    </div>
+                  }
+                  @if (showDuration) {
+                    <div class="clear-info-stat">
+                      <span class="clear-info-stat-value">{{ formatDuration(selectedActivity.durationMinutes) }}</span>
+                      <span class="clear-info-stat-label">Duration</span>
+                    </div>
+                  }
                 </div>
-                @if (selectedActivity.location) {
+                @if (selectedActivity.location && showLocation) {
                   <div class="clear-info-location">
                     <span class="material-icons text-sm">location_on</span>
                     <span>{{ selectedActivity.location }}</span>
@@ -94,10 +100,14 @@
               <div class="large-stat-unit">KM</div>
               <div class="large-stat-details">
                 <span>{{ selectedActivity.title }}</span>
-                <span class="large-stat-separator">|</span>
-                <span>{{ formatPace(selectedActivity.paceMinPerKm) }} /km</span>
-                <span class="large-stat-separator">|</span>
-                <span>{{ formatDuration(selectedActivity.durationMinutes) }}</span>
+                @if (showPace) {
+                  <span class="large-stat-separator">|</span>
+                  <span>{{ formatPace(selectedActivity.paceMinPerKm) }} /km</span>
+                }
+                @if (showDuration) {
+                  <span class="large-stat-separator">|</span>
+                  <span>{{ formatDuration(selectedActivity.durationMinutes) }}</span>
+                }
               </div>
               <div class="large-stat-date">{{ formatShortDate(selectedActivity.activityDate) }}</div>
             </div>
@@ -108,14 +118,20 @@
             <div class="template-aesthetic-text">
               <div class="aesthetic-top-stats">
                 <span class="aesthetic-username">{{ selectedActivity.username }}</span>
-                <span class="aesthetic-divider">·</span>
-                <span>{{ selectedActivity.distanceKm.toFixed(2) }} km</span>
-                <span class="aesthetic-divider">·</span>
-                <span>{{ formatDuration(selectedActivity.durationMinutes) }}</span>
+                @if (showDistance) {
+                  <span class="aesthetic-divider">·</span>
+                  <span>{{ selectedActivity.distanceKm.toFixed(2) }} km</span>
+                }
+                @if (showDuration) {
+                  <span class="aesthetic-divider">·</span>
+                  <span>{{ formatDuration(selectedActivity.durationMinutes) }}</span>
+                }
               </div>
               <div class="aesthetic-bold-title" (click)="editingTitle = true" [title]="'Click to edit'">{{ aestheticTitle }}</div>
               <div class="aesthetic-bottom">
-                <p class="aesthetic-pace">{{ formatPace(selectedActivity.paceMinPerKm) }} /km</p>
+                @if (showPace) {
+                  <p class="aesthetic-pace">{{ formatPace(selectedActivity.paceMinPerKm) }} /km</p>
+                }
                 <p class="aesthetic-date">{{ formatDate(selectedActivity.activityDate) }}</p>
               </div>
             </div>
@@ -127,18 +143,24 @@
               <div class="typo-main-text">{{ selectedActivity.distanceKm.toFixed(0) }}K</div>
               <div class="typo-sub-text">RUN</div>
               <div class="typo-stats-bar">
-                <div class="typo-stat">
-                  <span class="typo-stat-val">{{ formatPace(selectedActivity.paceMinPerKm) }}</span>
-                  <span class="typo-stat-lbl">PACE</span>
-                </div>
-                <div class="typo-stat">
-                  <span class="typo-stat-val">{{ formatDuration(selectedActivity.durationMinutes) }}</span>
-                  <span class="typo-stat-lbl">TIME</span>
-                </div>
-                <div class="typo-stat">
-                  <span class="typo-stat-val">{{ selectedActivity.distanceKm.toFixed(2) }}</span>
-                  <span class="typo-stat-lbl">KM</span>
-                </div>
+                @if (showPace) {
+                  <div class="typo-stat">
+                    <span class="typo-stat-val">{{ formatPace(selectedActivity.paceMinPerKm) }}</span>
+                    <span class="typo-stat-lbl">PACE</span>
+                  </div>
+                }
+                @if (showDuration) {
+                  <div class="typo-stat">
+                    <span class="typo-stat-val">{{ formatDuration(selectedActivity.durationMinutes) }}</span>
+                    <span class="typo-stat-lbl">TIME</span>
+                  </div>
+                }
+                @if (showDistance) {
+                  <div class="typo-stat">
+                    <span class="typo-stat-val">{{ selectedActivity.distanceKm.toFixed(2) }}</span>
+                    <span class="typo-stat-lbl">KM</span>
+                  </div>
+                }
               </div>
               <div class="typo-footer">
                 <span class="typo-username">{{ selectedActivity.username }}</span>
@@ -208,6 +230,29 @@
                 <span class="template-thumb-name">{{ tmpl.name }}</span>
               </button>
             }
+          </div>
+        </div>
+
+        <!-- Data Toggles -->
+        <div class="control-section">
+          <h3 class="control-label">Data Visibility</h3>
+          <div class="toggle-list">
+            <label class="toggle-item">
+              <span class="toggle-label">Distance</span>
+              <input type="checkbox" [(ngModel)]="showDistance" class="toggle-switch">
+            </label>
+            <label class="toggle-item">
+              <span class="toggle-label">Pace</span>
+              <input type="checkbox" [(ngModel)]="showPace" class="toggle-switch">
+            </label>
+            <label class="toggle-item">
+              <span class="toggle-label">Duration</span>
+              <input type="checkbox" [(ngModel)]="showDuration" class="toggle-switch">
+            </label>
+            <label class="toggle-item">
+              <span class="toggle-label">Location</span>
+              <input type="checkbox" [(ngModel)]="showLocation" class="toggle-switch">
+            </label>
           </div>
         </div>
 

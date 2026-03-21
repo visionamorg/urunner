@@ -34,6 +34,12 @@ export class ExportStudioComponent implements OnInit {
   aestheticTitle = 'MORNING RUN';
   editingTitle = false;
 
+  // Data visibility toggles
+  showPace = true;
+  showDuration = true;
+  showDistance = true;
+  showLocation = true;
+
   templates: TemplateOption[] = [
     { id: 'clear-info', name: 'Clear Info', description: 'Clean frosted-glass card overlay', icon: 'style' },
     { id: 'large-stat', name: 'Large Stat', description: 'Bold numeric overlay', icon: 'format_size' },
