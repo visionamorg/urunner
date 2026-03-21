@@ -9,3 +9,6 @@
 - *Given* I select the "Clear Info" template, *then* the canvas renders a semi-transparent rectangular card positioned over my background photo.
 - *Then* the card cleanly lists my profile text, distance, pace, and date.
 - *Given* localized text, *then* all placeholder text is forced to English for platform consistency.
+
+### Status: ✅ Done
+**Implemented:** Clear Info template renders a frosted-glass card (rgba black + backdrop-filter blur) at the bottom of the canvas. Displays avatar, username, date, distance, pace, duration, and optional location. All text uses English labels (Distance, Avg Pace, Duration).
