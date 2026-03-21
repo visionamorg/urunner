@@ -1,6 +1,6 @@
 # US-004 — Export Studio: Avatar in Export & Custom Branding
 
-## Status: [~] In Progress
+## Status: [x] Done
 
 ## Description
 Two improvements to the Export Studio:

@@ -9,7 +9,7 @@ import { ExportTemplateService, ExportTemplateDto } from '../../core/services/ex
 import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
 import html2canvas from 'html2canvas';
 
-export type TemplateName = 'clear-info' | 'large-stat' | 'aesthetic-text' | 'typography-poster';
+export type TemplateName = 'clear-info' | 'large-stat' | 'aesthetic-text' | 'typography-poster' | 'story-global';
 
 export interface TemplateOption {
   id: TemplateName;
@@ -76,8 +76,22 @@ export class ExportStudioComponent implements OnInit {
 
   // Branding stamp
   brandColor = '#f59e0b';
-  brandSize = 100; // percentage, 60–160
+  brandSize = 100; // percentage, 60–180
   brandPosition: 'tl' | 'tc' | 'tr' | 'ml' | 'mc' | 'mr' | 'bl' | 'bc' | 'br' = 'tl';
+
+  brandPresetColors = ['#f59e0b', '#ffffff', '#000000', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#f43f5e'];
+
+  brandPositions: { id: 'tl'|'tc'|'tr'|'ml'|'mc'|'mr'|'bl'|'bc'|'br'; label: string; icon: string }[] = [
+    { id: 'tl', label: 'Top Left',     icon: 'north_west' },
+    { id: 'tc', label: 'Top Center',   icon: 'north' },
+    { id: 'tr', label: 'Top Right',    icon: 'north_east' },
+    { id: 'ml', label: 'Middle Left',  icon: 'west' },
+    { id: 'mc', label: 'Center',       icon: 'filter_center_focus' },
+    { id: 'mr', label: 'Middle Right', icon: 'east' },
+    { id: 'bl', label: 'Bottom Left',  icon: 'south_west' },
+    { id: 'bc', label: 'Bottom Center',icon: 'south' },
+    { id: 'br', label: 'Bottom Right', icon: 'south_east' },
+  ];
 
   // Weather stamp
   showWeatherStamp = false;
@@ -89,7 +103,8 @@ export class ExportStudioComponent implements OnInit {
     { id: 'clear-info', name: 'Clear Info', description: 'Clean frosted-glass card overlay', icon: 'style' },
     { id: 'large-stat', name: 'Large Stat', description: 'Bold numeric overlay', icon: 'format_size' },
     { id: 'aesthetic-text', name: 'Aesthetic Text', description: 'Minimalist with bold title', icon: 'cloud' },
-    { id: 'typography-poster', name: 'Typography Poster', description: 'Magazine-style layout', icon: 'text_fields' }
+    { id: 'typography-poster', name: 'Typography Poster', description: 'Magazine-style layout', icon: 'text_fields' },
+    { id: 'story-global', name: 'Story Global', description: 'Editorial activity story card', icon: 'auto_stories' }
   ];
 
   constructor(
@@ -165,6 +180,10 @@ export class ExportStudioComponent implements OnInit {
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
+  getDayOfWeek(dateStr: string): string {
+    return new Date(dateStr).toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+  }
+
   getBrandPositionStyle(): Record<string, string> {
     const edge = '60px';
     const map: Record<string, Record<string, string>> = {
@@ -221,7 +240,7 @@ export class ExportStudioComponent implements OnInit {
     try {
       const canvas = await this.renderCanvas();
       const link = document.createElement('a');
-      link.download = `runhub-export-${this.selectedActivity?.id || 'activity'}.png`;
+      link.download = `urc-export-${this.selectedActivity?.id || 'activity'}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
     } catch (err) {
@@ -246,13 +265,13 @@ export class ExportStudioComponent implements OnInit {
         canvas.toBlob((b) => resolve(b!), 'image/png');
       });
 
-      const file = new File([blob], `runhub-export-${this.selectedActivity?.id || 'activity'}.png`, {
+      const file = new File([blob], `urc-export-${this.selectedActivity?.id || 'activity'}.png`, {
         type: 'image/png'
       });
 
       if (navigator.canShare({ files: [file] })) {
         await navigator.share({
-          title: `${this.selectedActivity?.title || 'My Run'} - RunHub`,
+          title: `${this.selectedActivity?.title || 'My Run'} - URC`,
           files: [file]
         });
       } else {
@@ -345,7 +364,7 @@ export class ExportStudioComponent implements OnInit {
 
       const blob = new Blob(chunks, { type: 'video/webm' });
       const link = document.createElement('a');
-      link.download = `runhub-export-${activity.id}.webm`;
+      link.download = `urc-export-${activity.id}.webm`;
       link.href = URL.createObjectURL(blob);
       link.click();
       URL.revokeObjectURL(link.href);
@@ -544,14 +563,14 @@ export class ExportStudioComponent implements OnInit {
 
     // Funny/Self-Deprecating
     const funnyOptions = [
-      `${dist}km done. My legs are filing a complaint with HR. ${pace}/km never felt so personal. 🦵💀 #RunHub #NoPainNoGain`,
+      `${dist}km done. My legs are filing a complaint with HR. ${pace}/km never felt so personal. 🦵💀 #URC #NoPainNoGain`,
       `Ran ${dist}km because I saw a croissant at the finish line (there was no croissant). ${dur} of pure betrayal. 🥐😤 #RunnerProblems`,
       `${dist}km in ${dur}. The first 2km were "I love running!" The rest was just survival instinct. 🏃‍♂️💨 #HonestRunner`,
     ];
 
     // Inspirational
     const inspirationalOptions = [
-      `${dist}km. ${dur}. Every step forward is a step toward the best version of yourself. Keep pushing. 💪🔥 #RunHub #NeverStop`,
+      `${dist}km. ${dur}. Every step forward is a step toward the best version of yourself. Keep pushing. 💪🔥 #URC #NeverStop`,
       `The road doesn't get easier — you get stronger. ${dist}km at ${pace}/km around ${loc}. 🏃‍♂️✨ #RunningMotivation #Grind`,
       isLong
         ? `${dist}km conquered today. Long runs build more than endurance — they build character. 🦁 #UltraRunner #MentalToughness`
@@ -560,9 +579,9 @@ export class ExportStudioComponent implements OnInit {
 
     // Just the Facts
     const factsOptions = [
-      `📊 ${dist}km | ⏱ ${dur} | 🏃 ${pace}/km${a.location ? ` | 📍 ${a.location}` : ''}\n#RunHub #RunStats`,
+      `📊 ${dist}km | ⏱ ${dur} | 🏃 ${pace}/km${a.location ? ` | 📍 ${a.location}` : ''}\n#URC #RunStats`,
       `Today's session: ${dist}km at ${pace}/km (${dur}). ${isFast ? 'Tempo day.' : isLong ? 'Long run day.' : 'Easy miles.'} #RunData`,
-      `${a.title || 'Run'} complete — ${dist}km, ${pace}/km, ${dur}. Tracked with @RunHub 📈 #Running`,
+      `${a.title || 'Run'} complete — ${dist}km, ${pace}/km, ${dur}. Tracked with @URC 📈 #Running`,
     ];
 
     this.captions = [
@@ -586,12 +605,12 @@ export class ExportStudioComponent implements OnInit {
     for (let i = 0; i < raw.length; i++) {
       hash = ((hash << 5) - hash + raw.charCodeAt(i)) | 0;
     }
-    return `RH-${Math.abs(hash).toString(36).toUpperCase().slice(0, 8)}`;
+    return `URC-${Math.abs(hash).toString(36).toUpperCase().slice(0, 8)}`;
   }
 
   getVerificationUrl(): string {
     if (!this.selectedActivity) return '';
-    return `runhub.app/verify/${this.selectedActivity.id}`;
+    return `urc.run/verify/${this.selectedActivity.id}`;
   }
 
   goBack(): void {

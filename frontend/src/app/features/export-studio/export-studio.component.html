@@ -208,6 +208,70 @@
             </div>
           }
 
+          <!-- Template: Story Global -->
+          @if (selectedTemplate === 'story-global') {
+            <div class="template-story-global">
+
+              <!-- Diagonal dark overlay -->
+              <div class="sg-overlay"></div>
+
+              <!-- Category pill -->
+              <div class="sg-pill" [style.--brand-color]="accentColor">
+                <span class="material-icons sg-pill-icon">directions_run</span>
+                <span>Urbain Running Club</span>
+              </div>
+
+              <!-- Editorial headline -->
+              <div class="sg-headline">
+                <div class="sg-headline-row1">
+                  <span class="sg-activity-word">Activity</span>
+                  <span class="material-icons sg-arrow-icon">north_east</span>
+                </div>
+                <div class="sg-headline-row2">
+                  <em class="sg-on">On</em>
+                  <span class="sg-day" [style.color]="accentColor">{{ getDayOfWeek(selectedActivity.activityDate) }}</span>
+                </div>
+              </div>
+
+              <!-- Stats card -->
+              <div class="sg-stats-card">
+                <div class="sg-stats-row">
+                  @if (showDistance) {
+                    <div class="sg-stat-item">
+                      <span class="sg-stat-label">Distance</span>
+                      <span class="sg-stat-value">{{ selectedActivity.distanceKm.toFixed(2) }}<em class="sg-stat-unit">km</em></span>
+                    </div>
+                  }
+                  @if (showPace) {
+                    <div class="sg-stat-item">
+                      <span class="sg-stat-label">Pace</span>
+                      <span class="sg-stat-value">{{ formatPace(selectedActivity.paceMinPerKm) }}<em class="sg-stat-unit">/km</em></span>
+                    </div>
+                  }
+                  @if (showDuration) {
+                    <div class="sg-stat-item">
+                      <span class="sg-stat-label">Time</span>
+                      <span class="sg-stat-value">{{ formatDuration(selectedActivity.durationMinutes) }}</span>
+                    </div>
+                  }
+                </div>
+                <p class="sg-quote">{{ selectedActivity.title || 'Every step is a victory, every kilometer a triumph.' }}</p>
+              </div>
+
+              <!-- Bottom strip -->
+              <div class="sg-bottom-strip">
+                <div class="sg-bottom-user">
+                  <div class="sg-bottom-avatar">
+                    <app-avatar [imageUrl]="currentUserProfileImageUrl" [username]="selectedActivity.username || ''"></app-avatar>
+                  </div>
+                  <span class="sg-bottom-username">&#64;{{ selectedActivity.username }}</span>
+                </div>
+                <span class="sg-bottom-date">{{ formatShortDate(selectedActivity.activityDate) }}</span>
+              </div>
+
+            </div>
+          }
+
           <!-- Weather Stamp -->
           @if (showWeatherStamp && weatherCondition) {
             <div class="weather-stamp">
@@ -325,6 +389,55 @@
               }
             </div>
           }
+        </div>
+
+        <!-- URC Branding -->
+        <div class="control-section">
+          <h3 class="control-label">URC Branding</h3>
+
+          <!-- Color -->
+          <div class="slider-group">
+            <div class="slider-header">
+              <span class="slider-label">Color</span>
+              <span class="slider-value" [style.color]="brandColor">{{ brandColor }}</span>
+            </div>
+            <div class="brand-color-row">
+              @for (c of brandPresetColors; track c) {
+                <button class="brand-color-swatch"
+                  [style.background]="c"
+                  [class.active]="brandColor === c"
+                  (click)="brandColor = c"></button>
+              }
+              <label class="brand-color-custom" title="Custom color">
+                <span class="material-icons text-sm">colorize</span>
+                <input type="color" [(ngModel)]="brandColor" class="sr-only" />
+              </label>
+            </div>
+          </div>
+
+          <!-- Size -->
+          <div class="slider-group">
+            <div class="slider-header">
+              <span class="slider-label">Size</span>
+              <span class="slider-value">{{ brandSize }}%</span>
+            </div>
+            <input type="range" min="60" max="180" [(ngModel)]="brandSize" class="range-slider" />
+          </div>
+
+          <!-- Position Grid -->
+          <div class="slider-group">
+            <div class="slider-header"><span class="slider-label">Position</span></div>
+            <div class="brand-pos-grid">
+              @for (pos of brandPositions; track pos.id) {
+                <button class="brand-pos-btn"
+                  [class.active]="brandPosition === pos.id"
+                  (click)="brandPosition = pos.id"
+                  [title]="pos.label">
+                  <span class="material-icons text-sm">{{ pos.icon }}</span>
+                </button>
+              }
+            </div>
+          </div>
         </div>
 
         <!-- Background Photo -->
