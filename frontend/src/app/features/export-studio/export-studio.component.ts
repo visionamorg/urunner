@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActivityService } from '../../core/services/activity.service';
 import { Activity } from '../../core/models/activity.model';
@@ -17,7 +18,7 @@ export interface TemplateOption {
 @Component({
   selector: 'app-export-studio',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './export-studio.component.html',
   styleUrl: './export-studio.component.scss'
 })
@@ -30,6 +31,8 @@ export class ExportStudioComponent implements OnInit {
   loading = true;
   exporting = false;
   showActivityPicker = false;
+  aestheticTitle = 'MORNING RUN';
+  editingTitle = false;
 
   templates: TemplateOption[] = [
     { id: 'clear-info', name: 'Clear Info', description: 'Clean frosted-glass card overlay', icon: 'style' },
@@ -56,6 +59,9 @@ export class ExportStudioComponent implements OnInit {
         } else {
           this.selectedActivity = activities[0] || null;
         }
+        if (this.selectedActivity) {
+          this.aestheticTitle = (this.selectedActivity.title || 'MORNING RUN').toUpperCase();
+        }
       },
       error: () => { this.loading = false; }
     });
@@ -68,6 +74,7 @@ export class ExportStudioComponent implements OnInit {
   selectActivity(activity: Activity): void {
     this.selectedActivity = activity;
     this.showActivityPicker = false;
+    this.aestheticTitle = (activity.title || 'MORNING RUN').toUpperCase();
   }
 
   formatPace(pace: number): string {

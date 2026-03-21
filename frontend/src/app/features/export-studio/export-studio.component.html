@@ -105,7 +105,7 @@
                 <span class="aesthetic-divider">·</span>
                 <span>{{ formatDuration(selectedActivity.durationMinutes) }}</span>
               </div>
-              <div class="aesthetic-bold-title">{{ selectedActivity.title?.toUpperCase() || 'MORNING RUN' }}</div>
+              <div class="aesthetic-bold-title" (click)="editingTitle = true" [title]="'Click to edit'">{{ aestheticTitle }}</div>
               <div class="aesthetic-bottom">
                 <p class="aesthetic-pace">{{ formatPace(selectedActivity.paceMinPerKm) }} /km</p>
                 <p class="aesthetic-date">{{ formatDate(selectedActivity.activityDate) }}</p>
@@ -173,6 +173,19 @@
             </div>
           }
         </div>
+
+        <!-- Aesthetic Title Editor -->
+        @if (selectedTemplate === 'aesthetic-text') {
+          <div class="control-section">
+            <h3 class="control-label">Title Text</h3>
+            <input
+              type="text"
+              [(ngModel)]="aestheticTitle"
+              class="input-field"
+              placeholder="MORNING RUN"
+              (input)="aestheticTitle = aestheticTitle.toUpperCase()">
+          </div>
+        }
 
         <!-- Template Carousel -->
         <div class="control-section">
