@@ -5,6 +5,8 @@
 **I want to** use a template featuring CRT-monitor scanlines, neon chromatic aberration, and "hacked" digital text,
 **So that** the export perfectly fits a gritty, futuristic urban aesthetic.
 
+**Status: Done**
+
 ### Acceptance Criteria:
 - *Given* I select the "Cyberpunk Glitch" template, *then* an SVG/CSS overlay resembling horizontal CRT scanlines is applied across the entire canvas with 20% opacity.
 - *Then* the typography (Stats, Title) uses a monospaced "hacker" font.

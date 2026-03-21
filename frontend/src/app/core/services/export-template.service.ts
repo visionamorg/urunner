@@ -14,6 +14,7 @@ export interface ExportTemplateDto {
   downloads: number;
   hasVoted: boolean;
   createdAt: string;
+  tags?: string;
 }
 
 export interface CreateExportTemplateRequest {
@@ -21,6 +22,7 @@ export interface CreateExportTemplateRequest {
   description: string;
   cssLayout: string;
   previewUrl?: string;
+  tags?: string;
 }
 
 @Injectable({ providedIn: 'root' })

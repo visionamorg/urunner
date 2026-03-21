@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActivityService } from '../../core/services/activity.service';
@@ -9,7 +9,7 @@ import { ExportTemplateService, ExportTemplateDto } from '../../core/services/ex
 import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
 import html2canvas from 'html2canvas';
 
-export type TemplateName = 'clear-info' | 'large-stat' | 'aesthetic-text' | 'typography-poster' | 'story-global';
+export type TemplateName = 'clear-info' | 'large-stat' | 'aesthetic-text' | 'typography-poster' | 'story-global' | 'newspaper' | 'cyberpunk' | 'receipt' | 'annual-wrapped' | 'cloud-text';
 
 export interface TemplateOption {
   id: TemplateName;
@@ -21,7 +21,7 @@ export interface TemplateOption {
 @Component({
   selector: 'app-export-studio',
   standalone: true,
-  imports: [CommonModule, FormsModule, AvatarComponent],
+  imports: [CommonModule, FormsModule, AvatarComponent, TitleCasePipe],
   templateUrl: './export-studio.component.html',
   styleUrl: './export-studio.component.scss'
 })
@@ -63,10 +63,23 @@ export class ExportStudioComponent implements OnInit {
   showCaptions = false;
   captions: { style: string; text: string }[] = [];
 
-  // Marketplace
+  // Studio tabs
+  studioTab: 'builder' | 'explore' = 'builder';
+
+  // Marketplace / Explore
   showMarketplace = false;
   communityTemplates: ExportTemplateDto[] = [];
   loadingTemplates = false;
+  savedTemplateIds = new Set<number>();
+
+  // Publish modal
+  showPublishModal = false;
+  publishName = '';
+  publishDesc = '';
+  publishSelectedTags = new Set<string>();
+  publishLoading = false;
+  publishSuccess = false;
+  readonly publishTagOptions = ['Minimalist', 'Editorial', 'Ultra-Running', 'Club Branded', 'Dark Mode', 'Colorful', 'Typography'];
 
   // Video export
   exportingVideo = false;
@@ -99,12 +112,31 @@ export class ExportStudioComponent implements OnInit {
   weatherTemp = '';
   weatherIcon = '';
 
+  // Cloud Text (Story 37)
+  cloudText = 'URC';
+  cloudTexture: 'cloud' | '3d' | 'neon' = 'cloud';
+  cloudTextColor = '#ffffff';
+  cloudFontSize = 180; // px in 1080-wide canvas
+
+  // Annual Wrapped stats
+  yearStats: { totalKm: number; totalActivities: number; totalMinutes: number; bestRun: number; topMonth: string } | null = null;
+
+  // Marketplace explore
+  marketplaceSort: 'trending' | 'top-rated' | 'newest' = 'trending';
+  marketplaceCategory = 'All';
+  marketplaceCategories = ['All', 'Minimalist', 'Editorial', 'Ultra-Running', 'Club Branded'];
+
   templates: TemplateOption[] = [
     { id: 'clear-info', name: 'Clear Info', description: 'Clean frosted-glass card overlay', icon: 'style' },
     { id: 'large-stat', name: 'Large Stat', description: 'Bold numeric overlay', icon: 'format_size' },
     { id: 'aesthetic-text', name: 'Aesthetic Text', description: 'Minimalist with bold title', icon: 'cloud' },
     { id: 'typography-poster', name: 'Typography Poster', description: 'Magazine-style layout', icon: 'text_fields' },
-    { id: 'story-global', name: 'Story Global', description: 'Editorial activity story card', icon: 'auto_stories' }
+    { id: 'story-global', name: 'Story Global', description: 'Editorial activity story card', icon: 'auto_stories' },
+    { id: 'newspaper', name: 'Breaking News', description: 'Old-school newspaper front page', icon: 'newspaper' },
+    { id: 'cyberpunk', name: 'Cyberpunk', description: 'Neon glitch hacker aesthetic', icon: 'terminal' },
+    { id: 'receipt', name: 'Receipt', description: 'Thermal grocery receipt printout', icon: 'receipt_long' },
+    { id: 'annual-wrapped', name: 'Year Wrapped', description: 'Spotify-style year in review', icon: 'celebration' },
+    { id: 'cloud-text', name: 'Cloud Text', description: 'Massive floating 3D sky typography', icon: 'cloud' }
   ];
 
   constructor(
@@ -139,6 +171,7 @@ export class ExportStudioComponent implements OnInit {
         if (this.selectedActivity) {
           this.aestheticTitle = (this.selectedActivity.title || 'MORNING RUN').toUpperCase();
         }
+        this.computeYearStats(activities);
       },
       error: () => { this.loading = false; }
     });
@@ -477,6 +510,65 @@ export class ExportStudioComponent implements OnInit {
     this.secondaryAccent = '#1e293b';
   }
 
+  switchTab(tab: 'builder' | 'explore'): void {
+    this.studioTab = tab;
+    if (tab === 'explore' && this.communityTemplates.length === 0) {
+      this.loadCommunityTemplates();
+    }
+  }
+
+  openPublishModal(): void {
+    this.publishName = this.selectedTemplate === 'aesthetic-text' ? this.aestheticTitle : '';
+    this.publishDesc = '';
+    this.publishSelectedTags.clear();
+    this.publishSuccess = false;
+    this.showPublishModal = true;
+  }
+
+  togglePublishTag(tag: string): void {
+    if (this.publishSelectedTags.has(tag)) {
+      this.publishSelectedTags.delete(tag);
+    } else if (this.publishSelectedTags.size < 3) {
+      this.publishSelectedTags.add(tag);
+    }
+  }
+
+  publishTemplate(): void {
+    if (!this.publishName.trim() || this.publishSelectedTags.size === 0) return;
+    this.publishLoading = true;
+
+    const config = {
+      baseTemplate: this.selectedTemplate,
+      accentColor: this.accentColor,
+      brandColor: this.brandColor,
+      brandPosition: this.brandPosition,
+      brandSize: this.brandSize,
+    };
+
+    this.exportTemplateService.create({
+      name: this.publishName.trim(),
+      description: this.publishDesc.trim(),
+      cssLayout: JSON.stringify(config),
+      tags: Array.from(this.publishSelectedTags).join(','),
+    }).subscribe({
+      next: (created) => {
+        this.publishLoading = false;
+        this.publishSuccess = true;
+        this.communityTemplates = [created, ...this.communityTemplates];
+        setTimeout(() => { this.showPublishModal = false; this.publishSuccess = false; }, 1800);
+      },
+      error: () => { this.publishLoading = false; }
+    });
+  }
+
+  toggleSaveTemplate(id: number): void {
+    if (this.savedTemplateIds.has(id)) {
+      this.savedTemplateIds.delete(id);
+    } else {
+      this.savedTemplateIds.add(id);
+    }
+  }
+
   toggleMarketplace(): void {
     this.showMarketplace = !this.showMarketplace;
     if (this.showMarketplace && this.communityTemplates.length === 0) {
@@ -559,7 +651,6 @@ export class ExportStudioComponent implements OnInit {
 
     const isLong = a.distanceKm >= 15;
     const isFast = a.paceMinPerKm < 5.5;
-    const isShort = a.distanceKm < 5;
 
     // Funny/Self-Deprecating
     const funnyOptions = [
@@ -615,5 +706,168 @@ export class ExportStudioComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/activities']);
+  }
+
+  // ── Story 31: Newspaper ──────────────────────────────────────────────────
+  getNewsHeadline(): string {
+    if (!this.selectedActivity) return 'RUNNER HITS THE STREETS!';
+    const km = this.selectedActivity.distanceKm;
+    if (km >= 42) return 'LOCAL RUNNER CONQUERS THE MARATHON!';
+    if (km >= 21) return 'HALF-MARATHON CRUSHED IN EPIC FASHION!';
+    if (km >= 10) return '10KM SMASHED';
+    return (this.selectedActivity.title || 'RUN').toUpperCase() + '!';
+  }
+
+  // ── Story 33: Receipt ────────────────────────────────────────────────────
+  getReceiptDots(label: string, value: string, total = 38): string {
+    const dots = total - label.length - value.length;
+    return '.'.repeat(Math.max(2, dots));
+  }
+
+  // ── Story 34: Annual Wrapped ─────────────────────────────────────────────
+  computeYearStats(activities: Activity[]): void {
+    const currentYear = new Date().getFullYear();
+    const yearActivities = activities.filter(a => new Date(a.activityDate).getFullYear() === currentYear);
+
+    if (yearActivities.length === 0) {
+      this.yearStats = null;
+      return;
+    }
+
+    const totalKm = yearActivities.reduce((sum, a) => sum + a.distanceKm, 0);
+    const totalActivities = yearActivities.length;
+    const totalMinutes = yearActivities.reduce((sum, a) => sum + a.durationMinutes, 0);
+    const bestRun = Math.max(...yearActivities.map(a => a.distanceKm));
+
+    // Find most-active month
+    const monthCounts: Record<number, number> = {};
+    yearActivities.forEach(a => {
+      const m = new Date(a.activityDate).getMonth();
+      monthCounts[m] = (monthCounts[m] || 0) + 1;
+    });
+    const topMonthIndex = Number(Object.entries(monthCounts).sort((a, b) => b[1] - a[1])[0][0]);
+    const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    const topMonth = monthNames[topMonthIndex];
+
+    this.yearStats = { totalKm, totalActivities, totalMinutes, bestRun, topMonth };
+  }
+
+  getTotalHours(): string {
+    if (!this.yearStats) return '0h 0m';
+    const h = Math.floor(this.yearStats.totalMinutes / 60);
+    const m = this.yearStats.totalMinutes % 60;
+    return `${h}h ${m}m`;
+  }
+
+  get currentYear(): number {
+    return new Date().getFullYear();
+  }
+
+  // ── Story 35: Marketplace explore ────────────────────────────────────────
+  get filteredCommunityTemplates(): ExportTemplateDto[] {
+    let list = [...this.communityTemplates];
+
+    if (this.marketplaceCategory !== 'All') {
+      const cat = this.marketplaceCategory.toLowerCase();
+      list = list.filter(t =>
+        (t.tags || '').toLowerCase().includes(cat) ||
+        t.name.toLowerCase().includes(cat) ||
+        (t.description || '').toLowerCase().includes(cat)
+      );
+    }
+
+    if (this.marketplaceSort === 'trending') {
+      list.sort((a, b) => b.downloads - a.downloads);
+    } else if (this.marketplaceSort === 'top-rated') {
+      list.sort((a, b) => b.votes - a.votes);
+    } else {
+      list.sort((a, b) => {
+        const dateA = (a as any).createdAt ? new Date((a as any).createdAt).getTime() : 0;
+        const dateB = (b as any).createdAt ? new Date((b as any).createdAt).getTime() : 0;
+        return dateB - dateA;
+      });
+    }
+
+    return list;
+  }
+
+  formatDownloadCount(count: number): string {
+    if (count >= 1000) return (count / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+    return count.toString();
+  }
+
+  // ── Story 37: Cloud Text ──────────────────────────────────────────────────
+  get computedCloudFontSize(): number {
+    const chars = Math.max(1, this.cloudText.length);
+    // auto-fit: target ~85% of 1080px canvas width
+    const auto = Math.floor(918 / chars);
+    return Math.min(this.cloudFontSize, auto);
+  }
+
+  getCloudTextStyle(): Record<string, string> {
+    const color = this.cloudTextColor;
+    const size = this.computedCloudFontSize;
+
+    const base: Record<string, string> = {
+      'font-size': `${size}px`,
+      'line-height': '1',
+      'letter-spacing': '-0.02em',
+    };
+
+    if (this.cloudTexture === 'cloud') {
+      return {
+        ...base,
+        'color': 'transparent',
+        'background': 'linear-gradient(180deg, #ffffff 0%, #f0f9ff 25%, #ddeeff 60%, #b8d4ec 100%)',
+        '-webkit-background-clip': 'text',
+        'background-clip': 'text',
+        'filter': [
+          'drop-shadow(0 3px 6px rgba(160,205,235,0.95))',
+          'drop-shadow(0 8px 22px rgba(130,185,225,0.7))',
+          'drop-shadow(0 -3px 10px rgba(255,255,255,1))',
+          'drop-shadow(0 18px 40px rgba(100,155,205,0.4))',
+        ].join(' '),
+      };
+    }
+
+    if (this.cloudTexture === '3d') {
+      const layers: string[] = [];
+      for (let i = 1; i <= 10; i++) {
+        layers.push(`${i}px ${i}px 0 ${this.darkenHex(color, i * 6)}`);
+      }
+      layers.push(`12px 12px 24px rgba(0,0,0,0.55)`);
+      return {
+        ...base,
+        'color': color,
+        'text-shadow': layers.join(', '),
+      };
+    }
+
+    // neon
+    return {
+      ...base,
+      'color': color,
+      'text-shadow': [
+        `0 0 6px ${color}`,
+        `0 0 14px ${color}`,
+        `0 0 28px ${color}`,
+        `0 0 56px ${color}cc`,
+        `0 0 100px ${color}88`,
+        `0 0 160px ${color}44`,
+      ].join(', '),
+      'filter': `drop-shadow(0 0 48px ${color}66)`,
+    };
+  }
+
+  private darkenHex(hex: string, percent: number): string {
+    const clean = hex.replace('#', '');
+    const num = parseInt(clean.length === 3
+      ? clean.split('').map(c => c + c).join('')
+      : clean, 16);
+    const amt = Math.round(2.55 * percent);
+    const r = Math.max(0, (num >> 16) - amt);
+    const g = Math.max(0, ((num >> 8) & 0xff) - amt);
+    const b = Math.max(0, (num & 0xff) - amt);
+    return `rgb(${r},${g},${b})`;
   }
 }

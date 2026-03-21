@@ -15,7 +15,8 @@
       "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d[''''projects''''][''''runhub-frontend''''][''''architect''''][''''build''''][''''options''''], indent=2\\)\\)\")",
       "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(d[''''projects''''][''''runhub-frontend''''][''''architect''''][''''build''''][''''builder'''']\\)\")",
       "Bash(grep -i \"\\\\.ts$\")",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(grep -n \"selectedTemplate === ''newspaper''\\\\|selectedTemplate === ''cyberpunk''\\\\|selectedTemplate === ''receipt''\\\\|selectedTemplate === ''annual-wrapped''\\\\|<!-- Weather Stamp -->\" /Users/macbook/Documents/CODE/urunner/runhub/frontend/src/app/features/export-studio/export-studio.component.html)"
     ]
   }
 }

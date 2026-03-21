@@ -7,29 +7,43 @@
     </button>
     <h1 class="studio-title">Export Studio</h1>
     <div class="flex items-center gap-2">
-      @if (canShare) {
-        <button (click)="shareToOS()" [disabled]="!selectedActivity || exporting" class="share-btn">
-          <span class="material-icons">share</span>
-          <span class="hidden sm:inline">Share</span>
+      @if (studioTab === 'builder') {
+        @if (canShare) {
+          <button (click)="shareToOS()" [disabled]="!selectedActivity || exporting" class="share-btn">
+            <span class="material-icons">share</span>
+            <span class="hidden sm:inline">Share</span>
+          </button>
+        }
+        <button (click)="exportToVideo()" [disabled]="!selectedActivity || exportingVideo" class="share-btn">
+          @if (exportingVideo) {
+            <div class="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
+          } @else {
+            <span class="material-icons">videocam</span>
+          }
+          <span class="hidden sm:inline">{{ exportingVideo ? 'Recording...' : 'Video' }}</span>
+        </button>
+        <button (click)="exportToImage()" [disabled]="!selectedActivity || exporting" class="export-btn">
+          @if (exporting) {
+            <div class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+          } @else {
+            <span class="material-icons">download</span>
+          }
+          <span>{{ exporting ? 'Exporting...' : 'Export' }}</span>
         </button>
       }
-      <button (click)="exportToVideo()" [disabled]="!selectedActivity || exportingVideo" class="share-btn">
-        @if (exportingVideo) {
-          <div class="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
-        } @else {
-          <span class="material-icons">videocam</span>
-        }
-        <span class="hidden sm:inline">{{ exportingVideo ? 'Recording...' : 'Video' }}</span>
-      </button>
-      <button (click)="exportToImage()" [disabled]="!selectedActivity || exporting" class="export-btn">
-        @if (exporting) {
-          <div class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-        } @else {
-          <span class="material-icons">download</span>
-        }
-        <span>{{ exporting ? 'Exporting...' : 'Export' }}</span>
-      </button>
     </div>
+  </div>
+
+  <!-- Tab Switcher -->
+  <div class="studio-tabs">
+    <button class="studio-tab-btn" [class.active]="studioTab === 'builder'" (click)="switchTab('builder')">
+      <span class="material-icons">tune</span>
+      Builder
+    </button>
+    <button class="studio-tab-btn" [class.active]="studioTab === 'explore'" (click)="switchTab('explore')">
+      <span class="material-icons">explore</span>
+      Explore Community
+    </button>
   </div>
 
   @if (loading) {
@@ -43,6 +57,106 @@
       <p class="text-muted-foreground">Log a run first to create an export</p>
       <button (click)="goBack()" class="btn-primary">Go to Activities</button>
     </div>
+  } @else if (studioTab === 'explore') {
+
+    <!-- ═══ EXPLORE COMMUNITY TEMPLATES ═══ -->
+    <div class="explore-page">
+
+      <!-- Top bar: filters + sort -->
+      <div class="explore-topbar">
+        <div class="explore-filter-pills">
+          @for (cat of marketplaceCategories; track cat) {
+            <button class="explore-pill" [class.active]="marketplaceCategory === cat" (click)="marketplaceCategory = cat">
+              {{ cat }}
+            </button>
+          }
+        </div>
+        <div class="explore-sort-tabs">
+          <button class="explore-sort-tab" [class.active]="marketplaceSort === 'trending'" (click)="marketplaceSort = 'trending'">
+            <span class="material-icons text-sm">trending_up</span>
+            Trending
+          </button>
+          <button class="explore-sort-tab" [class.active]="marketplaceSort === 'top-rated'" (click)="marketplaceSort = 'top-rated'">
+            <span class="material-icons text-sm">star</span>
+            Top Rated
+          </button>
+          <button class="explore-sort-tab" [class.active]="marketplaceSort === 'newest'" (click)="marketplaceSort = 'newest'">
+            <span class="material-icons text-sm">new_releases</span>
+            Newest
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      @if (loadingTemplates) {
+        <div class="flex justify-center items-center py-24">
+          <div class="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent"></div>
+        </div>
+
+      <!-- Empty -->
+      } @else if (filteredCommunityTemplates.length === 0) {
+        <div class="explore-empty">
+          <span class="material-icons text-5xl text-muted-foreground">grid_view</span>
+          <p class="text-foreground font-semibold mt-3">No templates yet</p>
+          <p class="text-muted-foreground text-sm mt-1">Be the first to publish a design to the community!</p>
+        </div>
+
+      <!-- Masonry Grid -->
+      } @else {
+        <div class="explore-masonry">
+          @for (ct of filteredCommunityTemplates; track ct.id) {
+            <div class="explore-card">
+
+              <!-- Thumbnail preview (placeholder gradient styled after template style) -->
+              <div class="explore-card-thumb">
+                <div class="explore-thumb-inner" [style.background]="'linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%)'">
+                  <!-- Mini stat preview -->
+                  <div class="explore-thumb-stat">
+                    <span class="explore-thumb-km">{{ selectedActivity?.distanceKm?.toFixed(1) ?? '5.0' }}</span>
+                    <span class="explore-thumb-unit">KM</span>
+                  </div>
+                  <div class="explore-thumb-title">{{ ct.name }}</div>
+                </div>
+
+                <!-- Hover overlay: creator info -->
+                <div class="explore-card-overlay">
+                  <div class="explore-creator-row">
+                    <div class="explore-creator-avatar overflow-hidden">
+                      <app-avatar [imageUrl]="null" [username]="ct.creatorUsername"></app-avatar>
+                    </div>
+                    <span class="explore-creator-name">{{ ct.creatorUsername }}</span>
+                  </div>
+                  <div class="explore-overlay-actions">
+                    <button class="explore-vote-btn" [class.voted]="ct.hasVoted" (click)="voteTemplate(ct.id); $event.stopPropagation()">
+                      <span class="material-icons text-sm">{{ ct.hasVoted ? 'favorite' : 'favorite_border' }}</span>
+                      <span>{{ ct.votes }}</span>
+                    </button>
+                    <button class="explore-save-btn" [class.saved]="savedTemplateIds.has(ct.id)" (click)="toggleSaveTemplate(ct.id); $event.stopPropagation()" [title]="savedTemplateIds.has(ct.id) ? 'Saved to library' : 'Save to library'">
+                      <span class="material-icons text-sm">{{ savedTemplateIds.has(ct.id) ? 'bookmark' : 'bookmark_border' }}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card footer -->
+              <div class="explore-card-footer">
+                <div class="flex flex-col gap-0.5 min-w-0">
+                  <p class="explore-card-name truncate">{{ ct.name }}</p>
+                  @if (ct.description) {
+                    <p class="explore-card-desc truncate">{{ ct.description }}</p>
+                  }
+                </div>
+                <div class="explore-card-meta">
+                  <span class="material-icons text-xs text-muted-foreground">download</span>
+                  <span class="text-xs text-muted-foreground">{{ formatDownloadCount(ct.downloads) }}</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
   } @else {
     <div class="studio-layout">
 
@@ -61,7 +175,7 @@
             <div class="canvas-photo-bg"
               [style.background-image]="'url(' + backgroundImages[0] + ')'"
               [style.opacity]="backgroundOpacity / 100"
-              [style.filter]="'blur(' + backgroundBlur + 'px)'">
+              [style.filter]="selectedTemplate === 'newspaper' ? 'grayscale(100%) contrast(120%)' : 'blur(' + backgroundBlur + 'px)'">
             </div>
           } @else if (backgroundImages.length > 1) {
             <div class="canvas-collage" [class]="'canvas-collage collage-' + collageLayout"
@@ -272,6 +386,221 @@
             </div>
           }
 
+          <!-- Template: Newspaper -->
+          @if (selectedTemplate === 'newspaper') {
+            <div class="template-newspaper">
+              <div class="np-header">
+                <div class="np-header-line"></div>
+                <div class="np-masthead">THE DAILY RUN</div>
+                <div class="np-subhead-bar">
+                  <span>VOL. {{ selectedActivity.id }}</span>
+                  <span>{{ formatDate(selectedActivity.activityDate) }}</span>
+                  <span>PRICE: FREE</span>
+                </div>
+                <div class="np-header-line"></div>
+              </div>
+              <div class="np-body">
+                <h1 class="np-headline">{{ getNewsHeadline() }}</h1>
+                <div class="np-columns">
+                  <div class="np-col">
+                    <p class="np-col-label">DISTANCE</p>
+                    <p class="np-col-value">{{ selectedActivity.distanceKm.toFixed(2) }} KM</p>
+                    <div class="np-divider"></div>
+                    @if (showPace) {
+                      <p class="np-col-label">AVG PACE</p>
+                      <p class="np-col-value">{{ formatPace(selectedActivity.paceMinPerKm) }} /KM</p>
+                    }
+                  </div>
+                  <div class="np-col-separator"></div>
+                  <div class="np-col">
+                    @if (showDuration) {
+                      <p class="np-col-label">DURATION</p>
+                      <p class="np-col-value">{{ formatDuration(selectedActivity.durationMinutes) }}</p>
+                      <div class="np-divider"></div>
+                    }
+                    @if (selectedActivity.location && showLocation) {
+                      <p class="np-col-label">LOCATION</p>
+                      <p class="np-col-value">{{ selectedActivity.location }}</p>
+                    }
+                  </div>
+                </div>
+                <div class="np-bottom-line"></div>
+                <p class="np-byline">BY {{ (selectedActivity.username || 'RUNNER').toUpperCase() }} · URC SPORT CORRESPONDENT</p>
+              </div>
+            </div>
+          }
+
+          <!-- Template: Cyberpunk -->
+          @if (selectedTemplate === 'cyberpunk') {
+            <div class="template-cyberpunk">
+              <div class="cp-scanlines"></div>
+              <div class="cp-grid-overlay"></div>
+              <div class="cp-content">
+                <div class="cp-tag">// SYS_RUN.EXE // INITIATED //</div>
+                <div class="cp-distance-glitch">
+                  <span class="cp-dist-shadow-cyan">{{ selectedActivity.distanceKm.toFixed(2) }}</span>
+                  <span class="cp-dist-main">{{ selectedActivity.distanceKm.toFixed(2) }}</span>
+                  <span class="cp-dist-shadow-magenta">{{ selectedActivity.distanceKm.toFixed(2) }}</span>
+                </div>
+                <div class="cp-unit">KILOMETERS_</div>
+                <div class="cp-stats-terminal">
+                  <div class="cp-terminal-header">&gt; ACTIVITY_REPORT.LOG</div>
+                  @if (showPace) { <div class="cp-terminal-line"><span class="cp-t-key">PACE</span><span class="cp-t-sep">............</span><span class="cp-t-val">{{ formatPace(selectedActivity.paceMinPerKm) }} /km</span></div> }
+                  @if (showDuration) { <div class="cp-terminal-line"><span class="cp-t-key">DURATION</span><span class="cp-t-sep">........</span><span class="cp-t-val">{{ formatDuration(selectedActivity.durationMinutes) }}</span></div> }
+                  @if (selectedActivity.location && showLocation) { <div class="cp-terminal-line"><span class="cp-t-key">ZONE</span><span class="cp-t-sep">............</span><span class="cp-t-val">{{ selectedActivity.location }}</span></div> }
+                  <div class="cp-terminal-line"><span class="cp-t-key">AGENT</span><span class="cp-t-sep">...........</span><span class="cp-t-val">{{ selectedActivity.username }}</span></div>
+                  <div class="cp-terminal-line"><span class="cp-t-key">STATUS</span><span class="cp-t-sep">..........</span><span class="cp-t-val cp-t-success">[MISSION_COMPLETE]</span></div>
+                </div>
+                <div class="cp-date">{{ formatDate(selectedActivity.activityDate) }}</div>
+              </div>
+            </div>
+          }
+
+          <!-- Template: Receipt -->
+          @if (selectedTemplate === 'receipt') {
+            <div class="template-receipt">
+              <div class="rp-paper">
+                <div class="rp-zigzag-top"></div>
+                <div class="rp-inner">
+                  <div class="rp-store-name">URBAIN RUNNING CLUB</div>
+                  <div class="rp-store-sub">Casablanca · Morocco</div>
+                  <div class="rp-divider-dash">--------------------------------</div>
+                  <div class="rp-section-head">ACTIVITY RECEIPT</div>
+                  <div class="rp-divider-dash">--------------------------------</div>
+                  <div class="rp-line"><span>DATE</span><span>{{ formatShortDate(selectedActivity.activityDate) }}</span></div>
+                  <div class="rp-line"><span>RUNNER</span><span>{{ (selectedActivity.username || '').toUpperCase() }}</span></div>
+                  <div class="rp-divider-dash">--------------------------------</div>
+                  <div class="rp-section-head">ITEMS</div>
+                  @if (showDistance) {
+                    <div class="rp-item-line">
+                      <span class="rp-item-name">DISTANCE</span>
+                      <span class="rp-item-dots">..................</span>
+                      <span class="rp-item-val">{{ selectedActivity.distanceKm.toFixed(2) }} KM</span>
+                    </div>
+                  }
+                  @if (showPace) {
+                    <div class="rp-item-line">
+                      <span class="rp-item-name">AVG PACE</span>
+                      <span class="rp-item-dots">..................</span>
+                      <span class="rp-item-val">{{ formatPace(selectedActivity.paceMinPerKm) }} /KM</span>
+                    </div>
+                  }
+                  @if (showDuration) {
+                    <div class="rp-item-line">
+                      <span class="rp-item-name">DURATION</span>
+                      <span class="rp-item-dots">..................</span>
+                      <span class="rp-item-val">{{ formatDuration(selectedActivity.durationMinutes) }}</span>
+                    </div>
+                  }
+                  @if (selectedActivity.location && showLocation) {
+                    <div class="rp-item-line">
+                      <span class="rp-item-name">ROUTE</span>
+                      <span class="rp-item-dots">..................</span>
+                      <span class="rp-item-val">{{ selectedActivity.location }}</span>
+                    </div>
+                  }
+                  <div class="rp-item-line"><span class="rp-item-name">CALORIES</span><span class="rp-item-dots">..................</span><span class="rp-item-val">N/A</span></div>
+                  <div class="rp-item-line"><span class="rp-item-name">TAX</span><span class="rp-item-dots">..................</span><span class="rp-item-val">0.00</span></div>
+                  <div class="rp-divider-dash">================================</div>
+                  <div class="rp-total-line"><span>TOTAL EFFORT</span><span>MAX</span></div>
+                  <div class="rp-divider-dash">================================</div>
+                  <div class="rp-thanks">THANK YOU FOR RUNNING!</div>
+                  <div class="rp-thanks">SEE YOU ON THE NEXT ONE.</div>
+                  <div class="rp-divider-dash">--------------------------------</div>
+                  <div class="rp-barcode">|||  ||||| || ||| ||||| || |||</div>
+                  <div class="rp-barcode-num">{{ getVerificationCode() }}</div>
+                  <div class="rp-urc">URC · urc.run/verify/{{ selectedActivity.id }}</div>
+                </div>
+                <div class="rp-zigzag-bottom"></div>
+              </div>
+            </div>
+          }
+
+          <!-- Template: Annual Wrapped -->
+          @if (selectedTemplate === 'annual-wrapped') {
+            <div class="template-wrapped">
+              <div class="wr-bg-layer"></div>
+              <div class="wr-content">
+                <div class="wr-year-label">{{ currentYear }}</div>
+                <div class="wr-headline">YOU RAN</div>
+                @if (yearStats) {
+                  <div class="wr-main-stat">{{ yearStats.totalKm.toFixed(0) }}<span class="wr-main-unit">KM</span></div>
+                  <div class="wr-sub-headline">THIS YEAR.</div>
+                  <div class="wr-grid">
+                    <div class="wr-grid-item">
+                      <span class="wr-grid-val">{{ yearStats.totalActivities }}</span>
+                      <span class="wr-grid-lbl">RUNS</span>
+                    </div>
+                    <div class="wr-grid-item">
+                      <span class="wr-grid-val">{{ getTotalHours() }}</span>
+                      <span class="wr-grid-lbl">ON FEET</span>
+                    </div>
+                    <div class="wr-grid-item">
+                      <span class="wr-grid-val">{{ yearStats.bestRun.toFixed(1) }}k</span>
+                      <span class="wr-grid-lbl">LONGEST</span>
+                    </div>
+                    <div class="wr-grid-item">
+                      <span class="wr-grid-val">{{ yearStats.topMonth }}</span>
+                      <span class="wr-grid-lbl">TOP MONTH</span>
+                    </div>
+                  </div>
+                } @else {
+                  <div class="wr-main-stat">0<span class="wr-main-unit">KM</span></div>
+                  <div class="wr-sub-headline">START RUNNING.</div>
+                }
+                <div class="wr-footer">
+                  <span>&#64;{{ selectedActivity.username }}</span>
+                  <span class="wr-footer-brand">URC</span>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Template: Cloud Text (Story 37) -->
+          @if (selectedTemplate === 'cloud-text') {
+            <div class="template-cloud-text">
+
+              <!-- Top bar: user info -->
+              <div class="ct-topbar">
+                <div class="ct-avatar-wrap">
+                  <app-avatar [imageUrl]="currentUserProfileImageUrl" [username]="selectedActivity.username || ''"></app-avatar>
+                </div>
+                <div class="ct-topbar-text">
+                  <span class="ct-username">{{ selectedActivity.username }}</span>
+                  <span class="ct-activity-meta">{{ formatDate(selectedActivity.activityDate) }} · {{ selectedActivity.title }}</span>
+                </div>
+              </div>
+
+              <!-- Massive floating text -->
+              <div class="ct-sky-zone">
+                <div class="ct-text" [ngStyle]="getCloudTextStyle()">{{ cloudText }}</div>
+              </div>
+
+              <!-- Stats horizon line -->
+              <div class="ct-stats-bar">
+                @if (showDistance) {
+                  <div class="ct-stat">
+                    <span class="ct-stat-label">Distância</span>
+                    <span class="ct-stat-value">{{ selectedActivity.distanceKm.toFixed(2) }} km</span>
+                  </div>
+                }
+                @if (showPace) {
+                  <div class="ct-stat">
+                    <span class="ct-stat-label">Ritmo</span>
+                    <span class="ct-stat-value">{{ formatPace(selectedActivity.paceMinPerKm) }} /km</span>
+                  </div>
+                }
+                @if (showDuration) {
+                  <div class="ct-stat">
+                    <span class="ct-stat-label">Tempo</span>
+                    <span class="ct-stat-value">{{ formatDuration(selectedActivity.durationMinutes) }}</span>
+                  </div>
+                }
+              </div>
+
+            </div>
+          }
+
           <!-- Weather Stamp -->
           @if (showWeatherStamp && weatherCondition) {
             <div class="weather-stamp">
@@ -339,6 +668,71 @@
           </div>
         }
 
+        <!-- Cloud Text Controls (Story 37) -->
+        @if (selectedTemplate === 'cloud-text') {
+          <div class="control-section">
+            <h3 class="control-label">Cloud Text</h3>
+
+            <!-- Text input -->
+            <div class="ct-input-wrap">
+              <input
+                type="text"
+                [(ngModel)]="cloudText"
+                class="input-field ct-input"
+                placeholder="URC"
+                maxlength="10"
+                (input)="cloudText = cloudText.toUpperCase()">
+              <span class="ct-char-count">{{ cloudText.length }}/10</span>
+            </div>
+
+            <!-- Texture style -->
+            <div class="ct-texture-row">
+              <button class="ct-texture-btn" [class.active]="cloudTexture === 'cloud'" (click)="cloudTexture = 'cloud'">
+                <span class="material-icons text-lg">cloud</span>
+                <span>Cloud</span>
+              </button>
+              <button class="ct-texture-btn" [class.active]="cloudTexture === '3d'" (click)="cloudTexture = '3d'">
+                <span class="material-icons text-lg">view_in_ar</span>
+                <span>3D Block</span>
+              </button>
+              <button class="ct-texture-btn" [class.active]="cloudTexture === 'neon'" (click)="cloudTexture = 'neon'">
+                <span class="material-icons text-lg">bolt</span>
+                <span>Neon</span>
+              </button>
+            </div>
+
+            <!-- Color -->
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-label">Color</span>
+                <span class="slider-value" [style.color]="cloudTextColor">{{ cloudTextColor }}</span>
+              </div>
+              <div class="brand-color-row">
+                @for (c of ['#ffffff','#f59e0b','#ff0080','#00ffcc','#3b82f6','#ef4444','#a855f7','#000000']; track c) {
+                  <button class="brand-color-swatch"
+                    [style.background]="c"
+                    [class.active]="cloudTextColor === c"
+                    (click)="cloudTextColor = c"
+                    [style.border-color]="c === '#000000' ? '#555' : 'transparent'"></button>
+                }
+                <label class="brand-color-custom" title="Custom color">
+                  <span class="material-icons text-sm">colorize</span>
+                  <input type="color" [(ngModel)]="cloudTextColor" class="sr-only" />
+                </label>
+              </div>
+            </div>
+
+            <!-- Font size -->
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-label">Size</span>
+                <span class="slider-value">{{ cloudFontSize }}px</span>
+              </div>
+              <input type="range" min="80" max="300" [(ngModel)]="cloudFontSize" class="range-slider">
+            </div>
+          </div>
+        }
+
         <!-- Template Carousel -->
         <div class="control-section">
           <h3 class="control-label">Template</h3>
@@ -353,42 +747,16 @@
               </button>
             }
           </div>
-          <button (click)="toggleMarketplace()" class="marketplace-btn">
-            <span class="material-icons text-sm">storefront</span>
-            <span>{{ showMarketplace ? 'Hide' : 'Explore Community Templates' }}</span>
-          </button>
-          @if (showMarketplace) {
-            <div class="marketplace-list">
-              @if (loadingTemplates) {
-                <div class="flex justify-center py-4">
-                  <div class="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent"></div>
-                </div>
-              } @else if (communityTemplates.length === 0) {
-                <p class="text-muted-foreground text-sm text-center py-4">No community templates yet. Be the first to share!</p>
-              } @else {
-                @for (ct of communityTemplates; track ct.id) {
-                  <div class="marketplace-card">
-                    <div class="marketplace-card-header">
-                      <div>
-                        <p class="marketplace-card-name">{{ ct.name }}</p>
-                        <p class="marketplace-card-author">by {{ ct.creatorUsername }}</p>
-                      </div>
-                      <button (click)="voteTemplate(ct.id)" class="vote-btn" [class.voted]="ct.hasVoted">
-                        <span class="material-icons text-sm">{{ ct.hasVoted ? 'favorite' : 'favorite_border' }}</span>
-                        <span>{{ ct.votes }}</span>
-                      </button>
-                    </div>
-                    @if (ct.description) {
-                      <p class="marketplace-card-desc">{{ ct.description }}</p>
-                    }
-                    <div class="marketplace-card-footer">
-                      <span class="text-xs text-muted-foreground">{{ ct.downloads }} downloads</span>
-                    </div>
-                  </div>
-                }
-              }
-            </div>
-          }
+          <div class="publish-action-row">
+            <button (click)="switchTab('explore')" class="marketplace-btn">
+              <span class="material-icons text-sm">explore</span>
+              <span>Explore Community</span>
+            </button>
+            <button (click)="openPublishModal()" class="publish-btn">
+              <span class="material-icons text-sm">publish</span>
+              <span>Publish to Community</span>
+            </button>
+          </div>
         </div>
 
         <!-- URC Branding -->
@@ -556,6 +924,98 @@
           }
         </div>
 
+      </div>
+    </div>
+  }
+
+  <!-- ═══ PUBLISH TO COMMUNITY MODAL ═══ -->
+  @if (showPublishModal) {
+    <div class="publish-modal-backdrop" (click)="showPublishModal = false">
+      <div class="publish-modal" (click)="$event.stopPropagation()">
+
+        @if (publishSuccess) {
+          <div class="publish-success">
+            <span class="material-icons text-5xl text-primary">check_circle</span>
+            <p class="text-foreground font-bold text-lg mt-3">Published!</p>
+            <p class="text-muted-foreground text-sm">Your template is live in the Explore feed.</p>
+          </div>
+        } @else {
+          <!-- Modal header -->
+          <div class="publish-modal-header">
+            <div>
+              <h2 class="publish-modal-title">Publish to Community</h2>
+              <p class="publish-modal-subtitle">Share your design with runners worldwide</p>
+            </div>
+            <button (click)="showPublishModal = false" class="publish-close-btn">
+              <span class="material-icons">close</span>
+            </button>
+          </div>
+
+          <!-- Template name -->
+          <div class="publish-field">
+            <label class="publish-label">Template Name <span class="text-primary">*</span></label>
+            <input
+              type="text"
+              [(ngModel)]="publishName"
+              class="input-field"
+              placeholder="e.g. Midnight Neon Run"
+              maxlength="100">
+            <span class="publish-char-count">{{ publishName.length }}/100</span>
+          </div>
+
+          <!-- Description -->
+          <div class="publish-field">
+            <label class="publish-label">Description <span class="text-muted-foreground text-xs">(optional)</span></label>
+            <textarea
+              [(ngModel)]="publishDesc"
+              class="input-field publish-textarea"
+              placeholder="Describe your template style..."
+              maxlength="300"
+              rows="2"></textarea>
+          </div>
+
+          <!-- Category tags -->
+          <div class="publish-field">
+            <label class="publish-label">
+              Category Tags <span class="text-primary">*</span>
+              <span class="text-muted-foreground text-xs ml-1">(pick up to 3)</span>
+            </label>
+            <div class="publish-tags-grid">
+              @for (tag of publishTagOptions; track tag) {
+                <button
+                  class="publish-tag-btn"
+                  [class.selected]="publishSelectedTags.has(tag)"
+                  [disabled]="!publishSelectedTags.has(tag) && publishSelectedTags.size >= 3"
+                  (click)="togglePublishTag(tag)">
+                  @if (publishSelectedTags.has(tag)) {
+                    <span class="material-icons text-sm">check</span>
+                  }
+                  {{ tag }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Base template info -->
+          <div class="publish-meta-info">
+            <span class="material-icons text-sm text-muted-foreground">layers</span>
+            <span class="text-xs text-muted-foreground">Based on <strong class="text-foreground">{{ selectedTemplate | titlecase }}</strong> template</span>
+          </div>
+
+          <!-- Submit -->
+          <button
+            class="publish-submit-btn"
+            [disabled]="!publishName.trim() || publishSelectedTags.size === 0 || publishLoading"
+            (click)="publishTemplate()">
+            @if (publishLoading) {
+              <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+              <span>Publishing...</span>
+            } @else {
+              <span class="material-icons text-sm">publish</span>
+              <span>Publish Template</span>
+            }
+          </button>
+        }
       </div>
     </div>
   }

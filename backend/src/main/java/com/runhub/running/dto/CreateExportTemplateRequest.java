@@ -17,6 +17,8 @@ public class CreateExportTemplateRequest {
 
     private String previewUrl;
 
+    private String tags;
+
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
@@ -28,4 +30,7 @@ public class CreateExportTemplateRequest {
 
     public String getPreviewUrl() { return previewUrl; }
     public void setPreviewUrl(String previewUrl) { this.previewUrl = previewUrl; }
+
+    public String getTags() { return tags; }
+    public void setTags(String tags) { this.tags = tags; }
 }

@@ -45,6 +45,7 @@ public class ExportTemplateService {
         template.setDescription(req.getDescription());
         template.setCssLayout(req.getCssLayout());
         template.setPreviewUrl(req.getPreviewUrl());
+        template.setTags(req.getTags());
         template = templateRepo.save(template);
         return toDto(template, user.getId());
     }
@@ -90,6 +91,7 @@ public class ExportTemplateService {
         dto.setVotes(t.getVotes());
         dto.setDownloads(t.getDownloads());
         dto.setCreatedAt(t.getCreatedAt());
+        dto.setTags(t.getTags());
         dto.setHasVoted(userId != null && voteRepo.existsByUserIdAndTemplateId(userId, t.getId()));
 
         try {

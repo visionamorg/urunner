@@ -14,6 +14,7 @@ public class ExportTemplateDto {
     private Integer downloads;
     private Boolean hasVoted;
     private LocalDateTime createdAt;
+    private String tags;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -47,4 +48,7 @@ public class ExportTemplateDto {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public String getTags() { return tags; }
+    public void setTags(String tags) { this.tags = tags; }
 }

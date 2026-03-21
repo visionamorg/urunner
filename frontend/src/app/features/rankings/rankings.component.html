@@ -72,16 +72,16 @@
           </div>
 
           <!-- Avatar -->
-          <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
-            [class.bg-yellow-500]="r.rank === 1"
+          <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 overflow-hidden"
+            [class.bg-yellow-500]="r.rank === 1 && !r.profileImageUrl"
             [class.text-white]="r.rank <= 3"
-            [class.bg-slate-400]="r.rank === 2"
-            [class.bg-amber-700]="r.rank === 3"
-            [class.bg-secondary]="r.rank > 3"
-            [class.border]="r.rank > 3"
-            [class.border-border]="r.rank > 3"
-            [class.text-muted-foreground]="r.rank > 3">
-            {{ getInitials(r.username) }}
+            [class.bg-slate-400]="r.rank === 2 && !r.profileImageUrl"
+            [class.bg-amber-700]="r.rank === 3 && !r.profileImageUrl"
+            [class.bg-secondary]="r.rank > 3 && !r.profileImageUrl"
+            [class.border]="r.rank > 3 && !r.profileImageUrl"
+            [class.border-border]="r.rank > 3 && !r.profileImageUrl"
+            [class.text-muted-foreground]="r.rank > 3 && !r.profileImageUrl">
+            <app-avatar [imageUrl]="r.profileImageUrl" [username]="r.username"></app-avatar>
           </div>
 
           <!-- Name -->

@@ -26,6 +26,9 @@ public class ExportTemplate {
     @Column(length = 500)
     private String previewUrl;
 
+    @Column(length = 200)
+    private String tags;
+
     @Column(nullable = false)
     private Integer votes = 0;
 
@@ -63,4 +66,7 @@ public class ExportTemplate {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public String getTags() { return tags; }
+    public void setTags(String tags) { this.tags = tags; }
 }

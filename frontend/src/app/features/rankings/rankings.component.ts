@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RankingService } from '../../core/services/ranking.service';
 import { Ranking } from '../../core/models/ranking.model';
 import { AuthService } from '../../core/services/auth.service';
+import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
 
 @Component({
   selector: 'app-rankings',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AvatarComponent],
   templateUrl: './rankings.component.html',
   styleUrl: './rankings.component.scss'
 })
