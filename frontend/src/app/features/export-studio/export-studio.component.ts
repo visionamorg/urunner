@@ -45,6 +45,9 @@ export class ExportStudioComponent implements OnInit {
   backgroundOpacity = 100;
   backgroundBlur = 0;
 
+  // Watermark
+  showWatermark = true;
+
   // Dynamic color palette
   accentColor = '#f59e0b';
   accentColorRgb = '245, 158, 11';
@@ -228,6 +231,23 @@ export class ExportStudioComponent implements OnInit {
     this.accentColor = '#f59e0b';
     this.accentColorRgb = '245, 158, 11';
     this.secondaryAccent = '#1e293b';
+  }
+
+  getVerificationCode(): string {
+    if (!this.selectedActivity) return '';
+    const a = this.selectedActivity;
+    // Simple hash from activity data for verification
+    const raw = `${a.id}-${a.distanceKm}-${a.durationMinutes}-${a.activityDate}`;
+    let hash = 0;
+    for (let i = 0; i < raw.length; i++) {
+      hash = ((hash << 5) - hash + raw.charCodeAt(i)) | 0;
+    }
+    return `RH-${Math.abs(hash).toString(36).toUpperCase().slice(0, 8)}`;
+  }
+
+  getVerificationUrl(): string {
+    if (!this.selectedActivity) return '';
+    return `runhub.app/verify/${this.selectedActivity.id}`;
   }
 
   goBack(): void {

@@ -181,6 +181,14 @@
             </div>
           }
 
+          <!-- Verification Watermark -->
+          @if (showWatermark) {
+            <div class="watermark">
+              <div class="watermark-hash">{{ getVerificationCode() }}</div>
+              <div class="watermark-url">{{ getVerificationUrl() }}</div>
+            </div>
+          }
+
         </div>
       </div>
 
@@ -312,6 +320,10 @@
             <label class="toggle-item">
               <span class="toggle-label">Location</span>
               <input type="checkbox" [(ngModel)]="showLocation" class="toggle-switch">
+            </label>
+            <label class="toggle-item">
+              <span class="toggle-label">Verification Watermark</span>
+              <input type="checkbox" [(ngModel)]="showWatermark" class="toggle-switch">
             </label>
           </div>
         </div>

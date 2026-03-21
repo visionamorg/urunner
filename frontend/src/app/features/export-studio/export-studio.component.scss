@@ -417,6 +417,32 @@
 }
 
 /* ═══════════════════════════════════════
+   WATERMARK
+   ═══════════════════════════════════════ */
+.watermark {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10;
+  text-align: right;
+  opacity: 0.4;
+}
+
+.watermark-hash {
+  font-size: 18px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.1em;
+  font-family: monospace;
+}
+
+.watermark-url {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: monospace;
+}
+
+/* ═══════════════════════════════════════
    UR BRAND LOGO (universal)
    ═══════════════════════════════════════ */
 .ur-brand-logo {
