@@ -56,6 +56,10 @@ export class ExportStudioComponent implements OnInit {
   secondaryAccent = '#1e293b';
   useAutoColors = true;
 
+  // AI Captions
+  showCaptions = false;
+  captions: { style: string; text: string }[] = [];
+
   templates: TemplateOption[] = [
     { id: 'clear-info', name: 'Clear Info', description: 'Clean frosted-glass card overlay', icon: 'style' },
     { id: 'large-stat', name: 'Large Stat', description: 'Bold numeric overlay', icon: 'format_size' },
@@ -291,6 +295,53 @@ export class ExportStudioComponent implements OnInit {
     this.accentColor = '#f59e0b';
     this.accentColorRgb = '245, 158, 11';
     this.secondaryAccent = '#1e293b';
+  }
+
+  generateCaptions(): void {
+    if (!this.selectedActivity) return;
+    const a = this.selectedActivity;
+    const dist = a.distanceKm.toFixed(1);
+    const pace = this.formatPace(a.paceMinPerKm);
+    const dur = this.formatDuration(a.durationMinutes);
+    const loc = a.location || 'the streets';
+
+    const isLong = a.distanceKm >= 15;
+    const isFast = a.paceMinPerKm < 5.5;
+    const isShort = a.distanceKm < 5;
+
+    // Funny/Self-Deprecating
+    const funnyOptions = [
+      `${dist}km done. My legs are filing a complaint with HR. ${pace}/km never felt so personal. 🦵💀 #RunHub #NoPainNoGain`,
+      `Ran ${dist}km because I saw a croissant at the finish line (there was no croissant). ${dur} of pure betrayal. 🥐😤 #RunnerProblems`,
+      `${dist}km in ${dur}. The first 2km were "I love running!" The rest was just survival instinct. 🏃‍♂️💨 #HonestRunner`,
+    ];
+
+    // Inspirational
+    const inspirationalOptions = [
+      `${dist}km. ${dur}. Every step forward is a step toward the best version of yourself. Keep pushing. 💪🔥 #RunHub #NeverStop`,
+      `The road doesn't get easier — you get stronger. ${dist}km at ${pace}/km around ${loc}. 🏃‍♂️✨ #RunningMotivation #Grind`,
+      isLong
+        ? `${dist}km conquered today. Long runs build more than endurance — they build character. 🦁 #UltraRunner #MentalToughness`
+        : `Another ${dist}km in the bank. Small runs, big changes. Consistency is the real superpower. 🔑 #DailyRunner`,
+    ];
+
+    // Just the Facts
+    const factsOptions = [
+      `📊 ${dist}km | ⏱ ${dur} | 🏃 ${pace}/km${a.location ? ` | 📍 ${a.location}` : ''}\n#RunHub #RunStats`,
+      `Today's session: ${dist}km at ${pace}/km (${dur}). ${isFast ? 'Tempo day.' : isLong ? 'Long run day.' : 'Easy miles.'} #RunData`,
+      `${a.title || 'Run'} complete — ${dist}km, ${pace}/km, ${dur}. Tracked with @RunHub 📈 #Running`,
+    ];
+
+    this.captions = [
+      { style: 'Funny', text: funnyOptions[Math.floor(Math.random() * funnyOptions.length)] },
+      { style: 'Inspirational', text: inspirationalOptions[Math.floor(Math.random() * inspirationalOptions.length)] },
+      { style: 'Just the Facts', text: factsOptions[Math.floor(Math.random() * factsOptions.length)] },
+    ];
+    this.showCaptions = true;
+  }
+
+  copyCaption(text: string): void {
+    navigator.clipboard.writeText(text).catch(() => {});
   }
 
   getVerificationCode(): string {

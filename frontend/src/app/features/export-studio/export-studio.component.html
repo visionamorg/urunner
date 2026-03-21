@@ -357,6 +357,28 @@
           </div>
         </div>
 
+        <!-- AI Captions -->
+        <div class="control-section">
+          <h3 class="control-label">Social Caption</h3>
+          <button (click)="generateCaptions()" class="caption-generate-btn">
+            <span class="material-icons">auto_awesome</span>
+            <span>{{ showCaptions ? 'Regenerate' : 'Generate Captions' }}</span>
+          </button>
+          @if (showCaptions) {
+            <div class="caption-list">
+              @for (c of captions; track c.style) {
+                <div class="caption-card">
+                  <div class="caption-style">{{ c.style }}</div>
+                  <p class="caption-text">{{ c.text }}</p>
+                  <button (click)="copyCaption(c.text)" class="caption-copy-btn">
+                    <span class="material-icons text-sm">content_copy</span> Copy
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
       </div>
     </div>
   }
