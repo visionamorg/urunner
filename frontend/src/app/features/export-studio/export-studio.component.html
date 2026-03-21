@@ -73,12 +73,15 @@
             </div>
           }
 
-          <!-- UR Community Logo (universal branding) -->
-          <div class="ur-brand-logo" [class]="'ur-brand-logo ur-brand-' + selectedTemplate">
-            <div class="ur-brand-icon">
+          <!-- URC Branding Stamp -->
+          <div class="urc-stamp" [ngStyle]="getBrandPositionStyle()" [style.--brand-color]="brandColor" [style.font-size.px]="brandSize * 0.14">
+            <div class="urc-stamp-icon" [style.background]="brandColor">
               <span class="material-icons">directions_run</span>
             </div>
-            <span class="ur-brand-text">UR Community</span>
+            <div class="urc-stamp-text">
+              <span class="urc-stamp-headline" [style.color]="brandColor">URC</span>
+              <span class="urc-stamp-sub">Urbain Running Club</span>
+            </div>
           </div>
 
           <!-- Template: Clear Info -->

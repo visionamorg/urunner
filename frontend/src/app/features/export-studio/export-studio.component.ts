@@ -165,6 +165,39 @@ export class ExportStudioComponent implements OnInit {
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
+  getBrandPositionStyle(): Record<string, string> {
+    const edge = '60px';
+    const map: Record<string, Record<string, string>> = {
+      tl: { top: edge, left: edge },
+      tc: { top: edge, left: '50%', transform: 'translateX(-50%)' },
+      tr: { top: edge, right: edge },
+      ml: { top: '50%', left: edge, transform: 'translateY(-50%)' },
+      mc: { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' },
+      mr: { top: '50%', right: edge, transform: 'translateY(-50%)' },
+      bl: { bottom: edge, left: edge },
+      bc: { bottom: edge, left: '50%', transform: 'translateX(-50%)' },
+      br: { bottom: edge, right: edge },
+    };
+    return map[this.brandPosition] ?? map['tl'];
+  }
+
+  /** Convert any image URL to a base64 data URL so html2canvas can render it without CORS issues */
+  private toDataUrl(url: string): Promise<string> {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const c = document.createElement('canvas');
+        c.width = img.naturalWidth;
+        c.height = img.naturalHeight;
+        c.getContext('2d')!.drawImage(img, 0, 0);
+        resolve(c.toDataURL('image/png'));
+      };
+      img.onerror = () => resolve(url); // fallback: keep original url
+      img.src = url;
+    });
+  }
+
   private async renderCanvas(): Promise<HTMLCanvasElement> {
     const element = this.canvasContainer.nativeElement;
     return html2canvas(element, {
