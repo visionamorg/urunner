@@ -37,6 +37,15 @@
           <!-- Default gradient background -->
           <div class="canvas-bg"></div>
 
+          <!-- User-uploaded background photo -->
+          @if (backgroundImageUrl) {
+            <div class="canvas-photo-bg"
+              [style.background-image]="'url(' + backgroundImageUrl + ')'"
+              [style.opacity]="backgroundOpacity / 100"
+              [style.filter]="'blur(' + backgroundBlur + 'px)'">
+            </div>
+          }
+
           <!-- UR Community Logo (universal branding) -->
           <div class="ur-brand-logo" [class]="'ur-brand-logo ur-brand-' + selectedTemplate">
             <div class="ur-brand-icon">
@@ -231,6 +240,39 @@
               </button>
             }
           </div>
+        </div>
+
+        <!-- Background Photo -->
+        <div class="control-section">
+          <h3 class="control-label">Background</h3>
+          @if (!backgroundImageUrl) {
+            <label class="bg-upload-btn">
+              <span class="material-icons">add_photo_alternate</span>
+              <span>Upload Photo</span>
+              <input type="file" accept="image/*" (change)="onBackgroundUpload($event)" class="hidden">
+            </label>
+          } @else {
+            <div class="bg-preview">
+              <div class="bg-preview-thumb" [style.background-image]="'url(' + backgroundImageUrl + ')'"></div>
+              <button (click)="removeBackground()" class="bg-remove-btn">
+                <span class="material-icons text-sm">close</span>
+              </button>
+            </div>
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-label">Opacity</span>
+                <span class="slider-value">{{ backgroundOpacity }}%</span>
+              </div>
+              <input type="range" min="10" max="100" [(ngModel)]="backgroundOpacity" class="range-slider">
+            </div>
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-label">Blur</span>
+                <span class="slider-value">{{ backgroundBlur }}px</span>
+              </div>
+              <input type="range" min="0" max="20" [(ngModel)]="backgroundBlur" class="range-slider">
+            </div>
+          }
         </div>
 
         <!-- Data Toggles -->

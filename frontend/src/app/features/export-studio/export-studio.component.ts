@@ -40,6 +40,11 @@ export class ExportStudioComponent implements OnInit {
   showDistance = true;
   showLocation = true;
 
+  // Background photo
+  backgroundImageUrl: string | null = null;
+  backgroundOpacity = 100;
+  backgroundBlur = 0;
+
   templates: TemplateOption[] = [
     { id: 'clear-info', name: 'Clear Info', description: 'Clean frosted-glass card overlay', icon: 'style' },
     { id: 'large-stat', name: 'Large Stat', description: 'Bold numeric overlay', icon: 'format_size' },
@@ -133,6 +138,24 @@ export class ExportStudioComponent implements OnInit {
     } finally {
       this.exporting = false;
     }
+  }
+
+  onBackgroundUpload(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || !input.files[0]) return;
+
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.backgroundImageUrl = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeBackground(): void {
+    this.backgroundImageUrl = null;
+    this.backgroundOpacity = 100;
+    this.backgroundBlur = 0;
   }
 
   goBack(): void {
