@@ -60,6 +60,9 @@ export class ExportStudioComponent implements OnInit {
   showCaptions = false;
   captions: { style: string; text: string }[] = [];
 
+  // Video export
+  exportingVideo = false;
+
   // Weather stamp
   showWeatherStamp = false;
   weatherCondition = '';
@@ -198,6 +201,94 @@ export class ExportStudioComponent implements OnInit {
       }
     } finally {
       this.exporting = false;
+    }
+  }
+
+  async exportToVideo(): Promise<void> {
+    if (!this.canvasContainer || !this.selectedActivity || this.exportingVideo) return;
+    this.exportingVideo = true;
+
+    try {
+      const activity = this.selectedActivity;
+      const targetDist = activity.distanceKm;
+      const targetPace = activity.paceMinPerKm;
+      const targetDuration = activity.durationMinutes;
+
+      // Create an offscreen canvas for animation
+      const offscreen = document.createElement('canvas');
+      offscreen.width = 1080;
+      offscreen.height = 1920;
+      const ctx = offscreen.getContext('2d')!;
+
+      // Get static background from html2canvas
+      const bgCanvas = await this.renderCanvas();
+
+      // Set up MediaRecorder
+      const stream = offscreen.captureStream(30);
+      const recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
+      const chunks: Blob[] = [];
+      recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+
+      const recordingDone = new Promise<void>((resolve) => {
+        recorder.onstop = () => resolve();
+      });
+
+      recorder.start();
+
+      // Animate for 5 seconds (150 frames at 30fps)
+      const totalFrames = 150;
+      for (let frame = 0; frame < totalFrames; frame++) {
+        const progress = frame / totalFrames;
+
+        // Draw the static background
+        ctx.drawImage(bgCanvas, 0, 0);
+
+        // Overlay animated count-up numbers
+        const animDist = (targetDist * Math.min(progress * 1.5, 1)).toFixed(2);
+        const animPaceRaw = targetPace * Math.min(progress * 1.5, 1);
+        const pMin = Math.floor(animPaceRaw);
+        const pSec = Math.round((animPaceRaw - pMin) * 60);
+        const animPace = `${pMin}:${pSec.toString().padStart(2, '0')}`;
+        const animDur = Math.floor(targetDuration * Math.min(progress * 1.5, 1));
+
+        // Draw count-up overlay in center during first 3 seconds
+        if (progress < 0.6) {
+          const alpha = progress < 0.1 ? progress * 10 : (progress > 0.5 ? (0.6 - progress) * 10 : 1);
+          ctx.save();
+          ctx.globalAlpha = alpha * 0.9;
+          ctx.fillStyle = 'rgba(0,0,0,0.6)';
+          ctx.fillRect(0, 700, 1080, 500);
+          ctx.globalAlpha = alpha;
+
+          ctx.font = '900 120px Inter, sans-serif';
+          ctx.fillStyle = '#f59e0b';
+          ctx.textAlign = 'center';
+          ctx.fillText(`${animDist} km`, 540, 900);
+
+          ctx.font = '600 48px Inter, sans-serif';
+          ctx.fillStyle = '#ffffff';
+          ctx.fillText(`${animPace} /km  ·  ${animDur}min`, 540, 1000);
+
+          ctx.restore();
+        }
+
+        // Wait for next frame
+        await new Promise(r => setTimeout(r, 1000 / 30));
+      }
+
+      recorder.stop();
+      await recordingDone;
+
+      const blob = new Blob(chunks, { type: 'video/webm' });
+      const link = document.createElement('a');
+      link.download = `runhub-export-${activity.id}.webm`;
+      link.href = URL.createObjectURL(blob);
+      link.click();
+      URL.revokeObjectURL(link.href);
+    } catch (err) {
+      console.error('Video export failed:', err);
+    } finally {
+      this.exportingVideo = false;
     }
   }
 

@@ -13,6 +13,14 @@
           <span class="hidden sm:inline">Share</span>
         </button>
       }
+      <button (click)="exportToVideo()" [disabled]="!selectedActivity || exportingVideo" class="share-btn">
+        @if (exportingVideo) {
+          <div class="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
+        } @else {
+          <span class="material-icons">videocam</span>
+        }
+        <span class="hidden sm:inline">{{ exportingVideo ? 'Recording...' : 'Video' }}</span>
+      </button>
       <button (click)="exportToImage()" [disabled]="!selectedActivity || exporting" class="export-btn">
         @if (exporting) {
           <div class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
