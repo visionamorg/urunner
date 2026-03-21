@@ -212,8 +212,8 @@
             <div class="card space-y-4" [class]="post.pinned ? 'border-primary/40 bg-primary/5' : ''">
               <!-- Post Header -->
               <div class="flex items-start gap-3">
-                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                  {{ post.authorInitials || getInitials(post.authorUsername) }}
+                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm flex-shrink-0 overflow-hidden">
+                  <app-avatar [imageUrl]="post.authorProfileImageUrl" [username]="post.authorUsername"></app-avatar>
                 </div>
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2 flex-wrap">
@@ -361,8 +361,8 @@
                   @if (post.comments && post.comments.length > 0) {
                     @for (comment of post.comments; track comment.id) {
                       <div class="flex items-start gap-2.5">
-                        <div class="w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center text-foreground font-bold text-xs flex-shrink-0">
-                          {{ comment.authorInitials || comment.authorUsername.substring(0, 2).toUpperCase() }}
+                        <div class="w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center text-foreground font-bold text-xs flex-shrink-0 overflow-hidden">
+                          <app-avatar [imageUrl]="null" [username]="comment.authorUsername"></app-avatar>
                         </div>
                         <div class="flex-1 bg-secondary rounded-xl px-3 py-2">
                           <div class="flex items-center gap-2 mb-0.5">
@@ -688,8 +688,8 @@
             @for (member of members; track member.userId) {
               <div class="card flex items-center gap-4">
                 <!-- Avatar -->
-                <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-bold text-base flex-shrink-0">
-                  {{ member.initials || (member.firstName ? member.firstName[0] : '?') }}
+                <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-bold text-base flex-shrink-0 overflow-hidden">
+                  <app-avatar [imageUrl]="member.profileImageUrl" [username]="member.username"></app-avatar>
                 </div>
                 <!-- Info -->
                 <div class="flex-1 min-w-0">

@@ -3,8 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActivityService } from '../../core/services/activity.service';
+import { UserService } from '../../core/services/user.service';
 import { Activity } from '../../core/models/activity.model';
 import { ExportTemplateService, ExportTemplateDto } from '../../core/services/export-template.service';
+import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
 import html2canvas from 'html2canvas';
 
 export type TemplateName = 'clear-info' | 'large-stat' | 'aesthetic-text' | 'typography-poster';
@@ -19,7 +21,7 @@ export interface TemplateOption {
 @Component({
   selector: 'app-export-studio',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AvatarComponent],
   templateUrl: './export-studio.component.html',
   styleUrl: './export-studio.component.scss'
 })
@@ -69,6 +71,14 @@ export class ExportStudioComponent implements OnInit {
   // Video export
   exportingVideo = false;
 
+  // Current user profile (stored as data URL for CORS-safe canvas capture)
+  currentUserProfileImageUrl: string | null = null;
+
+  // Branding stamp
+  brandColor = '#f59e0b';
+  brandSize = 100; // percentage, 60–160
+  brandPosition: 'tl' | 'tc' | 'tr' | 'ml' | 'mc' | 'mr' | 'bl' | 'bc' | 'br' = 'tl';
+
   // Weather stamp
   showWeatherStamp = false;
   weatherCondition = '';
@@ -84,12 +94,22 @@ export class ExportStudioComponent implements OnInit {
 
   constructor(
     private activityService: ActivityService,
+    private userService: UserService,
     private exportTemplateService: ExportTemplateService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
 
   ngOnInit(): void {
+    this.userService.getMe().subscribe({
+      next: async (profile) => {
+        if (profile.profileImageUrl) {
+          this.currentUserProfileImageUrl = await this.toDataUrl(profile.profileImageUrl);
+        }
+      },
+      error: () => {}
+    });
+
     this.activityService.getMyActivities().subscribe({
       next: (activities) => {
         this.activities = activities;
@@ -153,7 +173,11 @@ export class ExportStudioComponent implements OnInit {
       scale: 1,
       useCORS: true,
       backgroundColor: '#0a0a0a',
-      logging: false
+      logging: false,
+      onclone: (_doc: Document, clonedElement: HTMLElement) => {
+        clonedElement.style.transform = 'none';
+        clonedElement.style.transformOrigin = 'top left';
+      }
     });
   }
 

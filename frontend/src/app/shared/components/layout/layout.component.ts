@@ -2,18 +2,21 @@ import { Component, OnInit } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
+import { UserService } from '../../../core/services/user.service';
 import { AuthResponse } from '../../../core/models/user.model';
 import { ThemeService } from '../../../core/services/theme.service';
+import { AvatarComponent } from '../../components/avatar/avatar.component';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, RouterOutlet, RouterLinkActive],
+  imports: [CommonModule, RouterModule, RouterOutlet, RouterLinkActive, AvatarComponent],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss'
 })
 export class LayoutComponent implements OnInit {
   currentUser: AuthResponse | null = null;
+  profileImageUrl: string | null = null;
   sidebarOpen = false;
 
   navItems = [
@@ -37,11 +40,24 @@ export class LayoutComponent implements OnInit {
     { path: '/profile', icon: 'person', label: 'Profile' }
   ];
 
-  constructor(private authService: AuthService, private router: Router, public themeService: ThemeService) {}
+  constructor(
+    private authService: AuthService,
+    private userService: UserService,
+    private router: Router,
+    public themeService: ThemeService
+  ) {}
 
   ngOnInit(): void {
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
+      if (user) {
+        this.userService.getMe().subscribe({
+          next: (profile) => { this.profileImageUrl = profile.profileImageUrl ?? null; },
+          error: () => {}
+        });
+      } else {
+        this.profileImageUrl = null;
+      }
     });
   }
 

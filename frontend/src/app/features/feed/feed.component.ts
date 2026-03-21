@@ -2,13 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FeedService } from '../../core/services/feed.service';
+import { UserService } from '../../core/services/user.service';
 import { Post } from '../../core/models/post.model';
 import { AuthService } from '../../core/services/auth.service';
+import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
 
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AvatarComponent],
   templateUrl: './feed.component.html',
   styleUrl: './feed.component.scss'
 })
@@ -17,14 +19,20 @@ export class FeedComponent implements OnInit {
   loading = true;
   newPostContent = '';
   currentUserId = this.authService.getCurrentUser()?.userId;
+  currentUserProfileImageUrl: string | null = null;
 
   constructor(
     private feedService: FeedService,
-    private authService: AuthService
+    private authService: AuthService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
     this.load();
+    this.userService.getMe().subscribe({
+      next: (profile) => { this.currentUserProfileImageUrl = profile.profileImageUrl ?? null; },
+      error: () => {}
+    });
   }
 
   load(): void {

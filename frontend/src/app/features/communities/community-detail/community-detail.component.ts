@@ -13,11 +13,12 @@ import { RunEvent, CreateEventRequest, UpdateEventRequest } from '../../../core/
 import { Message } from '../../../core/models/message.model';
 import { CommunityCalendarComponent } from '../community-calendar/community-calendar.component';
 import { CommunityRoomsComponent } from '../community-rooms/community-rooms.component';
+import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
 
 @Component({
   selector: 'app-community-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, CommunityCalendarComponent, CommunityRoomsComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, CommunityCalendarComponent, CommunityRoomsComponent, AvatarComponent],
   templateUrl: './community-detail.component.html',
   styleUrl: './community-detail.component.scss'
 })

@@ -9,8 +9,8 @@
   <!-- Create Post -->
   <div class="card">
     <div class="flex items-start gap-4">
-      <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-        {{ getInitials(getCurrentUsername()) }}
+      <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold flex-shrink-0 overflow-hidden">
+        <app-avatar [imageUrl]="currentUserProfileImageUrl" [username]="getCurrentUsername()"></app-avatar>
       </div>
       <div class="flex-1">
         <textarea
@@ -43,8 +43,8 @@
     <div class="card hover:border-primary/10 transition-colors animate-slide-up">
       <!-- Author -->
       <div class="flex items-center gap-3 mb-4">
-        <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-          {{ getInitials(post.authorUsername) }}
+        <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold flex-shrink-0 overflow-hidden">
+          <app-avatar [imageUrl]="post.authorProfileImageUrl" [username]="post.authorUsername"></app-avatar>
         </div>
         <div class="flex-1">
           <p class="text-foreground font-semibold text-sm">{{ post.authorUsername }}</p>

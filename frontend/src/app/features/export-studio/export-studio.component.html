@@ -87,7 +87,7 @@
               <div class="clear-info-card">
                 <div class="clear-info-profile">
                   <div class="clear-info-avatar">
-                    <span class="material-icons">directions_run</span>
+                    <app-avatar [imageUrl]="currentUserProfileImageUrl" [username]="selectedActivity.username || ''"></app-avatar>
                   </div>
                   <div>
                     <p class="clear-info-username">{{ selectedActivity.username }}</p>
