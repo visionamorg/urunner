@@ -14,7 +14,8 @@
       "Bash(python3 -c \"import sys,json; cfg=json.load\\(sys.stdin\\); assets=cfg[''''projects''''][''''frontend''''][''''architect''''][''''build''''][''''options''''].get\\(''''assets'''',[]\\); print\\(assets\\)\")",
       "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d[''''projects''''][''''runhub-frontend''''][''''architect''''][''''build''''][''''options''''], indent=2\\)\\)\")",
       "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(d[''''projects''''][''''runhub-frontend''''][''''architect''''][''''build''''][''''builder'''']\\)\")",
-      "Bash(grep -i \"\\\\.ts$\")"
+      "Bash(grep -i \"\\\\.ts$\")",
+      "Bash(git push:*)"
     ]
   }
 }
