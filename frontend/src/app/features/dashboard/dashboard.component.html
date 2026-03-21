@@ -12,145 +12,137 @@
       </a>
     </div>
 
-    <!-- Stats Grid (6 cards) — all navigate to /activities -->
+    <!-- Stats Grid (6 cards) -->
     <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
 
-      <a routerLink="/activities" class="card relative overflow-hidden hover:border-primary/40 hover:scale-[1.02] transition-all cursor-pointer block">
-        <div class="absolute inset-0 bg-primary/5 pointer-events-none"></div>
-        <div class="relative">
-          <div class="w-9 h-9 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center mb-3">
+      <a routerLink="/activities" class="card relative overflow-hidden hover:border-primary/40 hover:scale-[1.02] transition-all cursor-pointer block p-0 flex flex-col justify-between group">
+        <div class="absolute inset-0 bg-primary/5 pointer-events-none group-hover:bg-primary/10 transition-colors"></div>
+        <div class="relative p-4 pb-0 z-10 pointer-events-none">
+          <div class="w-9 h-9 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center mb-2">
             <span class="material-icons text-primary text-base">route</span>
           </div>
-          <div class="stat-value">{{ stats?.totalDistanceKm?.toFixed(1) || '0.0' }}</div>
-          <p class="text-muted-foreground text-xs font-medium uppercase tracking-wider mt-1">Total KM</p>
+          <div class="stat-value leading-none">{{ stats?.totalDistanceKm?.toFixed(1) || '0.0' }}</div>
+          <p class="text-muted-foreground text-[10px] font-bold uppercase tracking-wider mt-1 mb-2">Total KM</p>
+        </div>
+        <div class="w-full relative z-0 mt-auto -mb-1 opacity-80 group-hover:opacity-100 transition-opacity">
+          @if (sparklineOptions1.series) {
+            <apx-chart [series]="sparklineOptions1.series" [chart]="sparklineOptions1.chart!" [stroke]="sparklineOptions1.stroke!" [fill]="sparklineOptions1.fill!" [colors]="sparklineOptions1.colors!" [tooltip]="sparklineOptions1.tooltip!"></apx-chart>
+          }
         </div>
       </a>
 
-      <a routerLink="/activities" class="card relative overflow-hidden hover:border-primary/40 hover:scale-[1.02] transition-all cursor-pointer block">
-        <div class="absolute inset-0 bg-destructive/5 pointer-events-none"></div>
-        <div class="relative">
-          <div class="w-9 h-9 rounded-xl bg-destructive/20 border border-destructive/30 flex items-center justify-center mb-3">
+      <a routerLink="/activities" class="card relative overflow-hidden hover:border-destructive/40 hover:scale-[1.02] transition-all cursor-pointer block p-0 flex flex-col justify-between group">
+        <div class="absolute inset-0 bg-destructive/5 pointer-events-none group-hover:bg-destructive/10 transition-colors"></div>
+        <div class="relative p-4 pb-0 z-10 pointer-events-none">
+          <div class="w-9 h-9 rounded-xl bg-destructive/20 border border-destructive/30 flex items-center justify-center mb-2">
             <span class="material-icons text-destructive text-base">calendar_view_week</span>
           </div>
-          <div class="stat-value">{{ stats?.weeklyDistanceKm?.toFixed(1) || '0.0' }}</div>
-          <p class="text-muted-foreground text-xs font-medium uppercase tracking-wider mt-1">This Week KM</p>
+          <div class="stat-value leading-none">{{ stats?.weeklyDistanceKm?.toFixed(1) || '0.0' }}</div>
+          <p class="text-muted-foreground text-[10px] font-bold uppercase tracking-wider mt-1 mb-2">This Week KM</p>
+        </div>
+        <div class="w-full relative z-0 mt-auto -mb-1 opacity-80 group-hover:opacity-100 transition-opacity">
+          @if (sparklineOptions2.series) {
+            <apx-chart [series]="sparklineOptions2.series" [chart]="sparklineOptions2.chart!" [stroke]="sparklineOptions2.stroke!" [fill]="sparklineOptions2.fill!" [colors]="sparklineOptions2.colors!" [tooltip]="sparklineOptions2.tooltip!"></apx-chart>
+          }
         </div>
       </a>
 
-      <a routerLink="/activities" class="card relative overflow-hidden hover:border-primary/40 hover:scale-[1.02] transition-all cursor-pointer block">
-        <div class="absolute inset-0 bg-primary/5 pointer-events-none"></div>
-        <div class="relative">
-          <div class="w-9 h-9 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center mb-3">
+      <a routerLink="/activities" class="card relative overflow-hidden hover:border-primary/40 hover:scale-[1.02] transition-all cursor-pointer block p-0 flex flex-col justify-between group">
+        <div class="absolute inset-0 bg-primary/5 pointer-events-none group-hover:bg-primary/10 transition-colors"></div>
+        <div class="relative p-4 pb-0 z-10 pointer-events-none">
+          <div class="w-9 h-9 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center mb-2">
             <span class="material-icons text-primary text-base">calendar_month</span>
           </div>
-          <div class="stat-value">{{ stats?.monthlyDistanceKm?.toFixed(1) || '0.0' }}</div>
-          <p class="text-muted-foreground text-xs font-medium uppercase tracking-wider mt-1">This Month KM</p>
+          <div class="stat-value leading-none">{{ stats?.monthlyDistanceKm?.toFixed(1) || '0.0' }}</div>
+          <p class="text-muted-foreground text-[10px] font-bold uppercase tracking-wider mt-1 mb-2">This Month KM</p>
+        </div>
+        <div class="w-full relative z-0 mt-auto -mb-1 opacity-80 group-hover:opacity-100 transition-opacity">
+          @if (sparklineOptions3.series) {
+            <apx-chart [series]="sparklineOptions3.series" [chart]="sparklineOptions3.chart!" [stroke]="sparklineOptions3.stroke!" [fill]="sparklineOptions3.fill!" [colors]="sparklineOptions3.colors!" [tooltip]="sparklineOptions3.tooltip!"></apx-chart>
+          }
         </div>
       </a>
 
-      <a routerLink="/activities" class="card relative overflow-hidden hover:border-primary/40 hover:scale-[1.02] transition-all cursor-pointer block">
-        <div class="absolute inset-0 bg-destructive/5 pointer-events-none"></div>
-        <div class="relative">
-          <div class="w-9 h-9 rounded-xl bg-destructive/20 border border-destructive/30 flex items-center justify-center mb-3">
+      <a routerLink="/activities" class="card relative overflow-hidden hover:border-destructive/40 hover:scale-[1.02] transition-all cursor-pointer block p-0 flex flex-col justify-between group">
+        <div class="absolute inset-0 bg-destructive/5 pointer-events-none group-hover:bg-destructive/10 transition-colors"></div>
+        <div class="relative p-4 pb-0 z-10 pointer-events-none">
+          <div class="w-9 h-9 rounded-xl bg-destructive/20 border border-destructive/30 flex items-center justify-center mb-2">
             <span class="material-icons text-destructive text-base">directions_run</span>
           </div>
-          <div class="stat-value">{{ stats?.totalRuns || 0 }}</div>
-          <p class="text-muted-foreground text-xs font-medium uppercase tracking-wider mt-1">Total Runs</p>
+          <div class="stat-value leading-none">{{ stats?.totalRuns || 0 }}</div>
+          <p class="text-muted-foreground text-[10px] font-bold uppercase tracking-wider mt-1 mb-2">Total Runs</p>
+        </div>
+        <div class="w-full relative z-0 mt-auto -mb-1 opacity-80 group-hover:opacity-100 transition-opacity">
+          @if (sparklineOptions4.series) {
+            <apx-chart [series]="sparklineOptions4.series" [chart]="sparklineOptions4.chart!" [stroke]="sparklineOptions4.stroke!" [fill]="sparklineOptions4.fill!" [colors]="sparklineOptions4.colors!" [tooltip]="sparklineOptions4.tooltip!"></apx-chart>
+          }
         </div>
       </a>
 
-      <a routerLink="/activities" class="card relative overflow-hidden hover:border-primary/40 hover:scale-[1.02] transition-all cursor-pointer block">
-        <div class="absolute inset-0 bg-blue-500/5 pointer-events-none"></div>
-        <div class="relative">
-          <div class="w-9 h-9 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center mb-3">
+      <a routerLink="/activities" class="card relative overflow-hidden hover:border-blue-500/40 hover:scale-[1.02] transition-all cursor-pointer block p-0 flex flex-col justify-between group">
+        <div class="absolute inset-0 bg-blue-500/5 pointer-events-none group-hover:bg-blue-500/10 transition-colors"></div>
+        <div class="relative p-4 pb-0 z-10 pointer-events-none">
+          <div class="w-9 h-9 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center mb-2">
             <span class="material-icons text-blue-400 text-base">speed</span>
           </div>
-          <div class="stat-value">{{ formatPace(stats?.avgPaceMinPerKm || 0).split(' ')[0] }}</div>
-          <p class="text-muted-foreground text-xs font-medium uppercase tracking-wider mt-1">Avg Pace /km</p>
+          <div class="stat-value leading-none">{{ formatPace(stats?.avgPaceMinPerKm || 0).split(' ')[0] }}</div>
+          <p class="text-muted-foreground text-[10px] font-bold uppercase tracking-wider mt-1 mb-2">Avg Pace</p>
+        </div>
+        <div class="w-full relative z-0 mt-auto -mb-1 opacity-80 group-hover:opacity-100 transition-opacity">
+          @if (sparklineOptions5.series) {
+            <apx-chart [series]="sparklineOptions5.series" [chart]="sparklineOptions5.chart!" [stroke]="sparklineOptions5.stroke!" [fill]="sparklineOptions5.fill!" [colors]="sparklineOptions5.colors!" [tooltip]="sparklineOptions5.tooltip!"></apx-chart>
+          }
         </div>
       </a>
 
-      <a routerLink="/activities" class="card relative overflow-hidden hover:border-primary/40 hover:scale-[1.02] transition-all cursor-pointer block">
-        <div class="absolute inset-0 bg-purple-500/5 pointer-events-none"></div>
-        <div class="relative">
-          <div class="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center mb-3">
+      <a routerLink="/activities" class="card relative overflow-hidden hover:border-purple-500/40 hover:scale-[1.02] transition-all cursor-pointer block p-0 flex flex-col justify-between group">
+        <div class="absolute inset-0 bg-purple-500/5 pointer-events-none group-hover:bg-purple-500/10 transition-colors"></div>
+        <div class="relative p-4 pb-0 z-10 pointer-events-none">
+          <div class="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center mb-2">
             <span class="material-icons text-purple-400 text-base">timer</span>
           </div>
-          <div class="stat-value">{{ getTotalHours() }}</div>
-          <p class="text-muted-foreground text-xs font-medium uppercase tracking-wider mt-1">Total Time</p>
+          <div class="stat-value leading-none">{{ getTotalHours() }}</div>
+          <p class="text-muted-foreground text-[10px] font-bold uppercase tracking-wider mt-1 mb-2">Total Time</p>
+        </div>
+        <div class="w-full relative z-0 mt-auto -mb-1 opacity-80 group-hover:opacity-100 transition-opacity">
+          @if (sparklineOptions6.series) {
+            <apx-chart [series]="sparklineOptions6.series" [chart]="sparklineOptions6.chart!" [stroke]="sparklineOptions6.stroke!" [fill]="sparklineOptions6.fill!" [colors]="sparklineOptions6.colors!" [tooltip]="sparklineOptions6.tooltip!"></apx-chart>
+          }
         </div>
       </a>
 
     </div>
 
-    <!-- Streak + RunPoints row -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-      <!-- Run Streak -->
-      <div class="card relative overflow-hidden border-orange-500/20 hover:border-orange-500/40 transition-all">
-        <div class="absolute inset-0 bg-gradient-to-br from-orange-500/8 to-transparent pointer-events-none"></div>
-        <div class="relative flex items-center gap-4">
-          <div class="w-14 h-14 rounded-2xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center flex-shrink-0">
-            <span class="material-icons text-orange-400 text-2xl">local_fire_department</span>
-          </div>
-          <div class="flex-1">
-            <div class="flex items-baseline gap-2">
-              <span class="text-4xl font-black text-foreground">{{ streak?.currentStreak ?? 0 }}</span>
-              <span class="text-muted-foreground text-sm font-medium">day streak</span>
-              @if (streak?.activeToday) {
-                <span class="text-xs bg-orange-500/20 text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded-full font-semibold">🔥 Active</span>
-              }
-            </div>
-            <p class="text-muted-foreground text-xs mt-0.5">Best: <strong class="text-foreground">{{ streak?.longestStreak ?? 0 }} days</strong> · {{ streak?.totalActiveDays ?? 0 }} total active days</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- RunPoints -->
-      <div class="card relative overflow-hidden border-yellow-500/20 hover:border-yellow-500/40 transition-all">
-        <div class="absolute inset-0 bg-gradient-to-br from-yellow-500/8 to-transparent pointer-events-none"></div>
-        <div class="relative flex items-center gap-4">
-          <div class="w-14 h-14 rounded-2xl bg-yellow-500/20 border border-yellow-500/30 flex items-center justify-center flex-shrink-0">
-            <span class="material-icons text-yellow-400 text-2xl">stars</span>
-          </div>
-          <div class="flex-1">
-            <div class="flex items-baseline gap-2">
-              <span class="text-4xl font-black text-foreground">{{ runPoints | number }}</span>
-              <span class="text-muted-foreground text-sm font-medium">RunPoints</span>
-            </div>
-            <p class="text-muted-foreground text-xs mt-0.5">Earn <strong class="text-yellow-400">10 pts/km</strong> for every run you log</p>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Row 1: This Week + Today's Schedule -->
+    <!-- Row 1: Volume vs Intensity Area Chart & Daily Schedule -->
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
-      <!-- This Week → navigate to /calendar -->
-      <div class="xl:col-span-2 card cursor-pointer hover:border-primary/30 transition-colors group"
-           (click)="navigateToCalendar()">
-        <h2 class="text-foreground font-bold mb-4 flex items-center gap-2">
-          <span class="material-icons text-primary">calendar_view_week</span>
-          This Week
-          <span class="ml-auto text-primary text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity">View calendar →</span>
-        </h2>
-        <div class="grid grid-cols-7 gap-2">
-          @for (day of thisWeekDays; track day.date.toISOString()) {
-            <div class="flex flex-col items-center gap-1.5 cursor-pointer"
-                 (click)="$event.stopPropagation(); navigateToCalendar(day.date)">
-              <span class="text-xs text-muted-foreground font-medium">{{ day.date | date:'EEE' }}</span>
-              <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold hover:ring-2 hover:ring-primary/40 transition-all"
-                [class]="day.isToday ? 'bg-primary text-foreground' : day.hasActivity ? 'bg-primary/20 text-primary border border-primary/30' : 'bg-secondary text-muted-foreground border border-border'">
-                {{ day.date | date:'d' }}
-              </div>
-              @if (day.hasActivity) {
-                <div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
-              } @else {
-                <div class="w-1.5 h-1.5"></div>
-              }
-            </div>
+      <!-- Main Area Chart: Performance Pulse -->
+      <div class="xl:col-span-2 card">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-3">
+            <span class="material-icons text-primary">show_chart</span>
+            <h2 class="text-foreground font-bold">Performance Pulse (Distance vs. Pace)</h2>
+          </div>
+          <div class="flex items-center gap-2 text-xs font-semibold">
+            <span class="bg-primary/20 text-primary px-3 py-1 rounded-full cursor-pointer hover:bg-primary/30 transition-colors">Distance</span>
+            <span class="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full cursor-pointer hover:bg-blue-500/30 transition-colors">Pace</span>
+          </div>
+        </div>
+        
+        <div class="w-full -ml-3 mt-4 relative">
+          @if (mainChartOptions.series) {
+            <apx-chart
+              [series]="mainChartOptions.series"
+              [chart]="mainChartOptions.chart!"
+              [xaxis]="mainChartOptions.xaxis!"
+              [yaxis]="mainChartOptions.yaxis!"
+              [stroke]="mainChartOptions.stroke!"
+              [fill]="mainChartOptions.fill!"
+              [colors]="mainChartOptions.colors!"
+              [dataLabels]="mainChartOptions.dataLabels!"
+              [tooltip]="mainChartOptions.tooltip!"
+              [legend]="mainChartOptions.legend!"
+              [grid]="mainChartOptions.grid!"></apx-chart>
           }
         </div>
       </div>
@@ -194,8 +186,31 @@
         }
       </div>
     </div>
+    
+    <!-- Row 2: Consistency Heatmap -->
+    <div class="card overflow-x-auto">
+      <div class="flex items-center justify-between mb-4 min-w-[600px]">
+        <div class="flex items-center gap-3">
+          <span class="material-icons text-primary">grid_on</span>
+          <h2 class="text-foreground font-bold">Consistency Heatmap (Last 365 Days)</h2>
+        </div>
+      </div>
+      <div class="w-full min-w-[600px] -mt-4">
+        @if (heatmapOptions.series) {
+          <apx-chart
+            [series]="heatmapOptions.series"
+            [chart]="heatmapOptions.chart!"
+            [dataLabels]="heatmapOptions.dataLabels!"
+            [colors]="heatmapOptions.colors!"
+            [plotOptions]="heatmapOptions.plotOptions!"
+            [xaxis]="heatmapOptions.xaxis!"
+            [legend]="heatmapOptions.legend!"
+            [tooltip]="heatmapOptions.tooltip!"></apx-chart>
+        }
+      </div>
+    </div>
 
-    <!-- Row 2: Recent Activities + Right Column -->
+    <!-- Row 3: Recent Activities + Goals/Load -->
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
       <!-- Recent Activities -->
@@ -208,7 +223,7 @@
           <a routerLink="/activities" class="text-primary hover:text-primary text-sm font-semibold transition-colors">View all →</a>
         </div>
 
-        @if (recentActivities.length === 0) {
+        @if (enrichedRecentActivities.length === 0) {
           <div class="flex flex-col items-center justify-center py-12 gap-3 text-center">
             <div class="w-16 h-16 rounded-2xl bg-secondary border border-border flex items-center justify-center">
               <span class="material-icons text-muted-foreground text-3xl">directions_run</span>
@@ -218,29 +233,94 @@
           </div>
         }
 
-        <div class="space-y-3">
-          @for (activity of recentActivities; track activity.id) {
+        <div class="space-y-4">
+          @for (activity of enrichedRecentActivities; track activity.id) {
             <a routerLink="/activities"
-              class="flex items-center gap-4 p-4 bg-secondary rounded-xl border border-border hover:border-primary/30 hover:scale-[1.01] transition-all cursor-pointer group">
-              <div class="w-10 h-10 rounded-xl bg-primary/20 border border-primary/20 flex items-center justify-center flex-shrink-0">
-                <span class="material-icons text-primary text-xl">directions_run</span>
+              class="flex flex-col sm:flex-row gap-4 p-4 bg-secondary rounded-xl border border-border hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-0.5 transition-all cursor-pointer group relative overflow-hidden">
+              
+              <!-- Map Thumbnail -->
+              <div class="w-full sm:w-28 h-20 rounded-lg bg-[#2a2d3e] border border-border/50 relative overflow-hidden flex-shrink-0 flex items-center justify-center">
+                <!-- Mock Map Background Pattern -->
+                <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 8px 8px;"></div>
+                <!-- SVG Polyline -->
+                <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" class="relative z-10 scale-90 drop-shadow-md">
+                  <path [attr.d]="activity.mockPolyline" fill="none" stroke="#f97316" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <circle cx="10" cy="50" r="4" fill="#3b82f6"></circle>
+                  <circle cx="90" cy="50" r="4" fill="#ef4444"></circle>
+                </svg>
               </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-foreground font-semibold text-sm truncate group-hover:text-primary transition-colors">{{ activity.title }}</p>
-                <p class="text-muted-foreground text-xs mt-0.5">{{ activity.activityDate | date:'MMM d' }} · {{ formatDuration(activity.durationMinutes) }} · {{ formatPace(activity.paceMinPerKm) }}</p>
-              </div>
-              <div class="flex-shrink-0">
-                <span class="badge bg-primary/15 text-primary border border-primary/20">{{ activity.distanceKm.toFixed(1) }} km</span>
+
+              <!-- Content -->
+              <div class="flex-1 min-w-0 flex flex-col justify-center">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <h3 class="text-foreground font-bold text-sm truncate group-hover:text-primary transition-colors flex items-center gap-2">
+                      {{ activity.title }}
+                      @if (activity.prPercentage >= 98) {
+                        <span class="text-[10px] bg-orange-500/20 text-orange-400 px-1.5 py-0.5 rounded uppercase tracking-wider font-extrabold flex items-center gap-0.5">
+                          <span class="material-icons text-[10px]">emoji_events</span> PR
+                        </span>
+                      }
+                    </h3>
+                    <p class="text-muted-foreground text-xs mt-1">
+                      {{ activity.activityDate | date:'MMM d' }} · {{ formatDuration(activity.durationMinutes) }} · {{ formatPace(activity.paceMinPerKm) }}
+                    </p>
+                  </div>
+                  <div class="text-right">
+                    <span class="text-lg font-black text-foreground">{{ activity.distanceKm.toFixed(1) }} <span class="text-xs text-muted-foreground font-medium">km</span></span>
+                  </div>
+                </div>
+
+                <!-- PR Progress Bar -->
+                <div class="mt-3">
+                  <div class="flex justify-between text-[10px] font-semibold text-muted-foreground mb-1 uppercase tracking-wider">
+                    <span>Performance vs PR</span>
+                    <span [ngClass]="activity.prPercentage >= 98 ? 'text-orange-400' : 'text-primary'">{{ activity.prPercentage }}%</span>
+                  </div>
+                  <div class="w-full bg-card rounded-full h-1.5 overflow-hidden border border-border/50">
+                    <div class="h-1.5 rounded-full transition-all duration-1000 ease-out"
+                      [ngClass]="activity.prColor"
+                      [style.width.%]="activity.prPercentage"></div>
+                  </div>
+                </div>
               </div>
             </a>
           }
         </div>
       </div>
 
-      <!-- Right Column: Upcoming Events + Weekly Leaders -->
+      <!-- Right Column: Goal/Load Widget & Upcoming Events -->
       <div class="space-y-6">
 
-        <!-- Upcoming Events -->
+        <!-- Training Load & Goals -->
+        <div class="card relative overflow-hidden flex flex-col items-center justify-center p-6 bg-gradient-to-b from-secondary to-background border border-primary/20 shadow-lg shadow-primary/5">
+          <div class="absolute inset-0 bg-primary/5 pointer-events-none"></div>
+          <h2 class="text-foreground font-black tracking-tight self-start mb-2 group flex items-center gap-2">
+            Monthly Target
+            <span class="material-icons text-primary ml-auto text-lg opacity-80 group-hover:opacity-100 transition-opacity">track_changes</span>
+          </h2>
+          
+          <div class="w-full -my-6 relative flex justify-center items-center">
+            @if (radialBarOptions.series) {
+              <apx-chart
+                [series]="radialBarOptions.series"
+                [chart]="radialBarOptions.chart!"
+                [plotOptions]="radialBarOptions.plotOptions!"
+                [labels]="radialBarOptions.labels!"
+                [fill]="radialBarOptions.fill!"
+                [stroke]="radialBarOptions.stroke!"></apx-chart>
+            }
+          </div>
+
+          <div class="w-full bg-card/50 border border-border/50 backdrop-blur-sm rounded-xl p-3 text-center mt-2 relative z-10">
+            <p class="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">Predicted Finish</p>
+            <p class="text-sm font-medium text-foreground">
+              At this rate, you'll hit <span class="text-orange-400 font-bold">112 km</span> by month-end.
+            </p>
+          </div>
+        </div>
+
+        <!-- Upcoming Events (Simplified to fit) -->
         <div class="card">
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-3">
@@ -256,8 +336,8 @@
 
           <div class="space-y-3">
             @for (event of upcomingEvents; track event.id) {
-              <a [routerLink]="['/events', event.id]" class="flex items-center gap-3 group hover:scale-[1.01] transition-all cursor-pointer">
-                <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-primary flex flex-col items-center justify-center">
+              <a [routerLink]="['/events', event.id]" class="flex items-center gap-3 group hover:scale-[1.01] transition-all cursor-pointer border border-transparent hover:border-border bg-secondary p-2 rounded-xl">
+                <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-primary flex flex-col items-center justify-center shadow-lg shadow-primary/20">
                   <span class="text-foreground font-black text-lg leading-none">{{ event.eventDate | date:'d' }}</span>
                   <span class="text-white/80 text-[10px] uppercase tracking-wider">{{ event.eventDate | date:'MMM' }}</span>
                 </div>
@@ -270,115 +350,7 @@
           </div>
         </div>
 
-        <!-- Weekly Leaders -->
-        <div class="card">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-3">
-              <span class="material-icons text-primary">leaderboard</span>
-              <h2 class="text-foreground font-bold">Weekly Leaders</h2>
-            </div>
-            <a routerLink="/rankings" class="text-primary hover:text-primary text-xs font-semibold transition-colors">Full board</a>
-          </div>
-          <div class="space-y-2">
-            @for (r of topRankings; track r.rank) {
-              <a routerLink="/rankings"
-                class="flex items-center gap-3 p-2 rounded-lg hover:bg-secondary transition-colors cursor-pointer group"
-                [class.bg-primary]="r.rank === 1" [class.bg-opacity-10]="r.rank === 1">
-                <div class="w-7 text-center text-sm font-bold flex-shrink-0">
-                  @if (r.rank === 1) { <span>🥇</span> }
-                  @else if (r.rank === 2) { <span>🥈</span> }
-                  @else if (r.rank === 3) { <span>🥉</span> }
-                  @else { <span class="text-muted-foreground">{{ r.rank }}</span> }
-                </div>
-                <div class="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                  {{ getInitials(r.username) }}
-                </div>
-                <span class="flex-1 text-foreground text-sm font-medium truncate group-hover:text-primary transition-colors">{{ r.username }}</span>
-                <span class="text-primary font-bold text-sm">{{ r.totalDistanceKm?.toFixed(1) }} km</span>
-              </a>
-            }
-          </div>
-        </div>
-
       </div>
     </div>
 
-    <!-- Row 3: Challenges + Active Programs -->
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-
-      <!-- Challenges → navigate to /activities -->
-      <div class="card">
-        <div class="flex items-center gap-3 mb-5">
-          <span class="material-icons text-primary">emoji_events</span>
-          <h2 class="text-foreground font-bold">Active Challenges</h2>
-        </div>
-        <div class="space-y-5">
-          @for (challenge of challenges; track challenge.id) {
-            <a routerLink="/activities"
-              class="block space-y-2 p-3 -mx-3 rounded-xl hover:bg-secondary transition-colors cursor-pointer group">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <span class="material-icons text-xl"
-                    [ngClass]="{
-                      'text-primary': challenge.color === 'orange',
-                      'text-destructive': challenge.color === 'red',
-                      'text-blue-400': challenge.color === 'blue'
-                    }">{{ challenge.icon }}</span>
-                  <div>
-                    <p class="text-foreground text-sm font-semibold group-hover:text-primary transition-colors">{{ challenge.title }}</p>
-                    <p class="text-muted-foreground text-xs">{{ challenge.description }}</p>
-                  </div>
-                </div>
-                <span class="text-primary font-bold text-sm">{{ getChallengeValue(challenge) }}</span>
-              </div>
-              <div class="w-full bg-secondary rounded-full h-2">
-                <div class="h-2 rounded-full bg-primary transition-all duration-500"
-                  [style.width.%]="getChallengeProgress(challenge)"></div>
-              </div>
-            </a>
-          }
-        </div>
-      </div>
-
-      <!-- Active Training Programs -->
-      <div class="card flex flex-col">
-        <div class="flex items-center gap-3 mb-4">
-          <span class="material-icons text-primary">fitness_center</span>
-          <h2 class="text-foreground font-bold">Active Programs</h2>
-          <a routerLink="/programs" class="ml-auto text-primary hover:text-primary text-xs font-semibold transition-colors">View all →</a>
-        </div>
-
-        @if (programProgress.length === 0) {
-          <div class="flex flex-col items-center justify-center py-6 gap-2 text-center">
-            <span class="material-icons text-muted-foreground text-3xl">fitness_center</span>
-            <p class="text-muted-foreground text-sm">No active programs</p>
-            <a routerLink="/programs" class="text-primary text-sm hover:underline">Browse training plans</a>
-          </div>
-        } @else {
-          <div class="space-y-3">
-            @for (prog of programProgress; track prog.id) {
-              <a routerLink="/programs"
-                class="block p-3 bg-secondary rounded-xl border border-border space-y-2 hover:border-primary/30 hover:scale-[1.01] transition-all cursor-pointer group">
-                <div class="flex items-center justify-between">
-                  <div class="min-w-0 flex-1">
-                    <p class="text-foreground font-semibold text-sm truncate group-hover:text-primary transition-colors">{{ prog.programName || 'Training Program' }}</p>
-                    <span class="text-muted-foreground text-xs uppercase">{{ prog.status || 'Active' }}</span>
-                  </div>
-                  <span class="text-primary font-bold text-sm flex-shrink-0 ml-3">
-                    {{ prog.completedSessions || 0 }} / {{ prog.totalSessions || '?' }}
-                  </span>
-                </div>
-                <div class="w-full bg-card rounded-full h-1.5">
-                  <div class="h-1.5 rounded-full bg-primary transition-all duration-500"
-                    [style.width.%]="getProgramProgress(prog)">
-                  </div>
-                </div>
-              </a>
-            }
-          </div>
-        }
-      </div>
-
-    </div>
-
-  </div>
+</div>

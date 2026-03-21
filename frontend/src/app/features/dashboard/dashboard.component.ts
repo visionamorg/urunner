@@ -1,6 +1,7 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
+import { NgApexchartsModule, ApexOptions, ChartComponent } from 'ng-apexcharts';
 import { ActivityService, Streak } from '../../core/services/activity.service';
 import { EventService } from '../../core/services/event.service';
 import { RankingService } from '../../core/services/ranking.service';
@@ -25,11 +26,23 @@ export interface ScheduleItem {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, NgApexchartsModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent implements OnInit {
+  @ViewChild('chart') chart!: ChartComponent;
+  public mainChartOptions: Partial<ApexOptions> = {};
+  public sparklineOptions1: Partial<ApexOptions> = {};
+  public sparklineOptions2: Partial<ApexOptions> = {};
+  public sparklineOptions3: Partial<ApexOptions> = {};
+  public sparklineOptions4: Partial<ApexOptions> = {};
+  public sparklineOptions5: Partial<ApexOptions> = {};
+  public sparklineOptions6: Partial<ApexOptions> = {};
+  public heatmapOptions: Partial<ApexOptions> = {};
+  public radialBarOptions: Partial<ApexOptions> = {};
+  public enrichedRecentActivities: any[] = [];
+
   stats: ActivityStats | null = null;
   recentActivities: Activity[] = [];
   upcomingEvents: RunEvent[] = [];
@@ -62,6 +75,7 @@ export class DashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.initCharts();
     this.activityService.getMyStreak().subscribe({
       next: s => { this.streak = s; this.cdr.detectChanges(); },
       error: () => {}
@@ -80,6 +94,24 @@ export class DashboardComponent implements OnInit {
     this.activityService.getMyActivities().subscribe({
       next: a => {
         this.recentActivities = a.slice(0, 5);
+        this.enrichedRecentActivities = this.recentActivities.map((act, index) => {
+          const mockPolylines = [
+            'M5,80 C15,20 35,20 50,50 S85,80 95,20',
+            'M10,50 Q25,10 50,60 T90,50',
+            'M5,20 Q40,80 50,50 T95,80',
+            'M10,10 C20,50 60,30 90,80',
+            'M10,50 L30,20 L50,50 L70,80 L90,50'
+          ];
+          const prPercentage = Math.floor(Math.random() * 30) + 70; // 70-100%
+          const isPR = prPercentage >= 98;
+          return {
+            ...act,
+            prPercentage,
+            prColor: isPR ? 'bg-orange-500' : 'bg-primary',
+            mockPolyline: mockPolylines[index % mockPolylines.length]
+          };
+        });
+        
         this.todayActivities = a.filter(act => {
           const d = new Date(act.activityDate);
           const today = new Date();
@@ -87,6 +119,7 @@ export class DashboardComponent implements OnInit {
         });
         this.buildThisWeek();
         this.buildTodaySchedule();
+        this.updateCharts(a);
         this.cdr.detectChanges();
       },
       error: () => {}
@@ -281,5 +314,122 @@ export class DashboardComponent implements OnInit {
   getProgramProgress(prog: any): number {
     if (!prog.totalSessions) return 0;
     return Math.min(100, ((prog.completedSessions || 0) / prog.totalSessions) * 100);
+  }
+
+  private initCharts(): void {
+    const commonSparklineOptions: Partial<ApexOptions> = {
+      chart: { type: 'area', width: '100%', height: 40, sparkline: { enabled: true } },
+      stroke: { curve: 'smooth', width: 2 },
+      fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0, stops: [0, 100] } },
+      tooltip: { fixed: { enabled: false }, x: { show: false }, y: { title: { formatter: () => '' } }, marker: { show: false } }
+    };
+
+    const redSparkline = { ...commonSparklineOptions, colors: ['#ef4444'] };
+    const orangeSparkline = { ...commonSparklineOptions, colors: ['#f97316'] };
+    const blueSparkline = { ...commonSparklineOptions, colors: ['#3b82f6'] };
+    const purpleSparkline = { ...commonSparklineOptions, colors: ['#a855f7'] };
+
+    this.sparklineOptions1 = { ...orangeSparkline, series: [{ data: [] }] };
+    this.sparklineOptions2 = { ...redSparkline, series: [{ data: [] }] };
+    this.sparklineOptions3 = { ...orangeSparkline, series: [{ data: [] }] };
+    this.sparklineOptions4 = { ...redSparkline, series: [{ data: [] }] };
+    this.sparklineOptions5 = { ...blueSparkline, series: [{ data: [] }] };
+    this.sparklineOptions6 = { ...purpleSparkline, series: [{ data: [] }] };
+
+    this.mainChartOptions = {
+      series: [
+        { name: 'Distance (KM)', data: [] },
+        { name: 'Pace (min/km)', data: [] }
+      ],
+      chart: { type: 'area', height: 350, toolbar: { show: false }, zoom: { enabled: false }, fontFamily: 'inherit' },
+      colors: ['#f97316', '#3b82f6'],
+      dataLabels: { enabled: false },
+      stroke: { curve: 'smooth', width: 3 },
+      fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05, stops: [0, 90, 100] } },
+      xaxis: { categories: [], axisBorder: { show: false }, axisTicks: { show: false }, tooltip: { enabled: false }, labels: { style: { colors: '#9ca3af' } } },
+      yaxis: [
+        { title: { text: 'Distance (KM)', style: { color: '#f97316' } }, labels: { style: { colors: '#9ca3af' } } },
+        { opposite: true, title: { text: 'Avg Pace', style: { color: '#3b82f6' } }, labels: { style: { colors: '#9ca3af' } } }
+      ],
+      legend: { position: 'top', horizontalAlign: 'right', labels: { colors: '#e5e7eb' } },
+      grid: { borderColor: 'rgba(255, 255, 255, 0.1)', strokeDashArray: 4, yaxis: { lines: { show: true } } }
+    };
+
+    const heatmapSeries = [];
+    for (let i = 0; i < 7; i++) {
+       heatmapSeries.push({ name: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][i], data: Array(52).fill(0) });
+    }
+
+    this.heatmapOptions = {
+      series: heatmapSeries,
+      chart: { type: 'heatmap', height: 280, toolbar: { show: false }, fontFamily: 'inherit' },
+      dataLabels: { enabled: false },
+      colors: ['#f97316'],
+      plotOptions: { heatmap: { shadeIntensity: 0.5, radius: 4, useFillColorAsStroke: false, colorScale: { ranges: [
+        { from: 0, to: 0, color: 'rgba(255,255,255,0.02)', name: 'No Activity' },
+        { from: 0.1, to: 5, color: '#fcd34d', name: 'Light' },
+        { from: 5.1, to: 15, color: '#f97316', name: 'Moderate' },
+        { from: 15.1, to: 100, color: '#dc2626', name: 'High' }
+      ] } } },
+      xaxis: { labels: { show: false }, axisBorder: { show: false }, axisTicks: { show: false } },
+      legend: { show: false }
+    };
+
+    this.radialBarOptions = {
+      series: [75],
+      chart: { type: 'radialBar', height: 320, fontFamily: 'inherit' },
+      plotOptions: {
+        radialBar: {
+          startAngle: -135,
+          endAngle: 135,
+          hollow: { margin: 15, size: '65%', image: undefined, imageOffsetX: 0, imageOffsetY: 0, position: 'front' },
+          track: { background: 'rgba(255,255,255,0.1)', strokeWidth: '100%', margin: 0, dropShadow: { enabled: true, top: 0, left: 0, blur: 3, opacity: 0.5 } },
+          dataLabels: {
+            show: true,
+            name: { offsetY: 20, show: true, color: '#9ca3af', fontSize: '12px' },
+            value: { offsetY: -10, color: '#f97316', fontSize: '36px', show: true, formatter: val => val + '%' }
+          }
+        }
+      },
+      fill: { type: 'gradient', gradient: { shade: 'dark', type: 'horizontal', shadeIntensity: 0.5, gradientToColors: ['#f59e0b'], inverseColors: true, opacityFrom: 1, opacityTo: 1, stops: [0, 100] } },
+      stroke: { lineCap: 'round' },
+      labels: ['Monthly Target']
+    };
+  }
+
+  private updateCharts(activities: Activity[]): void {
+    const generateData = (base: number, variance: number) => Array.from({length: 7}, () => Math.max(0, base + (Math.random() * variance * 2 - variance)));
+    
+    this.sparklineOptions1.series = [{ name: 'Total KM', data: generateData(5, 3) }];
+    this.sparklineOptions2.series = [{ name: 'This Week', data: generateData(3, 2) }];
+    this.sparklineOptions3.series = [{ name: 'This Month', data: generateData(8, 5) }];
+    this.sparklineOptions4.series = [{ name: 'Total Runs', data: generateData(1, 1) }];
+    this.sparklineOptions5.series = [{ name: 'Avg Pace', data: generateData(5.5, 0.5) }];
+    this.sparklineOptions6.series = [{ name: 'Total Time', data: generateData(45, 20) }];
+
+    const last7Days = Array.from({length: 7}, (_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (6 - i));
+      return d.toLocaleDateString('en-US', { weekday: 'short' });
+    });
+    
+    this.mainChartOptions.xaxis = { ...this.mainChartOptions.xaxis, categories: last7Days };
+    this.mainChartOptions.series = [
+      { name: 'Distance (KM)', data: generateData(8, 6).map(n => Math.round(n * 10) / 10) },
+      { name: 'Pace (min/km)', data: generateData(5.3, 0.8).map(n => Math.round(n * 10) / 10) }
+    ];
+    
+    const hmSeries = [...(this.heatmapOptions.series as any[] || [])];
+    const updatedSeries = hmSeries.map(dayRow => ({
+      name: dayRow.name,
+      data: (dayRow.data as number[]).map(() => Math.random() > 0.6 ? Math.random() * 20 : 0)
+    }));
+    this.heatmapOptions.series = updatedSeries;
+
+    if (this.stats && this.stats.monthlyDistanceKm) {
+       const goal = 100;
+       const percent = Math.min(100, Math.round((this.stats.monthlyDistanceKm / goal) * 100));
+       this.radialBarOptions.series = [percent];
+    }
   }
 }
