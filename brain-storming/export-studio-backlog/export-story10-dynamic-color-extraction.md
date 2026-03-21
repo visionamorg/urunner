@@ -8,3 +8,6 @@
 ### Acceptance Criteria:
 - *Given* I upload a background photo, *then* a client-side color extraction algorithm (e.g., ColorThief) immediately identifies the dominant primary and secondary colors.
 - *Then* the state updates the UI so that the template's accent colors (like the polyline trail or the large background numbers) shift to match the photo's extracted palette.
+
+### Status: ✅ Done
+**Implemented:** Native canvas-based color extraction algorithm identifies the most saturated and average colors from uploaded background photos. All template accent colors (stat values, geometric shapes, brand logo, text shadows) use CSS custom properties that update dynamically. Auto-extract toggle and color swatch preview in controls panel. Colors reset to default amber when background is removed.

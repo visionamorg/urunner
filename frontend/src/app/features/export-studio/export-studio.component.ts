@@ -45,6 +45,12 @@ export class ExportStudioComponent implements OnInit {
   backgroundOpacity = 100;
   backgroundBlur = 0;
 
+  // Dynamic color palette
+  accentColor = '#f59e0b';
+  accentColorRgb = '245, 158, 11';
+  secondaryAccent = '#1e293b';
+  useAutoColors = true;
+
   templates: TemplateOption[] = [
     { id: 'clear-info', name: 'Clear Info', description: 'Clean frosted-glass card overlay', icon: 'style' },
     { id: 'large-stat', name: 'Large Stat', description: 'Bold numeric overlay', icon: 'format_size' },
@@ -148,6 +154,9 @@ export class ExportStudioComponent implements OnInit {
     const reader = new FileReader();
     reader.onload = () => {
       this.backgroundImageUrl = reader.result as string;
+      if (this.useAutoColors) {
+        this.extractColors(reader.result as string);
+      }
     };
     reader.readAsDataURL(file);
   }
@@ -156,6 +165,69 @@ export class ExportStudioComponent implements OnInit {
     this.backgroundImageUrl = null;
     this.backgroundOpacity = 100;
     this.backgroundBlur = 0;
+    this.resetColors();
+  }
+
+  private extractColors(dataUrl: string): void {
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        // Sample at small size for performance
+        const size = 50;
+        canvas.width = size;
+        canvas.height = size;
+        ctx.drawImage(img, 0, 0, size, size);
+        const data = ctx.getImageData(0, 0, size, size).data;
+
+        // Simple dominant color extraction: average with saturation weighting
+        let rSum = 0, gSum = 0, bSum = 0, count = 0;
+        let maxSat = 0, satR = 0, satG = 0, satB = 0;
+
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i], g = data[i + 1], b = data[i + 2];
+          rSum += r; gSum += g; bSum += b; count++;
+
+          // Track most saturated color
+          const max = Math.max(r, g, b), min = Math.min(r, g, b);
+          const sat = max === 0 ? 0 : (max - min) / max;
+          if (sat > maxSat && max > 40) {
+            maxSat = sat;
+            satR = r; satG = g; satB = b;
+          }
+        }
+
+        if (maxSat > 0.15) {
+          this.accentColor = `rgb(${satR}, ${satG}, ${satB})`;
+          this.accentColorRgb = `${satR}, ${satG}, ${satB}`;
+        } else {
+          const avgR = Math.round(rSum / count);
+          const avgG = Math.round(gSum / count);
+          const avgB = Math.round(bSum / count);
+          this.accentColor = `rgb(${avgR}, ${avgG}, ${avgB})`;
+          this.accentColorRgb = `${avgR}, ${avgG}, ${avgB}`;
+        }
+
+        // Secondary: average color
+        const aR = Math.round(rSum / count);
+        const aG = Math.round(gSum / count);
+        const aB = Math.round(bSum / count);
+        this.secondaryAccent = `rgb(${aR}, ${aG}, ${aB})`;
+      } catch (e) {
+        console.warn('Color extraction failed:', e);
+      }
+    };
+    img.src = dataUrl;
+  }
+
+  private resetColors(): void {
+    this.accentColor = '#f59e0b';
+    this.accentColorRgb = '245, 158, 11';
+    this.secondaryAccent = '#1e293b';
   }
 
   goBack(): void {

@@ -32,7 +32,10 @@
 
       <!-- Canvas Preview Area -->
       <div class="canvas-wrapper">
-        <div class="canvas-frame" #canvasContainer>
+        <div class="canvas-frame" #canvasContainer
+          [style.--accent-color]="accentColor"
+          [style.--accent-rgb]="accentColorRgb"
+          [style.--secondary-accent]="secondaryAccent">
 
           <!-- Default gradient background -->
           <div class="canvas-bg"></div>
@@ -274,6 +277,21 @@
             </div>
           }
         </div>
+
+        <!-- Color Palette -->
+        @if (backgroundImageUrl) {
+          <div class="control-section">
+            <h3 class="control-label">Color Palette</h3>
+            <label class="toggle-item">
+              <span class="toggle-label">Auto-extract colors</span>
+              <input type="checkbox" [(ngModel)]="useAutoColors" class="toggle-switch">
+            </label>
+            <div class="color-preview">
+              <div class="color-swatch" [style.background]="accentColor" title="Primary accent"></div>
+              <div class="color-swatch" [style.background]="secondaryAccent" title="Secondary accent"></div>
+            </div>
+          </div>
+        }
 
         <!-- Data Toggles -->
         <div class="control-section">
