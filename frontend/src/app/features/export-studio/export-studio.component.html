@@ -6,14 +6,22 @@
       <span class="material-icons">arrow_back</span>
     </button>
     <h1 class="studio-title">Export Studio</h1>
-    <button (click)="exportToImage()" [disabled]="!selectedActivity || exporting" class="export-btn">
-      @if (exporting) {
-        <div class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-      } @else {
-        <span class="material-icons">download</span>
+    <div class="flex items-center gap-2">
+      @if (canShare) {
+        <button (click)="shareToOS()" [disabled]="!selectedActivity || exporting" class="share-btn">
+          <span class="material-icons">share</span>
+          <span class="hidden sm:inline">Share</span>
+        </button>
       }
-      <span>{{ exporting ? 'Exporting...' : 'Export' }}</span>
-    </button>
+      <button (click)="exportToImage()" [disabled]="!selectedActivity || exporting" class="export-btn">
+        @if (exporting) {
+          <div class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+        } @else {
+          <span class="material-icons">download</span>
+        }
+        <span>{{ exporting ? 'Exporting...' : 'Export' }}</span>
+      </button>
+    </div>
   </div>
 
   @if (loading) {

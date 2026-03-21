@@ -39,6 +39,31 @@
   color: rgb(var(--foreground));
 }
 
+.share-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  background: rgb(var(--secondary));
+  border: 1px solid rgb(var(--border));
+  color: rgb(var(--foreground));
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    background: rgb(var(--accent));
+    border-color: rgb(var(--primary) / 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
 .export-btn {
   display: flex;
   align-items: center;

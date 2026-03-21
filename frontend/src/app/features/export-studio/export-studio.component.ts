@@ -123,27 +123,67 @@ export class ExportStudioComponent implements OnInit {
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
+  private async renderCanvas(): Promise<HTMLCanvasElement> {
+    const element = this.canvasContainer.nativeElement;
+    return html2canvas(element, {
+      width: 1080,
+      height: 1920,
+      scale: 1,
+      useCORS: true,
+      backgroundColor: '#0a0a0a',
+      logging: false
+    });
+  }
+
   async exportToImage(): Promise<void> {
     if (!this.canvasContainer || this.exporting) return;
     this.exporting = true;
 
     try {
-      const element = this.canvasContainer.nativeElement;
-      const canvas = await html2canvas(element, {
-        width: 1080,
-        height: 1920,
-        scale: 1,
-        useCORS: true,
-        backgroundColor: '#0a0a0a',
-        logging: false
-      });
-
+      const canvas = await this.renderCanvas();
       const link = document.createElement('a');
       link.download = `runhub-export-${this.selectedActivity?.id || 'activity'}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
     } catch (err) {
       console.error('Export failed:', err);
+    } finally {
+      this.exporting = false;
+    }
+  }
+
+  get canShare(): boolean {
+    return !!navigator.share && !!navigator.canShare;
+  }
+
+  async shareToOS(): Promise<void> {
+    if (!this.canvasContainer || this.exporting) return;
+    this.exporting = true;
+
+    try {
+      const canvas = await this.renderCanvas();
+
+      const blob = await new Promise<Blob>((resolve) => {
+        canvas.toBlob((b) => resolve(b!), 'image/png');
+      });
+
+      const file = new File([blob], `runhub-export-${this.selectedActivity?.id || 'activity'}.png`, {
+        type: 'image/png'
+      });
+
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: `${this.selectedActivity?.title || 'My Run'} - RunHub`,
+          files: [file]
+        });
+      } else {
+        // Fallback to download
+        this.exportToImage();
+      }
+    } catch (err: any) {
+      if (err.name !== 'AbortError') {
+        console.error('Share failed:', err);
+      }
     } finally {
       this.exporting = false;
     }
