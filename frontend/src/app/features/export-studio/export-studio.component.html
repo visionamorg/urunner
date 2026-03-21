@@ -197,6 +197,17 @@
             </div>
           }
 
+          <!-- Weather Stamp -->
+          @if (showWeatherStamp && weatherCondition) {
+            <div class="weather-stamp">
+              <span class="material-icons weather-stamp-icon">{{ weatherIcon }}</span>
+              <div class="weather-stamp-text">
+                <span class="weather-stamp-condition">{{ weatherCondition }}</span>
+                <span class="weather-stamp-temp">{{ weatherTemp }}</span>
+              </div>
+            </div>
+          }
+
           <!-- Verification Watermark -->
           @if (showWatermark) {
             <div class="watermark">
@@ -354,6 +365,12 @@
               <span class="toggle-label">Verification Watermark</span>
               <input type="checkbox" [(ngModel)]="showWatermark" class="toggle-switch">
             </label>
+            <div class="toggle-item">
+              <span class="toggle-label">Weather Stamp</span>
+              <button (click)="generateWeatherStamp()" class="weather-gen-btn">
+                <span class="material-icons text-sm">{{ showWeatherStamp ? 'refresh' : 'wb_sunny' }}</span>
+              </button>
+            </div>
           </div>
         </div>
 

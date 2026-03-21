@@ -60,6 +60,12 @@ export class ExportStudioComponent implements OnInit {
   showCaptions = false;
   captions: { style: string; text: string }[] = [];
 
+  // Weather stamp
+  showWeatherStamp = false;
+  weatherCondition = '';
+  weatherTemp = '';
+  weatherIcon = '';
+
   templates: TemplateOption[] = [
     { id: 'clear-info', name: 'Clear Info', description: 'Clean frosted-glass card overlay', icon: 'style' },
     { id: 'large-stat', name: 'Large Stat', description: 'Bold numeric overlay', icon: 'format_size' },
@@ -295,6 +301,51 @@ export class ExportStudioComponent implements OnInit {
     this.accentColor = '#f59e0b';
     this.accentColorRgb = '245, 158, 11';
     this.secondaryAccent = '#1e293b';
+  }
+
+  generateWeatherStamp(): void {
+    if (!this.selectedActivity) return;
+    const date = new Date(this.selectedActivity.activityDate);
+    const month = date.getMonth(); // 0-11
+
+    // Simulate weather based on month/season
+    const conditions: { condition: string; temp: string; icon: string }[] = [];
+
+    if (month >= 11 || month <= 1) {
+      // Winter
+      conditions.push(
+        { condition: 'FREEZING', temp: `${Math.floor(Math.random() * 8) - 5}°C`, icon: 'ac_unit' },
+        { condition: 'COLD & CRISP', temp: `${Math.floor(Math.random() * 6) + 2}°C`, icon: 'cloudy_snowing' },
+        { condition: 'SNOWY', temp: `${Math.floor(Math.random() * 4) - 3}°C`, icon: 'weather_snowy' }
+      );
+    } else if (month >= 2 && month <= 4) {
+      // Spring
+      conditions.push(
+        { condition: 'FRESH SPRING', temp: `${Math.floor(Math.random() * 8) + 10}°C`, icon: 'partly_cloudy_day' },
+        { condition: 'LIGHT RAIN', temp: `${Math.floor(Math.random() * 6) + 12}°C`, icon: 'rainy' },
+        { condition: 'BREEZY', temp: `${Math.floor(Math.random() * 6) + 14}°C`, icon: 'air' }
+      );
+    } else if (month >= 5 && month <= 7) {
+      // Summer
+      conditions.push(
+        { condition: 'SCORCHING', temp: `${Math.floor(Math.random() * 10) + 30}°C`, icon: 'local_fire_department' },
+        { condition: 'HOT & SUNNY', temp: `${Math.floor(Math.random() * 8) + 28}°C`, icon: 'wb_sunny' },
+        { condition: 'HUMID', temp: `${Math.floor(Math.random() * 6) + 26}°C`, icon: 'water_drop' }
+      );
+    } else {
+      // Autumn
+      conditions.push(
+        { condition: 'AUTUMN CHILL', temp: `${Math.floor(Math.random() * 8) + 8}°C`, icon: 'eco' },
+        { condition: 'OVERCAST', temp: `${Math.floor(Math.random() * 6) + 12}°C`, icon: 'cloud' },
+        { condition: 'WINDY', temp: `${Math.floor(Math.random() * 6) + 10}°C`, icon: 'air' }
+      );
+    }
+
+    const pick = conditions[Math.floor(Math.random() * conditions.length)];
+    this.weatherCondition = pick.condition;
+    this.weatherTemp = pick.temp;
+    this.weatherIcon = pick.icon;
+    this.showWeatherStamp = true;
   }
 
   generateCaptions(): void {

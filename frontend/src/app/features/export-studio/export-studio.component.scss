@@ -510,6 +510,64 @@
 }
 
 /* ═══════════════════════════════════════
+   WEATHER STAMP
+   ═══════════════════════════════════════ */
+.weather-stamp {
+  position: absolute;
+  top: 80px;
+  right: 80px;
+  z-index: 9;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 32px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.weather-stamp-icon {
+  font-size: 48px;
+  color: var(--accent-color);
+}
+
+.weather-stamp-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.weather-stamp-condition {
+  font-size: 22px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.05em;
+}
+
+.weather-stamp-temp {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--accent-color);
+  line-height: 1;
+}
+
+.weather-gen-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  background: rgb(var(--primary) / 0.1);
+  border: 1px solid rgb(var(--primary) / 0.2);
+  color: rgb(var(--primary));
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover { background: rgb(var(--primary) / 0.2); }
+}
+
+/* ═══════════════════════════════════════
    WATERMARK
    ═══════════════════════════════════════ */
 .watermark {
