@@ -67,7 +67,7 @@
 
     <!-- Community Goal Banner -->
     @if (communityGoal) {
-      <div class="card mb-4 p-4 border-primary/20" [class.border-green-500/30]="communityGoal.completed">
+      <div class="card mb-4 p-4 border-primary/20" [ngClass]="{'border-green-500/30': communityGoal.completed}">
         <div class="flex items-start justify-between gap-3 mb-3">
           <div>
             <div class="flex items-center gap-2">
