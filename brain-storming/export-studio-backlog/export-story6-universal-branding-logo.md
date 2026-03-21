@@ -8,3 +8,6 @@
 ### Acceptance Criteria:
 - *Given* any of the 4 templates is selected, *then* the "UR Community" brand logo is automatically injected into the layout.
 - *Then* the logo placement follows the specific design constraints of each template (e.g., inside the text card for Template 1, anchored bottom-left for Template 2) without obstructing the user's focus.
+
+### Status: ✅ Done
+**Implemented:** "UR Community" logo (amber icon + text) automatically appears on every template with template-specific positioning: Clear Info (top-left), Large Stat (bottom-left), Aesthetic Text (bottom-right reversed), Typography Poster (top-left). Logo renders at z-index 10 to stay visible.

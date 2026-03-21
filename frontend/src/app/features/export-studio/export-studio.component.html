@@ -37,6 +37,14 @@
           <!-- Default gradient background -->
           <div class="canvas-bg"></div>
 
+          <!-- UR Community Logo (universal branding) -->
+          <div class="ur-brand-logo" [class]="'ur-brand-logo ur-brand-' + selectedTemplate">
+            <div class="ur-brand-icon">
+              <span class="material-icons">directions_run</span>
+            </div>
+            <span class="ur-brand-text">UR Community</span>
+          </div>
+
           <!-- Template: Clear Info -->
           @if (selectedTemplate === 'clear-info') {
             <div class="template-clear-info">

@@ -232,6 +232,61 @@
 }
 
 /* ═══════════════════════════════════════
+   UR BRAND LOGO (universal)
+   ═══════════════════════════════════════ */
+.ur-brand-logo {
+  position: absolute;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ur-brand-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .material-icons {
+    font-size: 28px;
+    color: #000;
+  }
+}
+
+.ur-brand-text {
+  font-size: 26px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.02em;
+}
+
+/* Template-specific logo positions */
+.ur-brand-clear-info {
+  top: 60px;
+  left: 80px;
+}
+
+.ur-brand-large-stat {
+  bottom: 80px;
+  left: 80px;
+}
+
+.ur-brand-aesthetic-text {
+  bottom: 80px;
+  right: 80px;
+  flex-direction: row-reverse;
+}
+
+.ur-brand-typography-poster {
+  top: 80px;
+  left: 80px;
+}
+
+/* ═══════════════════════════════════════
    TEMPLATE STYLES (inside canvas-frame)
    ═══════════════════════════════════════ */
 
