@@ -60,6 +60,12 @@
                 <span class="material-icons text-sm">shield</span>
                 {{ user.role | titlecase }}
               </span>
+              @if ((user.runPoints ?? 0) > 0) {
+                <span class="badge bg-yellow-500/15 border border-yellow-500/30 text-yellow-400">
+                  <span class="material-icons text-sm">stars</span>
+                  {{ user.runPoints | number }} RunPoints
+                </span>
+              }
             </div>
 
             @if (user.bio) {

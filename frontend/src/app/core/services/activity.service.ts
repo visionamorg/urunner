@@ -3,6 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Activity, ActivityStats, CreateActivityRequest } from '../models/activity.model';
 
+export interface Streak {
+  currentStreak: number;
+  longestStreak: number;
+  activeToday: boolean;
+  totalActiveDays: number;
+}
+
 export interface SyncResult {
   imported: number;
   skipped: number;
@@ -27,6 +34,10 @@ export class ActivityService {
 
   getMyStats(): Observable<ActivityStats> {
     return this.http.get<ActivityStats>('/api/activities/stats');
+  }
+
+  getMyStreak(): Observable<Streak> {
+    return this.http.get<Streak>('/api/activities/streak');
   }
 
   syncStrava(): Observable<SyncResult> {

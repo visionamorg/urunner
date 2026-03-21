@@ -50,4 +50,10 @@ public interface ActivityRepository extends JpaRepository<RunningActivity, Long>
            "GROUP BY a.user.id, a.user.username, a.user.firstName, a.user.lastName, a.user.profileImageUrl " +
            "ORDER BY totalDist DESC")
     List<Object[]> findRankingsByUserIds(@Param("userIds") List<Long> userIds);
+
+    @Query("SELECT DISTINCT a.activityDate FROM RunningActivity a WHERE a.user.id = :userId ORDER BY a.activityDate DESC")
+    List<LocalDate> findDistinctActivityDatesByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT COALESCE(SUM(a.distanceKm), 0) FROM RunningActivity a WHERE a.user.id IN :userIds AND a.activityDate >= :from AND a.activityDate <= :to")
+    Double sumDistanceByUserIdsAndDateRange(@Param("userIds") List<Long> userIds, @Param("from") LocalDate from, @Param("to") LocalDate to);
 }

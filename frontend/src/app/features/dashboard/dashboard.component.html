@@ -83,6 +83,48 @@
 
     </div>
 
+    <!-- Streak + RunPoints row -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+      <!-- Run Streak -->
+      <div class="card relative overflow-hidden border-orange-500/20 hover:border-orange-500/40 transition-all">
+        <div class="absolute inset-0 bg-gradient-to-br from-orange-500/8 to-transparent pointer-events-none"></div>
+        <div class="relative flex items-center gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center flex-shrink-0">
+            <span class="material-icons text-orange-400 text-2xl">local_fire_department</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-baseline gap-2">
+              <span class="text-4xl font-black text-foreground">{{ streak?.currentStreak ?? 0 }}</span>
+              <span class="text-muted-foreground text-sm font-medium">day streak</span>
+              @if (streak?.activeToday) {
+                <span class="text-xs bg-orange-500/20 text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded-full font-semibold">🔥 Active</span>
+              }
+            </div>
+            <p class="text-muted-foreground text-xs mt-0.5">Best: <strong class="text-foreground">{{ streak?.longestStreak ?? 0 }} days</strong> · {{ streak?.totalActiveDays ?? 0 }} total active days</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- RunPoints -->
+      <div class="card relative overflow-hidden border-yellow-500/20 hover:border-yellow-500/40 transition-all">
+        <div class="absolute inset-0 bg-gradient-to-br from-yellow-500/8 to-transparent pointer-events-none"></div>
+        <div class="relative flex items-center gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-yellow-500/20 border border-yellow-500/30 flex items-center justify-center flex-shrink-0">
+            <span class="material-icons text-yellow-400 text-2xl">stars</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-baseline gap-2">
+              <span class="text-4xl font-black text-foreground">{{ runPoints | number }}</span>
+              <span class="text-muted-foreground text-sm font-medium">RunPoints</span>
+            </div>
+            <p class="text-muted-foreground text-xs mt-0.5">Earn <strong class="text-yellow-400">10 pts/km</strong> for every run you log</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
     <!-- Row 1: This Week + Today's Schedule -->
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
 

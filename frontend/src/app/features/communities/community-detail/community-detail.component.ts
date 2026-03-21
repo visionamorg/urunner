@@ -7,6 +7,7 @@ import { FeedService } from '../../../core/services/feed.service';
 import { ChatService } from '../../../core/services/chat.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { EventService } from '../../../core/services/event.service';
+import { CommunityGoalService, CommunityGoal, CreateGoalRequest } from '../../../core/services/community-goal.service';
 import { Community, CommunityMember, InviteDto, DriveFolderDto } from '../../../core/models/community.model';
 import { Post, Comment } from '../../../core/models/post.model';
 import { RunEvent, CreateEventRequest, UpdateEventRequest } from '../../../core/models/event.model';
@@ -82,6 +83,12 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
   lightboxTransitioning = false;
   private touchStartX = 0;
 
+  // Community Goal
+  communityGoal: CommunityGoal | null = null;
+  showGoalForm = false;
+  goalForm: CreateGoalRequest = { title: '', targetKm: 500, startDate: '', endDate: '' };
+  savingGoal = false;
+
   // Reactions
   readonly EMOJIS = ['❤️', '👍', '😂', '😮', '😢', '🙌'];
   showReactionPicker: { [postId: number]: boolean } = {};
@@ -113,7 +120,8 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     private feedService: FeedService,
     private chatService: ChatService,
     private authService: AuthService,
-    private eventService: EventService
+    private eventService: EventService,
+    private goalService: CommunityGoalService
   ) {}
 
   ngOnInit(): void {
@@ -141,6 +149,7 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
         this.loadFeed();
         this.loadMembers();
         if (c.isAdmin) this.loadInvites();
+        this.loadGoal();
       },
       error: () => {
         this.loading = false;
@@ -179,6 +188,29 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     this.communityService.getCommunityInvites(this.communityId).subscribe({
       next: (invites) => { this.invites = invites; },
       error: () => {}
+    });
+  }
+
+  loadGoal(): void {
+    this.goalService.getGoal(this.communityId).subscribe({
+      next: (g) => { this.communityGoal = g; },
+      error: () => { this.communityGoal = null; }
+    });
+  }
+
+  saveGoal(): void {
+    if (!this.goalForm.title || !this.goalForm.targetKm) return;
+    this.savingGoal = true;
+    const today = new Date().toISOString().split('T')[0];
+    const end = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const req: CreateGoalRequest = {
+      ...this.goalForm,
+      startDate: this.goalForm.startDate || today,
+      endDate: this.goalForm.endDate || end,
+    };
+    this.goalService.setGoal(this.communityId, req).subscribe({
+      next: (g) => { this.communityGoal = g; this.showGoalForm = false; this.savingGoal = false; },
+      error: () => { this.savingGoal = false; }
     });
   }
 

@@ -97,6 +97,10 @@ public class User implements UserDetails {
     @Column(name = "instagram_handle", length = 100)
     private String instagramHandle;
 
+    @Column(name = "run_points", nullable = false)
+    @Builder.Default
+    private Integer runPoints = 0;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Builder.Default

@@ -29,4 +29,5 @@ public class UserDto {
     private String pbHalfMarathon;
     private String pbMarathon;
     private String instagramHandle;
+    private Integer runPoints;
 }

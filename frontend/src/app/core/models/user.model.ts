@@ -22,6 +22,7 @@ export interface User {
   pbHalfMarathon?: string;
   pbMarathon?: string;
   instagramHandle?: string;
+  runPoints?: number;
 }
 
 export interface AuthResponse {

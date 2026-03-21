@@ -46,7 +46,17 @@ public class ActivityService {
                 .location(request.getLocation())
                 .notes(request.getNotes())
                 .build();
-        return activityMapper.toDto(activityRepository.save(activity));
+        ActivityDto saved = activityMapper.toDto(activityRepository.save(activity));
+
+        // Award RunPoints: 10 pts/km — anti-cheat: skip if pace < 1.5 min/km (superhuman)
+        if (request.getDistanceKm() > 0 && request.getDurationMinutes() > 0) {
+            double pace = request.getDurationMinutes() / request.getDistanceKm();
+            if (pace >= 1.5) {
+                int points = (int) (request.getDistanceKm() * 10);
+                userService.awardRunPoints(user, points);
+            }
+        }
+        return saved;
     }
 
     public ActivityStatsDto getUserStats(String email) {

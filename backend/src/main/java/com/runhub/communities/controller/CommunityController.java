@@ -3,6 +3,7 @@ package com.runhub.communities.controller;
 import com.runhub.communities.dto.*;
 import com.runhub.communities.dto.DriveFolderDto;
 import com.runhub.communities.service.CommunityService;
+import com.runhub.communities.service.CommunityGoalService;
 import com.runhub.events.dto.CreateEventRequest;
 import com.runhub.events.dto.EventDto;
 import com.runhub.events.dto.UpdateEventRequest;
@@ -28,6 +29,7 @@ public class CommunityController {
     private final CommunityService communityService;
     private final FeedService feedService;
     private final EventService eventService;
+    private final CommunityGoalService goalService;
 
     // ── Community CRUD ────────────────────────────────────────────────────────
 
@@ -195,6 +197,22 @@ public class CommunityController {
                                                       @AuthenticationPrincipal User user) {
         eventService.cancelCommunityEvent(id, eid, user.getEmail());
         return ResponseEntity.ok().build();
+    }
+
+    // ── Community Goal ────────────────────────────────────────────────────────
+
+    @GetMapping("/{id}/goal")
+    public ResponseEntity<?> getGoal(@PathVariable Long id) {
+        return goalService.getCurrentGoal(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
+    }
+
+    @PostMapping("/{id}/goal")
+    public ResponseEntity<CommunityGoalDto> setGoal(@PathVariable Long id,
+                                                     @RequestBody CreateGoalRequest req,
+                                                     @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(goalService.createGoal(id, req, user));
     }
 
     // ── My Invites (user-facing) ──────────────────────────────────────────────

@@ -56,4 +56,10 @@ public class UserService {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
     }
+
+    @Transactional
+    public void awardRunPoints(User user, int points) {
+        user.setRunPoints((user.getRunPoints() == null ? 0 : user.getRunPoints()) + points);
+        userRepository.save(user);
+    }
 }

@@ -1,10 +1,11 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { ActivityService } from '../../core/services/activity.service';
+import { ActivityService, Streak } from '../../core/services/activity.service';
 import { EventService } from '../../core/services/event.service';
 import { RankingService } from '../../core/services/ranking.service';
 import { ProgramService } from '../../core/services/program.service';
+import { UserService } from '../../core/services/user.service';
 import { Activity, ActivityStats } from '../../core/models/activity.model';
 import { RunEvent } from '../../core/models/event.model';
 import { Ranking } from '../../core/models/ranking.model';
@@ -36,6 +37,8 @@ export class DashboardComponent implements OnInit {
   programProgress: any[] = [];
   todayActivities: Activity[] = [];
   todaySchedule: ScheduleItem[] = [];
+  streak: Streak | null = null;
+  runPoints = 0;
   loading = false;
   currentUser = this.authService.getCurrentUser();
 
@@ -52,12 +55,23 @@ export class DashboardComponent implements OnInit {
     private eventService: EventService,
     private rankingService: RankingService,
     private programService: ProgramService,
+    private userService: UserService,
     private authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    this.activityService.getMyStreak().subscribe({
+      next: s => { this.streak = s; this.cdr.detectChanges(); },
+      error: () => {}
+    });
+
+    this.userService.getMe().subscribe({
+      next: u => { this.runPoints = u.runPoints ?? 0; this.cdr.detectChanges(); },
+      error: () => {}
+    });
+
     this.activityService.getMyStats().subscribe({
       next: s => { this.stats = s; this.cdr.detectChanges(); },
       error: () => {}
