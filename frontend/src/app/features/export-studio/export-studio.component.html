@@ -165,26 +165,38 @@
         <div class="canvas-frame" #canvasContainer
           [style.--accent-color]="accentColor"
           [style.--accent-rgb]="accentColorRgb"
-          [style.--secondary-accent]="secondaryAccent">
+          [style.--secondary-accent]="secondaryAccent"
+          [style.width.px]="canvasWidth"
+          [style.height.px]="canvasHeight"
+          [class.format-square]="cardFormat === '1:1'"
+          [class.format-landscape]="cardFormat === '16:9'">
 
           <!-- Default gradient background -->
-          <div class="canvas-bg"></div>
+          @if (selectedGradient) {
+            <div class="canvas-bg" [style.background]="getGradientCss(selectedGradient)"></div>
+          } @else if (selectedPattern) {
+            <div class="canvas-bg canvas-pattern" [attr.data-pattern]="selectedPattern"></div>
+          } @else {
+            <div class="canvas-bg"></div>
+          }
 
           <!-- User-uploaded background photo(s) -->
           @if (backgroundImages.length === 1) {
             <div class="canvas-photo-bg"
               [style.background-image]="'url(' + backgroundImages[0] + ')'"
               [style.opacity]="backgroundOpacity / 100"
-              [style.filter]="selectedTemplate === 'newspaper' ? 'grayscale(100%) contrast(120%)' : 'blur(' + backgroundBlur + 'px)'">
+              [style.filter]="backgroundFilter">
             </div>
+            <div class="canvas-vignette"></div>
           } @else if (backgroundImages.length > 1) {
             <div class="canvas-collage" [class]="'canvas-collage collage-' + collageLayout"
               [style.opacity]="backgroundOpacity / 100"
-              [style.filter]="'blur(' + backgroundBlur + 'px)'">
+              [style.filter]="backgroundFilter">
               @for (img of backgroundImages; track img; let i = $index) {
                 <div class="collage-panel" [style.background-image]="'url(' + img + ')'"></div>
               }
             </div>
+            <div class="canvas-vignette"></div>
           }
 
           <!-- URC Branding Stamp -->
@@ -601,6 +613,316 @@
             </div>
           }
 
+          <!-- Template: Graffiti -->
+          @if (selectedTemplate === 'graffiti') {
+            <div class="template-graffiti">
+              <div class="graffiti-drips"></div>
+              <div class="graffiti-content">
+                <div class="graffiti-tag">{{ selectedActivity.username?.toUpperCase() }}</div>
+                @if (showDistance) {
+                  <div class="graffiti-distance">
+                    <span class="graffiti-num">{{ selectedActivity.distanceKm.toFixed(1) }}</span>
+                    <span class="graffiti-unit">KM</span>
+                  </div>
+                }
+                <div class="graffiti-stats">
+                  @if (showPace) {
+                    <span class="graffiti-stat">{{ formatPace(selectedActivity.paceMinPerKm) }}/km</span>
+                  }
+                  @if (showDuration) {
+                    <span class="graffiti-stat">{{ formatDuration(selectedActivity.durationMinutes) }}</span>
+                  }
+                </div>
+                @if (showLocation && selectedActivity.location) {
+                  <div class="graffiti-location">
+                    <span class="material-icons">location_on</span>
+                    {{ selectedActivity.location }}
+                  </div>
+                }
+                <div class="graffiti-date">{{ formatShortDate(selectedActivity.activityDate) }}</div>
+              </div>
+            </div>
+          }
+
+          <!-- Template: Brutalist -->
+          @if (selectedTemplate === 'brutalist') {
+            <div class="template-brutalist">
+              <div class="brutalist-border"></div>
+              <div class="brutalist-content">
+                <div class="brutalist-headline">
+                  @if (showDistance) {
+                    <span class="brutalist-distance">{{ selectedActivity.distanceKm.toFixed(1) }}</span>
+                  }
+                  <span class="brutalist-km">KM</span>
+                </div>
+                <div class="brutalist-divider"></div>
+                <div class="brutalist-meta">
+                  @if (showPace) {
+                    <div class="brutalist-row">
+                      <span class="brutalist-label">PACE</span>
+                      <span class="brutalist-value">{{ formatPace(selectedActivity.paceMinPerKm) }}/KM</span>
+                    </div>
+                  }
+                  @if (showDuration) {
+                    <div class="brutalist-row">
+                      <span class="brutalist-label">TIME</span>
+                      <span class="brutalist-value">{{ formatDuration(selectedActivity.durationMinutes) }}</span>
+                    </div>
+                  }
+                  @if (showLocation && selectedActivity.location) {
+                    <div class="brutalist-row">
+                      <span class="brutalist-label">ZONE</span>
+                      <span class="brutalist-value">{{ selectedActivity.location?.toUpperCase() }}</span>
+                    </div>
+                  }
+                </div>
+                <div class="brutalist-footer">
+                  <span>{{ selectedActivity.username?.toUpperCase() }}</span>
+                  <span>{{ formatShortDate(selectedActivity.activityDate) }}</span>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Template: VHS Tape -->
+          @if (selectedTemplate === 'vhs-tape') {
+            <div class="template-vhs">
+              <div class="vhs-scanlines"></div>
+              <div class="vhs-tracking"></div>
+              <div class="vhs-content">
+                <div class="vhs-rec">
+                  <span class="vhs-rec-dot"></span> REC
+                </div>
+                <div class="vhs-timestamp">{{ formatDate(selectedActivity.activityDate) }}</div>
+                <div class="vhs-center">
+                  @if (showDistance) {
+                    <div class="vhs-distance">{{ selectedActivity.distanceKm.toFixed(2) }} KM</div>
+                  }
+                  @if (showPace) {
+                    <div class="vhs-pace">{{ formatPace(selectedActivity.paceMinPerKm) }} /KM</div>
+                  }
+                </div>
+                <div class="vhs-bottom">
+                  <div class="vhs-label">{{ selectedActivity.title || 'MORNING RUN' }}</div>
+                  @if (showDuration) {
+                    <div class="vhs-timer">{{ formatDuration(selectedActivity.durationMinutes) }}</div>
+                  }
+                  <div class="vhs-user">{{ selectedActivity.username }}</div>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Template: Race Bib -->
+          @if (selectedTemplate === 'race-bib') {
+            <div class="template-race-bib">
+              <div class="bib-card">
+                <div class="bib-header">
+                  <div class="bib-event-name">{{ selectedActivity.title || 'CITY MARATHON' }}</div>
+                  <div class="bib-event-date">{{ formatDate(selectedActivity.activityDate) }}</div>
+                </div>
+                <div class="bib-number">{{ getRaceBibNumber() }}</div>
+                <div class="bib-runner-name">{{ selectedActivity.username?.toUpperCase() }}</div>
+                <div class="bib-stats">
+                  @if (showDistance) {
+                    <div class="bib-stat">
+                      <span class="bib-stat-value">{{ selectedActivity.distanceKm.toFixed(2) }}</span>
+                      <span class="bib-stat-label">KM</span>
+                    </div>
+                  }
+                  @if (showPace) {
+                    <div class="bib-stat">
+                      <span class="bib-stat-value">{{ formatPace(selectedActivity.paceMinPerKm) }}</span>
+                      <span class="bib-stat-label">PACE</span>
+                    </div>
+                  }
+                  @if (showDuration) {
+                    <div class="bib-stat">
+                      <span class="bib-stat-value">{{ formatDuration(selectedActivity.durationMinutes) }}</span>
+                      <span class="bib-stat-label">TIME</span>
+                    </div>
+                  }
+                </div>
+                @if (showLocation && selectedActivity.location) {
+                  <div class="bib-location">{{ selectedActivity.location }}</div>
+                }
+                <div class="bib-barcode">
+                  <div class="bib-barcode-bars"></div>
+                  <span class="bib-barcode-num">{{ getVerificationCode() }}</span>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Template: Podium -->
+          @if (selectedTemplate === 'podium') {
+            <div class="template-podium">
+              <div class="podium-medal">
+                <span class="material-icons podium-medal-icon">emoji_events</span>
+              </div>
+              <div class="podium-headline">FINISHER</div>
+              <div class="podium-runner">{{ selectedActivity.username }}</div>
+              @if (showDistance) {
+                <div class="podium-distance">
+                  <span class="podium-num">{{ selectedActivity.distanceKm.toFixed(2) }}</span>
+                  <span class="podium-unit">KM</span>
+                </div>
+              }
+              <div class="podium-stats-row">
+                @if (showPace) {
+                  <div class="podium-stat">
+                    <span class="podium-stat-value">{{ formatPace(selectedActivity.paceMinPerKm) }}</span>
+                    <span class="podium-stat-label">PACE</span>
+                  </div>
+                }
+                @if (showDuration) {
+                  <div class="podium-stat">
+                    <span class="podium-stat-value">{{ formatDuration(selectedActivity.durationMinutes) }}</span>
+                    <span class="podium-stat-label">TIME</span>
+                  </div>
+                }
+              </div>
+              <div class="podium-event">{{ selectedActivity.title || 'Race Day' }}</div>
+              <div class="podium-date">{{ formatDate(selectedActivity.activityDate) }}</div>
+            </div>
+          }
+
+          <!-- Template: Polaroid -->
+          @if (selectedTemplate === 'polaroid') {
+            <div class="template-polaroid">
+              <div class="polaroid-frame">
+                <div class="polaroid-photo">
+                  @if (backgroundImages.length > 0) {
+                    <div class="polaroid-photo-bg" [style.background-image]="'url(' + backgroundImages[0] + ')'"></div>
+                  } @else {
+                    <div class="polaroid-photo-placeholder">
+                      <span class="material-icons">photo_camera</span>
+                    </div>
+                  }
+                </div>
+                <div class="polaroid-caption">
+                  <p class="polaroid-title">{{ customHeadline || selectedActivity.title || 'My Run' }}</p>
+                  <div class="polaroid-stats">
+                    @if (showDistance) {
+                      <span>{{ selectedActivity.distanceKm.toFixed(1) }} km</span>
+                    }
+                    @if (showPace) {
+                      <span>{{ formatPace(selectedActivity.paceMinPerKm) }}/km</span>
+                    }
+                    @if (showDuration) {
+                      <span>{{ formatDuration(selectedActivity.durationMinutes) }}</span>
+                    }
+                  </div>
+                  <p class="polaroid-date">{{ formatShortDate(selectedActivity.activityDate) }}</p>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Template: Minimalist Peak -->
+          @if (selectedTemplate === 'minimalist-peak') {
+            <div class="template-minimalist-peak" [class.light-mode]="templateColorMode === 'light'">
+              <div class="mp-giant-distance">{{ selectedActivity.distanceKm.toFixed(1) }}</div>
+              <div class="mp-unit">KM</div>
+              <div class="mp-footer" [class.glass]="useGlassmorphism">
+                @if (showPace) {
+                  <div class="mp-footer-stat">
+                    <span class="mp-footer-value">{{ formatPace(selectedActivity.paceMinPerKm) }}</span>
+                    <span class="mp-footer-label">PACE</span>
+                  </div>
+                }
+                @if (showDuration) {
+                  <div class="mp-footer-stat">
+                    <span class="mp-footer-value">{{ formatDuration(selectedActivity.durationMinutes) }}</span>
+                    <span class="mp-footer-label">TIME</span>
+                  </div>
+                }
+                <div class="mp-footer-stat">
+                  <span class="mp-footer-value">{{ selectedActivity.username }}</span>
+                  <span class="mp-footer-label">{{ formatShortDate(selectedActivity.activityDate) }}</span>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Template: Split-Screen Pro -->
+          @if (selectedTemplate === 'split-screen-pro') {
+            <div class="template-split-screen" [class.light-mode]="templateColorMode === 'light'">
+              <div class="ss-left">
+                @if (backgroundImages.length > 0) {
+                  <div class="ss-photo" [style.background-image]="'url(' + backgroundImages[0] + ')'"></div>
+                } @else {
+                  <div class="ss-photo-placeholder">
+                    <span class="material-icons">person</span>
+                    <span>Upload Photo</span>
+                  </div>
+                }
+              </div>
+              <div class="ss-right" [class.glass]="useGlassmorphism">
+                <div class="ss-header">
+                  <span class="ss-club" [style.color]="accentColor">URC</span>
+                  <span class="ss-date">{{ formatShortDate(selectedActivity.activityDate) }}</span>
+                </div>
+                @if (showDistance) {
+                  <div class="ss-data-row">
+                    <span class="ss-data-label">DISTANCE</span>
+                    <span class="ss-data-value">{{ selectedActivity.distanceKm.toFixed(2) }} km</span>
+                  </div>
+                }
+                @if (showPace) {
+                  <div class="ss-data-row">
+                    <span class="ss-data-label">AVG PACE</span>
+                    <span class="ss-data-value">{{ formatPace(selectedActivity.paceMinPerKm) }} /km</span>
+                  </div>
+                }
+                @if (showDuration) {
+                  <div class="ss-data-row">
+                    <span class="ss-data-label">DURATION</span>
+                    <span class="ss-data-value">{{ formatDuration(selectedActivity.durationMinutes) }}</span>
+                  </div>
+                }
+                @if (showLocation && selectedActivity.location) {
+                  <div class="ss-data-row">
+                    <span class="ss-data-label">ROUTE</span>
+                    <span class="ss-data-value">{{ selectedActivity.location }}</span>
+                  </div>
+                }
+                <div class="ss-runner">{{ selectedActivity.username }}</div>
+              </div>
+            </div>
+          }
+
+          <!-- Template: Magazine Cover -->
+          @if (selectedTemplate === 'magazine-cover') {
+            <div class="template-magazine-cover" [class.light-mode]="templateColorMode === 'light'">
+              <div class="mc-masthead" [style.color]="accentColor">
+                {{ aestheticTitle || (selectedActivity.title || 'RUN DAY').toUpperCase() }}
+              </div>
+              <div class="mc-tagline">{{ formatDate(selectedActivity.activityDate) }}</div>
+              <div class="mc-headlines">
+                @if (showDistance) {
+                  <div class="mc-headline-item">
+                    <span class="mc-headline-value">{{ selectedActivity.distanceKm.toFixed(1) }}</span>
+                    <span class="mc-headline-unit">KM</span>
+                  </div>
+                }
+                @if (showPace) {
+                  <div class="mc-headline-item">
+                    <span class="mc-headline-value">{{ formatPace(selectedActivity.paceMinPerKm) }}</span>
+                    <span class="mc-headline-unit">/KM</span>
+                  </div>
+                }
+              </div>
+              @if (showDuration) {
+                <div class="mc-duration">{{ formatDuration(selectedActivity.durationMinutes) }}</div>
+              }
+              <div class="mc-bottom">
+                <span class="mc-runner">{{ selectedActivity.username }}</span>
+                <span class="mc-brand">URC</span>
+              </div>
+            </div>
+          }
+
           <!-- Weather Stamp -->
           @if (showWeatherStamp && weatherCondition) {
             <div class="weather-stamp">
@@ -623,310 +945,546 @@
         </div>
       </div>
 
-      <!-- Controls Panel -->
+      <!-- Controls Panel — Tabbed Sidebar -->
       <div class="controls-panel">
 
-        <!-- Activity Selector -->
-        <div class="control-section">
-          <h3 class="control-label">Activity</h3>
-          <button (click)="showActivityPicker = !showActivityPicker" class="activity-selector-btn">
-            <div class="flex items-center gap-3">
-              <span class="material-icons text-primary">directions_run</span>
-              <div class="text-left">
-                <p class="text-foreground text-sm font-semibold truncate">{{ selectedActivity.title }}</p>
-                <p class="text-muted-foreground text-xs">{{ selectedActivity.distanceKm.toFixed(2) }} km · {{ formatShortDate(selectedActivity.activityDate) }}</p>
-              </div>
-            </div>
-            <span class="material-icons text-muted-foreground">{{ showActivityPicker ? 'expand_less' : 'expand_more' }}</span>
+        <!-- Sidebar Tab Bar (always visible) -->
+        <div class="sidebar-tabs">
+          <button class="sidebar-tab" [class.active]="sidebarTab === 'activity'" (click)="switchSidebarTab('activity')">
+            <span class="material-icons">directions_run</span>
+            <span>Activity</span>
           </button>
-
-          @if (showActivityPicker) {
-            <div class="activity-picker">
-              @for (activity of activities; track activity.id) {
-                <button
-                  (click)="selectActivity(activity)"
-                  class="activity-pick-item"
-                  [class.active]="activity.id === selectedActivity.id">
-                  <p class="text-sm font-medium truncate">{{ activity.title }}</p>
-                  <p class="text-xs text-muted-foreground">{{ activity.distanceKm.toFixed(2) }} km · {{ formatShortDate(activity.activityDate) }}</p>
-                </button>
-              }
-            </div>
-          }
+          <button class="sidebar-tab" [class.active]="sidebarTab === 'layout'" (click)="switchSidebarTab('layout')">
+            <span class="material-icons">dashboard</span>
+            <span>Layout</span>
+          </button>
+          <button class="sidebar-tab" [class.active]="sidebarTab === 'design'" (click)="switchSidebarTab('design')">
+            <span class="material-icons">palette</span>
+            <span>Design</span>
+          </button>
+          <button class="sidebar-tab" [class.active]="sidebarTab === 'branding'" (click)="switchSidebarTab('branding')">
+            <span class="material-icons">verified</span>
+            <span>Branding</span>
+          </button>
         </div>
 
-        <!-- Aesthetic Title Editor -->
-        @if (selectedTemplate === 'aesthetic-text') {
-          <div class="control-section">
-            <h3 class="control-label">Title Text</h3>
-            <input
-              type="text"
-              [(ngModel)]="aestheticTitle"
-              class="input-field"
-              placeholder="MORNING RUN"
-              (input)="aestheticTitle = aestheticTitle.toUpperCase()">
-          </div>
-        }
+        <!-- Tab Content -->
+        <div class="sidebar-tab-content">
 
-        <!-- Cloud Text Controls (Story 37) -->
-        @if (selectedTemplate === 'cloud-text') {
-          <div class="control-section">
-            <h3 class="control-label">Cloud Text</h3>
-
-            <!-- Text input -->
-            <div class="ct-input-wrap">
-              <input
-                type="text"
-                [(ngModel)]="cloudText"
-                class="input-field ct-input"
-                placeholder="URC"
-                maxlength="10"
-                (input)="cloudText = cloudText.toUpperCase()">
-              <span class="ct-char-count">{{ cloudText.length }}/10</span>
+          <!-- ═══ ACTIVITY TAB ═══ -->
+          @if (sidebarTab === 'activity') {
+            <div class="control-section">
+              <h3 class="control-label">Activity</h3>
+              <button (click)="showActivityPicker = !showActivityPicker" class="activity-selector-btn">
+                <div class="flex items-center gap-3">
+                  <span class="material-icons text-primary">directions_run</span>
+                  <div class="text-left">
+                    <p class="text-foreground text-sm font-semibold truncate">{{ selectedActivity.title }}</p>
+                    <p class="text-muted-foreground text-xs">{{ selectedActivity.distanceKm.toFixed(2) }} km · {{ formatShortDate(selectedActivity.activityDate) }}</p>
+                  </div>
+                </div>
+                <span class="material-icons text-muted-foreground">{{ showActivityPicker ? 'expand_less' : 'expand_more' }}</span>
+              </button>
+              @if (showActivityPicker) {
+                <div class="activity-picker">
+                  @for (activity of activities; track activity.id) {
+                    <button
+                      (click)="selectActivity(activity)"
+                      class="activity-pick-item"
+                      [class.active]="activity.id === selectedActivity.id">
+                      <p class="text-sm font-medium truncate">{{ activity.title }}</p>
+                      <p class="text-xs text-muted-foreground">{{ activity.distanceKm.toFixed(2) }} km · {{ formatShortDate(activity.activityDate) }}</p>
+                    </button>
+                  }
+                </div>
+              }
             </div>
 
-            <!-- Texture style -->
-            <div class="ct-texture-row">
-              <button class="ct-texture-btn" [class.active]="cloudTexture === 'cloud'" (click)="cloudTexture = 'cloud'">
-                <span class="material-icons text-lg">cloud</span>
-                <span>Cloud</span>
-              </button>
-              <button class="ct-texture-btn" [class.active]="cloudTexture === '3d'" (click)="cloudTexture = '3d'">
-                <span class="material-icons text-lg">view_in_ar</span>
-                <span>3D Block</span>
-              </button>
-              <button class="ct-texture-btn" [class.active]="cloudTexture === 'neon'" (click)="cloudTexture = 'neon'">
-                <span class="material-icons text-lg">bolt</span>
-                <span>Neon</span>
-              </button>
-            </div>
-
-            <!-- Color -->
-            <div class="slider-group">
-              <div class="slider-header">
-                <span class="slider-label">Color</span>
-                <span class="slider-value" [style.color]="cloudTextColor">{{ cloudTextColor }}</span>
-              </div>
-              <div class="brand-color-row">
-                @for (c of ['#ffffff','#f59e0b','#ff0080','#00ffcc','#3b82f6','#ef4444','#a855f7','#000000']; track c) {
-                  <button class="brand-color-swatch"
-                    [style.background]="c"
-                    [class.active]="cloudTextColor === c"
-                    (click)="cloudTextColor = c"
-                    [style.border-color]="c === '#000000' ? '#555' : 'transparent'"></button>
-                }
-                <label class="brand-color-custom" title="Custom color">
-                  <span class="material-icons text-sm">colorize</span>
-                  <input type="color" [(ngModel)]="cloudTextColor" class="sr-only" />
+            <div class="control-section">
+              <h3 class="control-label">Data Visibility</h3>
+              <div class="toggle-list">
+                <label class="toggle-item">
+                  <span class="toggle-label">Distance</span>
+                  <input type="checkbox" [(ngModel)]="showDistance" class="toggle-switch">
                 </label>
+                <label class="toggle-item">
+                  <span class="toggle-label">Pace</span>
+                  <input type="checkbox" [(ngModel)]="showPace" class="toggle-switch">
+                </label>
+                <label class="toggle-item">
+                  <span class="toggle-label">Duration</span>
+                  <input type="checkbox" [(ngModel)]="showDuration" class="toggle-switch">
+                </label>
+                <label class="toggle-item">
+                  <span class="toggle-label">Location</span>
+                  <input type="checkbox" [(ngModel)]="showLocation" class="toggle-switch">
+                </label>
+                <label class="toggle-item">
+                  <span class="toggle-label">Calories</span>
+                  <input type="checkbox" [(ngModel)]="showCalories" class="toggle-switch">
+                </label>
+                <label class="toggle-item">
+                  <span class="toggle-label">Heart Rate</span>
+                  <input type="checkbox" [(ngModel)]="showHeartRate" class="toggle-switch">
+                </label>
+                <label class="toggle-item">
+                  <span class="toggle-label">Elevation Gain</span>
+                  <input type="checkbox" [(ngModel)]="showElevation" class="toggle-switch">
+                </label>
+                <label class="toggle-item">
+                  <span class="toggle-label">Activity Name</span>
+                  <input type="checkbox" [(ngModel)]="showActivityName" class="toggle-switch">
+                </label>
+                <label class="toggle-item">
+                  <span class="toggle-label">Date & Time</span>
+                  <input type="checkbox" [(ngModel)]="showDateTime" class="toggle-switch">
+                </label>
+                <label class="toggle-item">
+                  <span class="toggle-label">Club Name</span>
+                  <input type="checkbox" [(ngModel)]="showClubName" class="toggle-switch">
+                </label>
+                <label class="toggle-item">
+                  <span class="toggle-label">Runner Name</span>
+                  <input type="checkbox" [(ngModel)]="showRunnerName" class="toggle-switch">
+                </label>
+                <label class="toggle-item">
+                  <span class="toggle-label">Verification Watermark</span>
+                  <input type="checkbox" [(ngModel)]="showWatermark" class="toggle-switch">
+                </label>
+                <div class="toggle-item">
+                  <span class="toggle-label">Weather Stamp</span>
+                  <button (click)="generateWeatherStamp()" class="weather-gen-btn">
+                    <span class="material-icons text-sm">{{ showWeatherStamp ? 'refresh' : 'wb_sunny' }}</span>
+                  </button>
+                </div>
               </div>
-            </div>
-
-            <!-- Font size -->
-            <div class="slider-group">
-              <div class="slider-header">
-                <span class="slider-label">Size</span>
-                <span class="slider-value">{{ cloudFontSize }}px</span>
-              </div>
-              <input type="range" min="80" max="300" [(ngModel)]="cloudFontSize" class="range-slider">
-            </div>
-          </div>
-        }
-
-        <!-- Template Carousel -->
-        <div class="control-section">
-          <h3 class="control-label">Template</h3>
-          <div class="template-carousel">
-            @for (tmpl of templates; track tmpl.id) {
-              <button
-                (click)="selectTemplate(tmpl.id)"
-                class="template-thumb"
-                [class.active]="selectedTemplate === tmpl.id">
-                <span class="material-icons text-2xl">{{ tmpl.icon }}</span>
-                <span class="template-thumb-name">{{ tmpl.name }}</span>
-              </button>
-            }
-          </div>
-          <div class="publish-action-row">
-            <button (click)="switchTab('explore')" class="marketplace-btn">
-              <span class="material-icons text-sm">explore</span>
-              <span>Explore Community</span>
-            </button>
-            <button (click)="openPublishModal()" class="publish-btn">
-              <span class="material-icons text-sm">publish</span>
-              <span>Publish to Community</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- URC Branding -->
-        <div class="control-section">
-          <h3 class="control-label">URC Branding</h3>
-
-          <!-- Color -->
-          <div class="slider-group">
-            <div class="slider-header">
-              <span class="slider-label">Color</span>
-              <span class="slider-value" [style.color]="brandColor">{{ brandColor }}</span>
-            </div>
-            <div class="brand-color-row">
-              @for (c of brandPresetColors; track c) {
-                <button class="brand-color-swatch"
-                  [style.background]="c"
-                  [class.active]="brandColor === c"
-                  (click)="brandColor = c"></button>
-              }
-              <label class="brand-color-custom" title="Custom color">
-                <span class="material-icons text-sm">colorize</span>
-                <input type="color" [(ngModel)]="brandColor" class="sr-only" />
-              </label>
-            </div>
-          </div>
-
-          <!-- Size -->
-          <div class="slider-group">
-            <div class="slider-header">
-              <span class="slider-label">Size</span>
-              <span class="slider-value">{{ brandSize }}%</span>
-            </div>
-            <input type="range" min="60" max="180" [(ngModel)]="brandSize" class="range-slider" />
-          </div>
-
-          <!-- Position Grid -->
-          <div class="slider-group">
-            <div class="slider-header"><span class="slider-label">Position</span></div>
-            <div class="brand-pos-grid">
-              @for (pos of brandPositions; track pos.id) {
-                <button class="brand-pos-btn"
-                  [class.active]="brandPosition === pos.id"
-                  (click)="brandPosition = pos.id"
-                  [title]="pos.label">
-                  <span class="material-icons text-sm">{{ pos.icon }}</span>
-                </button>
-              }
-            </div>
-          </div>
-        </div>
-
-        <!-- Background Photo -->
-        <div class="control-section">
-          <h3 class="control-label">Background</h3>
-          @if (backgroundImages.length === 0) {
-            <label class="bg-upload-btn">
-              <span class="material-icons">add_photo_alternate</span>
-              <span>Upload Photos (up to 3)</span>
-              <input type="file" accept="image/*" multiple (change)="onBackgroundUpload($event)" class="hidden">
-            </label>
-          } @else {
-            <div class="bg-preview-grid">
-              @for (img of backgroundImages; track img) {
-                <div class="bg-preview-thumb" [style.background-image]="'url(' + img + ')'"></div>
-              }
-              <button (click)="removeBackground()" class="bg-remove-all">
-                <span class="material-icons text-sm">close</span>
-                <span>Clear</span>
-              </button>
-            </div>
-            @if (backgroundImages.length > 1) {
-              <div class="collage-layout-picker">
-                <button (click)="collageLayout = 'vertical-thirds'" class="collage-opt" [class.active]="collageLayout === 'vertical-thirds'">
-                  <span class="material-icons text-sm">view_column</span> Thirds
-                </button>
-                <button (click)="collageLayout = 'diagonal'" class="collage-opt" [class.active]="collageLayout === 'diagonal'">
-                  <span class="material-icons text-sm">view_quilt</span> Diagonal
-                </button>
-              </div>
-            }
-            <div class="slider-group">
-              <div class="slider-header">
-                <span class="slider-label">Opacity</span>
-                <span class="slider-value">{{ backgroundOpacity }}%</span>
-              </div>
-              <input type="range" min="10" max="100" [(ngModel)]="backgroundOpacity" class="range-slider">
-            </div>
-            <div class="slider-group">
-              <div class="slider-header">
-                <span class="slider-label">Blur</span>
-                <span class="slider-value">{{ backgroundBlur }}px</span>
-              </div>
-              <input type="range" min="0" max="20" [(ngModel)]="backgroundBlur" class="range-slider">
             </div>
           }
-        </div>
 
-        <!-- Color Palette -->
-        @if (backgroundImageUrl) {
-          <div class="control-section">
-            <h3 class="control-label">Color Palette</h3>
-            <label class="toggle-item">
-              <span class="toggle-label">Auto-extract colors</span>
-              <input type="checkbox" [(ngModel)]="useAutoColors" class="toggle-switch">
-            </label>
-            <div class="color-preview">
-              <div class="color-swatch" [style.background]="accentColor" title="Primary accent"></div>
-              <div class="color-swatch" [style.background]="secondaryAccent" title="Secondary accent"></div>
-            </div>
-          </div>
-        }
-
-        <!-- Data Toggles -->
-        <div class="control-section">
-          <h3 class="control-label">Data Visibility</h3>
-          <div class="toggle-list">
-            <label class="toggle-item">
-              <span class="toggle-label">Distance</span>
-              <input type="checkbox" [(ngModel)]="showDistance" class="toggle-switch">
-            </label>
-            <label class="toggle-item">
-              <span class="toggle-label">Pace</span>
-              <input type="checkbox" [(ngModel)]="showPace" class="toggle-switch">
-            </label>
-            <label class="toggle-item">
-              <span class="toggle-label">Duration</span>
-              <input type="checkbox" [(ngModel)]="showDuration" class="toggle-switch">
-            </label>
-            <label class="toggle-item">
-              <span class="toggle-label">Location</span>
-              <input type="checkbox" [(ngModel)]="showLocation" class="toggle-switch">
-            </label>
-            <label class="toggle-item">
-              <span class="toggle-label">Verification Watermark</span>
-              <input type="checkbox" [(ngModel)]="showWatermark" class="toggle-switch">
-            </label>
-            <div class="toggle-item">
-              <span class="toggle-label">Weather Stamp</span>
-              <button (click)="generateWeatherStamp()" class="weather-gen-btn">
-                <span class="material-icons text-sm">{{ showWeatherStamp ? 'refresh' : 'wb_sunny' }}</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- AI Captions -->
-        <div class="control-section">
-          <h3 class="control-label">Social Caption</h3>
-          <button (click)="generateCaptions()" class="caption-generate-btn">
-            <span class="material-icons">auto_awesome</span>
-            <span>{{ showCaptions ? 'Regenerate' : 'Generate Captions' }}</span>
-          </button>
-          @if (showCaptions) {
-            <div class="caption-list">
-              @for (c of captions; track c.style) {
-                <div class="caption-card">
-                  <div class="caption-style">{{ c.style }}</div>
-                  <p class="caption-text">{{ c.text }}</p>
-                  <button (click)="copyCaption(c.text)" class="caption-copy-btn">
-                    <span class="material-icons text-sm">content_copy</span> Copy
+          <!-- ═══ LAYOUT TAB ═══ -->
+          @if (sidebarTab === 'layout') {
+            <!-- Template Grid with Categories -->
+            <div class="control-section">
+              <h3 class="control-label">Template</h3>
+              <div class="template-category-tabs">
+                <button class="cat-tab" [class.active]="templateCategory === 'all'" (click)="templateCategory = 'all'">All</button>
+                <button class="cat-tab" [class.active]="templateCategory === 'street'" (click)="templateCategory = 'street'">Street</button>
+                <button class="cat-tab" [class.active]="templateCategory === 'elite'" (click)="templateCategory = 'elite'">Elite</button>
+                <button class="cat-tab" [class.active]="templateCategory === 'minimal'" (click)="templateCategory = 'minimal'">Minimal</button>
+                <button class="cat-tab" [class.active]="templateCategory === 'editorial'" (click)="templateCategory = 'editorial'">Editorial</button>
+                <button class="cat-tab" [class.active]="templateCategory === 'concept'" (click)="templateCategory = 'concept'">Concept</button>
+              </div>
+              <div class="template-carousel">
+                @for (tmpl of filteredTemplates; track tmpl.id) {
+                  <button
+                    (click)="selectTemplate(tmpl.id)"
+                    class="template-thumb"
+                    [class.active]="selectedTemplate === tmpl.id">
+                    <span class="material-icons text-2xl">{{ tmpl.icon }}</span>
+                    <span class="template-thumb-name">{{ tmpl.name }}</span>
                   </button>
+                }
+              </div>
+              <div class="publish-action-row">
+                <button (click)="switchTab('explore')" class="marketplace-btn">
+                  <span class="material-icons text-sm">explore</span>
+                  <span>Explore Community</span>
+                </button>
+                <button (click)="openPublishModal()" class="publish-btn">
+                  <span class="material-icons text-sm">publish</span>
+                  <span>Publish to Community</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Card Format -->
+            <div class="control-section">
+              <h3 class="control-label">Format</h3>
+              <div class="format-row">
+                @for (fmt of formatOptions; track fmt.id) {
+                  <button class="format-btn" [class.active]="cardFormat === fmt.id" (click)="selectFormat(fmt.id)">
+                    <span class="material-icons">{{ fmt.icon }}</span>
+                    <span>{{ fmt.label }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- Conditional: Aesthetic Title Editor -->
+            @if (selectedTemplate === 'aesthetic-text' || selectedTemplate === 'magazine-cover') {
+              <div class="control-section">
+                <h3 class="control-label">Title Text</h3>
+                <input
+                  type="text"
+                  [(ngModel)]="aestheticTitle"
+                  class="input-field"
+                  placeholder="MORNING RUN"
+                  (input)="aestheticTitle = aestheticTitle.toUpperCase()">
+              </div>
+            }
+
+            <!-- Conditional: Cloud Text Controls -->
+            @if (selectedTemplate === 'cloud-text') {
+              <div class="control-section">
+                <h3 class="control-label">Cloud Text</h3>
+                <div class="ct-input-wrap">
+                  <input
+                    type="text"
+                    [(ngModel)]="cloudText"
+                    class="input-field ct-input"
+                    placeholder="URC"
+                    maxlength="10"
+                    (input)="cloudText = cloudText.toUpperCase()">
+                  <span class="ct-char-count">{{ cloudText.length }}/10</span>
+                </div>
+                <div class="ct-texture-row">
+                  <button class="ct-texture-btn" [class.active]="cloudTexture === 'cloud'" (click)="cloudTexture = 'cloud'">
+                    <span class="material-icons text-lg">cloud</span>
+                    <span>Cloud</span>
+                  </button>
+                  <button class="ct-texture-btn" [class.active]="cloudTexture === '3d'" (click)="cloudTexture = '3d'">
+                    <span class="material-icons text-lg">view_in_ar</span>
+                    <span>3D Block</span>
+                  </button>
+                  <button class="ct-texture-btn" [class.active]="cloudTexture === 'neon'" (click)="cloudTexture = 'neon'">
+                    <span class="material-icons text-lg">bolt</span>
+                    <span>Neon</span>
+                  </button>
+                </div>
+                <div class="slider-group">
+                  <div class="slider-header">
+                    <span class="slider-label">Color</span>
+                    <span class="slider-value" [style.color]="cloudTextColor">{{ cloudTextColor }}</span>
+                  </div>
+                  <div class="brand-color-row">
+                    @for (c of ['#ffffff','#f59e0b','#ff0080','#00ffcc','#3b82f6','#ef4444','#a855f7','#000000']; track c) {
+                      <button class="brand-color-swatch"
+                        [style.background]="c"
+                        [class.active]="cloudTextColor === c"
+                        (click)="cloudTextColor = c"
+                        [style.border-color]="c === '#000000' ? '#555' : 'transparent'"></button>
+                    }
+                    <label class="brand-color-custom" title="Custom color">
+                      <span class="material-icons text-sm">colorize</span>
+                      <input type="color" [(ngModel)]="cloudTextColor" class="sr-only" />
+                    </label>
+                  </div>
+                </div>
+                <div class="slider-group">
+                  <div class="slider-header">
+                    <span class="slider-label">Size</span>
+                    <span class="slider-value">{{ cloudFontSize }}px</span>
+                  </div>
+                  <input type="range" min="80" max="300" [(ngModel)]="cloudFontSize" class="range-slider">
+                </div>
+              </div>
+            }
+          }
+
+          <!-- ═══ DESIGN TAB ═══ -->
+          @if (sidebarTab === 'design') {
+            <!-- Background -->
+            <div class="control-section">
+              <h3 class="control-label">Background</h3>
+              @if (backgroundImages.length === 0 && !selectedGradient && !selectedPattern) {
+                <label class="bg-upload-btn">
+                  <span class="material-icons">add_photo_alternate</span>
+                  <span>Upload Photos (up to 3)</span>
+                  <input type="file" accept="image/*" multiple (change)="onBackgroundUpload($event)" class="hidden">
+                </label>
+              } @else if (backgroundImages.length > 0) {
+                <div class="bg-preview-grid">
+                  @for (img of backgroundImages; track img) {
+                    <div class="bg-preview-thumb" [style.background-image]="'url(' + img + ')'"></div>
+                  }
+                  <button (click)="removeBackground()" class="bg-remove-all">
+                    <span class="material-icons text-sm">close</span>
+                    <span>Clear</span>
+                  </button>
+                </div>
+                @if (backgroundImages.length > 1) {
+                  <div class="collage-layout-picker">
+                    <button (click)="collageLayout = 'vertical-thirds'" class="collage-opt" [class.active]="collageLayout === 'vertical-thirds'">
+                      <span class="material-icons text-sm">view_column</span> Thirds
+                    </button>
+                    <button (click)="collageLayout = 'diagonal'" class="collage-opt" [class.active]="collageLayout === 'diagonal'">
+                      <span class="material-icons text-sm">view_quilt</span> Diagonal
+                    </button>
+                  </div>
+                }
+                <div class="slider-group">
+                  <div class="slider-header"><span class="slider-label">Opacity</span><span class="slider-value">{{ backgroundOpacity }}%</span></div>
+                  <input type="range" min="10" max="100" [(ngModel)]="backgroundOpacity" class="range-slider">
+                </div>
+                <div class="slider-group">
+                  <div class="slider-header"><span class="slider-label">Blur</span><span class="slider-value">{{ backgroundBlur }}px</span></div>
+                  <input type="range" min="0" max="20" [(ngModel)]="backgroundBlur" class="range-slider">
+                </div>
+                <div class="slider-group">
+                  <div class="slider-header"><span class="slider-label">Brightness</span><span class="slider-value">{{ backgroundBrightness }}%</span></div>
+                  <input type="range" min="20" max="200" [(ngModel)]="backgroundBrightness" class="range-slider">
+                </div>
+                <div class="slider-group">
+                  <div class="slider-header"><span class="slider-label">Contrast</span><span class="slider-value">{{ backgroundContrast }}%</span></div>
+                  <input type="range" min="20" max="200" [(ngModel)]="backgroundContrast" class="range-slider">
+                </div>
+                <div class="slider-group">
+                  <div class="slider-header"><span class="slider-label">Saturation</span><span class="slider-value">{{ backgroundSaturation }}%</span></div>
+                  <input type="range" min="0" max="200" [(ngModel)]="backgroundSaturation" class="range-slider">
+                </div>
+              }
+              @if (backgroundImages.length === 0) {
+                <div class="slider-group">
+                  <div class="slider-header"><span class="slider-label">Gradients</span></div>
+                  <div class="gradient-presets">
+                    @for (g of gradientPresets; track g.id) {
+                      <button class="gradient-swatch"
+                        [style.background]="g.css"
+                        [class.active]="selectedGradient === g.id"
+                        (click)="selectGradient(g.id)">
+                      </button>
+                    }
+                  </div>
+                </div>
+                <div class="slider-group">
+                  <div class="slider-header"><span class="slider-label">Patterns</span></div>
+                  <div class="pattern-presets">
+                    @for (p of patternPresets; track p.id) {
+                      <button class="pattern-btn"
+                        [class.active]="selectedPattern === p.id"
+                        (click)="selectPattern(p.id)">
+                        <span class="material-icons text-sm">{{ p.icon }}</span>
+                        <span>{{ p.label }}</span>
+                      </button>
+                    }
+                  </div>
+                </div>
+                @if (selectedGradient || selectedPattern) {
+                  <button (click)="clearBackgroundPreset()" class="bg-remove-all" style="margin-top: 0.5rem">
+                    <span class="material-icons text-sm">close</span>
+                    <span>Clear Preset</span>
+                  </button>
+                }
+                <label class="bg-upload-btn" style="margin-top: 0.5rem">
+                  <span class="material-icons">add_photo_alternate</span>
+                  <span>Or Upload Photo</span>
+                  <input type="file" accept="image/*" multiple (change)="onBackgroundUpload($event)" class="hidden">
+                </label>
+              }
+            </div>
+
+            <!-- Color Palette + Magic Button -->
+            <div class="control-section">
+              <h3 class="control-label">Color Palette</h3>
+              <button (click)="applyMagicColors()" class="magic-color-btn" [disabled]="backgroundImages.length === 0">
+                <span class="material-icons">auto_fix_high</span>
+                <span>Magic Colors</span>
+              </button>
+              @if (backgroundImageUrl) {
+                <label class="toggle-item" style="margin-top: 0.5rem">
+                  <span class="toggle-label">Auto-extract colors</span>
+                  <input type="checkbox" [(ngModel)]="useAutoColors" class="toggle-switch">
+                </label>
+              }
+              <div class="color-preview" style="margin-top: 0.5rem">
+                <div class="color-swatch" [style.background]="accentColor" title="Primary accent"></div>
+                <div class="color-swatch" [style.background]="secondaryAccent" title="Secondary accent"></div>
+              </div>
+            </div>
+
+            <!-- Text Editor -->
+            <div class="control-section">
+              <h3 class="control-label">Text</h3>
+              <div class="slider-group">
+                <span class="slider-label">Headline</span>
+                <input type="text" [(ngModel)]="customHeadline" class="input-field" placeholder="Custom headline...">
+              </div>
+              <div class="slider-group">
+                <span class="slider-label">Subtitle</span>
+                <input type="text" [(ngModel)]="customSubtitle" class="input-field" placeholder="Add subtitle...">
+              </div>
+              <div class="slider-group">
+                <div class="slider-header"><span class="slider-label">Font</span></div>
+                <div class="font-picker">
+                  @for (font of fontOptions; track font) {
+                    <button class="font-btn" [class.active]="selectedFont === font" (click)="selectedFont = font"
+                      [style.font-family]="font">
+                      {{ font }}
+                    </button>
+                  }
+                </div>
+              </div>
+              <div class="slider-group">
+                <div class="slider-header"><span class="slider-label">Text Color</span></div>
+                <div class="brand-color-row">
+                  @for (c of ['#ffffff', '#000000', '#f59e0b', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#f43f5e']; track c) {
+                    <button class="brand-color-swatch" [style.background]="c" [class.active]="textColor === c" (click)="textColor = c"></button>
+                  }
+                  <label class="brand-color-custom" title="Custom color">
+                    <span class="material-icons text-sm">colorize</span>
+                    <input type="color" [(ngModel)]="textColor" class="sr-only" />
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- UX Toggles -->
+            <div class="control-section">
+              <h3 class="control-label">Effects</h3>
+              <label class="toggle-item">
+                <span class="toggle-label">Glassmorphism</span>
+                <input type="checkbox" [(ngModel)]="useGlassmorphism" class="toggle-switch">
+              </label>
+              <div class="slider-group" style="margin-top: 0.5rem">
+                <div class="slider-header"><span class="slider-label">Template Mode</span></div>
+                <div class="mode-toggle-row">
+                  <button class="mode-btn" [class.active]="templateColorMode === 'dark'" (click)="templateColorMode = 'dark'">
+                    <span class="material-icons text-sm">dark_mode</span> Dark
+                  </button>
+                  <button class="mode-btn" [class.active]="templateColorMode === 'light'" (click)="templateColorMode = 'light'">
+                    <span class="material-icons text-sm">light_mode</span> Light
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- ═══ BRANDING TAB ═══ -->
+          @if (sidebarTab === 'branding') {
+            <div class="control-section">
+              <h3 class="control-label">URC Branding</h3>
+              <div class="slider-group">
+                <div class="slider-header">
+                  <span class="slider-label">Color</span>
+                  <span class="slider-value" [style.color]="brandColor">{{ brandColor }}</span>
+                </div>
+                <div class="brand-color-row">
+                  @for (c of brandPresetColors; track c) {
+                    <button class="brand-color-swatch"
+                      [style.background]="c"
+                      [class.active]="brandColor === c"
+                      (click)="brandColor = c"></button>
+                  }
+                  <label class="brand-color-custom" title="Custom color">
+                    <span class="material-icons text-sm">colorize</span>
+                    <input type="color" [(ngModel)]="brandColor" class="sr-only" />
+                  </label>
+                </div>
+              </div>
+              <div class="slider-group">
+                <div class="slider-header">
+                  <span class="slider-label">Size</span>
+                  <span class="slider-value">{{ brandSize }}%</span>
+                </div>
+                <input type="range" min="60" max="180" [(ngModel)]="brandSize" class="range-slider" />
+              </div>
+              <div class="slider-group">
+                <div class="slider-header"><span class="slider-label">Position</span></div>
+                <div class="brand-pos-grid">
+                  @for (pos of brandPositions; track pos.id) {
+                    <button class="brand-pos-btn"
+                      [class.active]="brandPosition === pos.id"
+                      (click)="brandPosition = pos.id"
+                      [title]="pos.label">
+                      <span class="material-icons text-sm">{{ pos.icon }}</span>
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- Social Caption -->
+            <div class="control-section">
+              <h3 class="control-label">Social Caption</h3>
+              <button (click)="generateCaptions()" class="caption-generate-btn">
+                <span class="material-icons">auto_awesome</span>
+                <span>{{ showCaptions ? 'Regenerate' : 'Generate Captions' }}</span>
+              </button>
+              @if (showCaptions) {
+                <div class="caption-list">
+                  @for (c of captions; track c.style) {
+                    <div class="caption-card">
+                      <div class="caption-style">
+                        <span class="material-icons text-xs">{{
+                          c.style === 'Motivational' ? 'local_fire_department' :
+                          c.style === 'Aesthetic' ? 'spa' : 'military_tech'
+                        }}</span>
+                        {{ c.style }}
+                      </div>
+                      <p class="caption-text">{{ c.text }}</p>
+                      <button (click)="copyCaption(c.text)" class="caption-copy-btn">
+                        <span class="material-icons text-sm">content_copy</span> Copy
+                      </button>
+                    </div>
+                  }
                 </div>
               }
             </div>
           }
+
+        </div>
+
+        <!-- Floating Action Bar (always visible) -->
+        <div class="sidebar-action-bar">
+          @if (canShare) {
+            <button (click)="shareToOS()" [disabled]="!selectedActivity || exporting" class="action-bar-btn secondary">
+              <span class="material-icons">share</span>
+            </button>
+          }
+          <button (click)="exportToVideo()" [disabled]="!selectedActivity || exportingVideo" class="action-bar-btn secondary">
+            @if (exportingVideo) {
+              <div class="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
+            } @else {
+              <span class="material-icons">videocam</span>
+            }
+          </button>
+          <button (click)="exportToImage()" [disabled]="!selectedActivity || exporting" class="action-bar-btn primary">
+            @if (exporting) {
+              <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+            } @else {
+              <span class="material-icons">download</span>
+            }
+            <span>{{ exporting ? 'Exporting...' : 'Export' }}</span>
+          </button>
         </div>
 
       </div>
     </div>
   }
+
+  <!-- ═══ EXPORT PROGRESS BAR ═══ -->
+  @if (showExportProgress) {
+    <div class="export-progress-overlay">
+      <div class="export-progress-card">
+        <span class="material-icons text-primary text-3xl">videocam</span>
+        <p class="text-foreground font-semibold mt-2">Recording Video...</p>
+        <div class="export-progress-bar">
+          <div class="export-progress-fill" [style.width.%]="exportProgress"></div>
+        </div>
+        <p class="text-muted-foreground text-sm">{{ exportProgress }}%</p>
+      </div>
+    </div>
+  }
+
+  <!-- ═══ MOBILE BOTTOM TOOLBAR ═══ -->
+  <div class="mobile-toolbar">
+    <button class="mobile-toolbar-btn" [class.active]="sidebarTab === 'activity'" (click)="switchSidebarTab('activity')">
+      <span class="material-icons">directions_run</span>
+      <span>Activity</span>
+    </button>
+    <button class="mobile-toolbar-btn" [class.active]="sidebarTab === 'layout'" (click)="switchSidebarTab('layout')">
+      <span class="material-icons">dashboard</span>
+      <span>Layout</span>
+    </button>
+    <button class="mobile-toolbar-btn" [class.active]="sidebarTab === 'design'" (click)="switchSidebarTab('design')">
+      <span class="material-icons">palette</span>
+      <span>Design</span>
+    </button>
+    <button class="mobile-toolbar-btn" (click)="exportToImage()" [disabled]="!selectedActivity || exporting">
+      <span class="material-icons">download</span>
+      <span>Export</span>
+    </button>
+  </div>
 
   <!-- ═══ PUBLISH TO COMMUNITY MODAL ═══ -->
   @if (showPublishModal) {

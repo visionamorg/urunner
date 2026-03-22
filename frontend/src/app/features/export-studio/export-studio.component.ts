@@ -9,13 +9,36 @@ import { ExportTemplateService, ExportTemplateDto } from '../../core/services/ex
 import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
 import html2canvas from 'html2canvas';
 
-export type TemplateName = 'clear-info' | 'large-stat' | 'aesthetic-text' | 'typography-poster' | 'story-global' | 'newspaper' | 'cyberpunk' | 'receipt' | 'annual-wrapped' | 'cloud-text';
+export type TemplateName =
+  // Street
+  | 'cyberpunk' | 'graffiti' | 'brutalist' | 'vhs-tape'
+  // Elite
+  | 'race-bib' | 'podium' | 'aesthetic-text' | 'cloud-text'
+  // Minimal
+  | 'clear-info' | 'large-stat' | 'receipt' | 'polaroid'
+  // Editorial
+  | 'newspaper' | 'story-global' | 'typography-poster' | 'annual-wrapped'
+  // High-Concept
+  | 'minimalist-peak' | 'split-screen-pro' | 'magazine-cover';
+
+export type TemplateCategory = 'all' | 'street' | 'elite' | 'minimal' | 'editorial' | 'concept';
+
+export type CardFormat = '9:16' | '1:1' | '16:9';
 
 export interface TemplateOption {
   id: TemplateName;
   name: string;
   description: string;
   icon: string;
+  category: TemplateCategory;
+}
+
+export interface FormatOption {
+  id: CardFormat;
+  label: string;
+  icon: string;
+  width: number;
+  height: number;
 }
 
 @Component({
@@ -42,13 +65,50 @@ export class ExportStudioComponent implements OnInit {
   showDuration = true;
   showDistance = true;
   showLocation = true;
+  showCalories = false;
+  showHeartRate = false;
+  showElevation = false;
+  showActivityName = true;
+  showDateTime = true;
+  showClubName = true;
+  showRunnerName = false;
 
   // Background photo(s)
   backgroundImageUrl: string | null = null;
   backgroundImages: string[] = [];
   backgroundOpacity = 100;
   backgroundBlur = 0;
+  backgroundBrightness = 100;
+  backgroundContrast = 100;
+  backgroundSaturation = 100;
   collageLayout: 'single' | 'vertical-thirds' | 'diagonal' = 'single';
+
+  // Gradient presets
+  selectedGradient: string | null = null;
+  gradientPresets = [
+    { id: 'sunset-run', css: 'linear-gradient(135deg, #f97316 0%, #ec4899 50%, #8b5cf6 100%)' },
+    { id: 'night-road', css: 'linear-gradient(180deg, #0f172a 0%, #1e293b 40%, #334155 100%)' },
+    { id: 'ocean-pace', css: 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 50%, #1e40af 100%)' },
+    { id: 'forest-trail', css: 'linear-gradient(135deg, #065f46 0%, #059669 50%, #34d399 100%)' },
+    { id: 'lava-flow', css: 'linear-gradient(135deg, #dc2626 0%, #f97316 50%, #facc15 100%)' },
+    { id: 'midnight', css: 'linear-gradient(180deg, #020617 0%, #0f172a 50%, #1e293b 100%)' },
+    { id: 'aurora', css: 'linear-gradient(135deg, #a78bfa 0%, #06b6d4 50%, #34d399 100%)' },
+    { id: 'steel', css: 'linear-gradient(135deg, #374151 0%, #6b7280 50%, #9ca3af 100%)' },
+    { id: 'ember', css: 'linear-gradient(180deg, #1c1917 0%, #78350f 50%, #f59e0b 100%)' },
+    { id: 'neon-city', css: 'linear-gradient(135deg, #7c3aed 0%, #ec4899 50%, #06b6d4 100%)' },
+    { id: 'dawn', css: 'linear-gradient(180deg, #1e3a5f 0%, #f59e0b 60%, #fde68a 100%)' },
+    { id: 'carbon', css: 'linear-gradient(135deg, #18181b 0%, #27272a 50%, #3f3f46 100%)' },
+  ];
+
+  // Pattern presets
+  selectedPattern: string | null = null;
+  patternPresets = [
+    { id: 'carbon-fiber', label: 'Carbon', icon: 'grid_4x4' },
+    { id: 'track-lanes', label: 'Track', icon: 'straighten' },
+    { id: 'topographic', label: 'Topo', icon: 'landscape' },
+    { id: 'dots', label: 'Dots', icon: 'blur_on' },
+    { id: 'grid', label: 'Grid', icon: 'grid_on' },
+  ];
 
   // Watermark
   showWatermark = true;
@@ -59,12 +119,50 @@ export class ExportStudioComponent implements OnInit {
   secondaryAccent = '#1e293b';
   useAutoColors = true;
 
+  // Text editor
+  customHeadline = '';
+  customSubtitle = '';
+  selectedFont = 'Inter';
+  textColor = '#ffffff';
+  readonly fontOptions = ['Inter', 'Orbitron', 'Bebas Neue', 'Playfair Display', 'Permanent Marker', 'Space Grotesk', 'DM Sans', 'Share Tech Mono'];
+
+  // Card format
+  cardFormat: CardFormat = '9:16';
+  readonly formatOptions: FormatOption[] = [
+    { id: '9:16', label: 'Story', icon: 'crop_portrait', width: 1080, height: 1920 },
+    { id: '1:1', label: 'Post', icon: 'crop_square', width: 1080, height: 1080 },
+    { id: '16:9', label: 'Landscape', icon: 'crop_landscape', width: 1920, height: 1080 },
+  ];
+
+  // Template category filter
+  templateCategory: TemplateCategory = 'all';
+
   // AI Captions
   showCaptions = false;
   captions: { style: string; text: string }[] = [];
 
+  // Export
+  exportFormat: 'png' | 'jpeg' = 'png';
+  jpegQuality = 90;
+  videoDuration: 5 | 8 | 12 = 5;
+  exportProgress = 0;
+  showExportProgress = false;
+
+  // Mobile
+  mobileDrawerOpen = false;
+  mobileActiveTab: 'templates' | 'style' | 'data' | 'export' = 'templates';
+
   // Studio tabs
   studioTab: 'builder' | 'explore' = 'builder';
+
+  // Sidebar panel tabs (zero-scroll)
+  sidebarTab: 'activity' | 'layout' | 'design' | 'branding' = 'layout';
+
+  // Glassmorphism toggle
+  useGlassmorphism = true;
+
+  // Dark/Light mode for template elements
+  templateColorMode: 'dark' | 'light' = 'dark';
 
   // Marketplace / Explore
   showMarketplace = false;
@@ -127,16 +225,30 @@ export class ExportStudioComponent implements OnInit {
   marketplaceCategories = ['All', 'Minimalist', 'Editorial', 'Ultra-Running', 'Club Branded'];
 
   templates: TemplateOption[] = [
-    { id: 'clear-info', name: 'Clear Info', description: 'Clean frosted-glass card overlay', icon: 'style' },
-    { id: 'large-stat', name: 'Large Stat', description: 'Bold numeric overlay', icon: 'format_size' },
-    { id: 'aesthetic-text', name: 'Aesthetic Text', description: 'Minimalist with bold title', icon: 'cloud' },
-    { id: 'typography-poster', name: 'Typography Poster', description: 'Magazine-style layout', icon: 'text_fields' },
-    { id: 'story-global', name: 'Story Global', description: 'Editorial activity story card', icon: 'auto_stories' },
-    { id: 'newspaper', name: 'Breaking News', description: 'Old-school newspaper front page', icon: 'newspaper' },
-    { id: 'cyberpunk', name: 'Cyberpunk', description: 'Neon glitch hacker aesthetic', icon: 'terminal' },
-    { id: 'receipt', name: 'Receipt', description: 'Thermal grocery receipt printout', icon: 'receipt_long' },
-    { id: 'annual-wrapped', name: 'Year Wrapped', description: 'Spotify-style year in review', icon: 'celebration' },
-    { id: 'cloud-text', name: 'Cloud Text', description: 'Massive floating 3D sky typography', icon: 'cloud' }
+    // Street
+    { id: 'cyberpunk', name: 'Cyberpunk', description: 'Neon glitch hacker aesthetic', icon: 'terminal', category: 'street' },
+    { id: 'graffiti', name: 'Graffiti', description: 'Spray paint texture, bold street fonts', icon: 'brush', category: 'street' },
+    { id: 'brutalist', name: 'Brutalist', description: 'Raw B&W, massive typography', icon: 'format_bold', category: 'street' },
+    { id: 'vhs-tape', name: 'VHS Tape', description: '80s cassette, retro distortion', icon: 'movie', category: 'street' },
+    // Elite
+    { id: 'race-bib', name: 'Race Bib', description: 'Official race bib with number', icon: 'confirmation_number', category: 'elite' },
+    { id: 'podium', name: 'Podium', description: 'Gold medal ceremony feel', icon: 'emoji_events', category: 'elite' },
+    { id: 'aesthetic-text', name: 'Aesthetic Text', description: 'Minimalist with bold title', icon: 'cloud', category: 'elite' },
+    { id: 'cloud-text', name: 'Cloud Text', description: 'Massive floating 3D typography', icon: 'cloud', category: 'elite' },
+    // Minimal
+    { id: 'clear-info', name: 'Clear Info', description: 'Clean frosted-glass card overlay', icon: 'style', category: 'minimal' },
+    { id: 'large-stat', name: 'Large Stat', description: 'Bold numeric overlay', icon: 'format_size', category: 'minimal' },
+    { id: 'receipt', name: 'Receipt', description: 'Thermal receipt printout', icon: 'receipt_long', category: 'minimal' },
+    { id: 'polaroid', name: 'Polaroid', description: 'Photo + handwritten caption', icon: 'photo_camera', category: 'minimal' },
+    // Editorial
+    { id: 'newspaper', name: 'Breaking News', description: 'Newspaper front page', icon: 'newspaper', category: 'editorial' },
+    { id: 'story-global', name: 'Magazine', description: 'Glossy editorial layout', icon: 'auto_stories', category: 'editorial' },
+    { id: 'typography-poster', name: 'Typography Poster', description: 'Words as visual art', icon: 'text_fields', category: 'editorial' },
+    { id: 'annual-wrapped', name: 'Year Wrapped', description: 'Spotify-style year recap', icon: 'celebration', category: 'editorial' },
+    // High-Concept
+    { id: 'minimalist-peak', name: 'Minimalist Peak', description: 'Giant distance overlaying entire canvas', icon: 'height', category: 'concept' },
+    { id: 'split-screen-pro', name: 'Split-Screen', description: '50/50 photo and tech data sheet', icon: 'vertical_split', category: 'concept' },
+    { id: 'magazine-cover', name: 'Magazine Cover', description: 'Masthead title with headline stats', icon: 'menu_book', category: 'concept' },
   ];
 
   constructor(
@@ -253,8 +365,8 @@ export class ExportStudioComponent implements OnInit {
   private async renderCanvas(): Promise<HTMLCanvasElement> {
     const element = this.canvasContainer.nativeElement;
     return html2canvas(element, {
-      width: 1080,
-      height: 1920,
+      width: this.canvasWidth,
+      height: this.canvasHeight,
       scale: 1,
       useCORS: true,
       backgroundColor: '#0a0a0a',
@@ -332,8 +444,8 @@ export class ExportStudioComponent implements OnInit {
 
       // Create an offscreen canvas for animation
       const offscreen = document.createElement('canvas');
-      offscreen.width = 1080;
-      offscreen.height = 1920;
+      offscreen.width = this.canvasWidth;
+      offscreen.height = this.canvasHeight;
       const ctx = offscreen.getContext('2d')!;
 
       // Get static background from html2canvas
@@ -351,10 +463,15 @@ export class ExportStudioComponent implements OnInit {
 
       recorder.start();
 
-      // Animate for 5 seconds (150 frames at 30fps)
-      const totalFrames = 150;
+      // Animate for selected duration
+      this.showExportProgress = true;
+      this.exportProgress = 0;
+      const totalFrames = this.videoDuration * 30;
       for (let frame = 0; frame < totalFrames; frame++) {
         const progress = frame / totalFrames;
+
+        // Update progress
+        this.exportProgress = Math.round((frame / totalFrames) * 100);
 
         // Draw the static background
         ctx.drawImage(bgCanvas, 0, 0);
@@ -405,6 +522,8 @@ export class ExportStudioComponent implements OnInit {
       console.error('Video export failed:', err);
     } finally {
       this.exportingVideo = false;
+      this.showExportProgress = false;
+      this.exportProgress = 0;
     }
   }
 
@@ -425,7 +544,19 @@ export class ExportStudioComponent implements OnInit {
 
         if (loadedCount === files.length) {
           this.backgroundImageUrl = this.backgroundImages[0];
-          this.collageLayout = this.backgroundImages.length > 1 ? 'vertical-thirds' : 'single';
+
+          // Smart collage: auto-select layout based on image count
+          if (this.backgroundImages.length === 1) {
+            this.collageLayout = 'single';
+          } else if (this.backgroundImages.length === 2) {
+            this.collageLayout = 'vertical-thirds';
+          } else {
+            this.collageLayout = 'diagonal';
+          }
+
+          // Auto-adapt: apply subtle blur + reduce opacity for depth
+          this.backgroundBlur = 3;
+          this.backgroundOpacity = 85;
 
           if (this.useAutoColors) {
             this.extractColors(this.backgroundImages[0]);
@@ -444,7 +575,12 @@ export class ExportStudioComponent implements OnInit {
     this.backgroundImages = [];
     this.backgroundOpacity = 100;
     this.backgroundBlur = 0;
+    this.backgroundBrightness = 100;
+    this.backgroundContrast = 100;
+    this.backgroundSaturation = 100;
     this.collageLayout = 'single';
+    this.selectedGradient = null;
+    this.selectedPattern = null;
     this.resetColors();
   }
 
@@ -508,6 +644,16 @@ export class ExportStudioComponent implements OnInit {
     this.accentColor = '#f59e0b';
     this.accentColorRgb = '245, 158, 11';
     this.secondaryAccent = '#1e293b';
+  }
+
+  switchSidebarTab(tab: 'activity' | 'layout' | 'design' | 'branding'): void {
+    this.sidebarTab = tab;
+  }
+
+  applyMagicColors(): void {
+    if (this.backgroundImages.length > 0) {
+      this.extractColors(this.backgroundImages[0]);
+    }
   }
 
   switchTab(tab: 'builder' | 'explore'): void {
@@ -652,33 +798,40 @@ export class ExportStudioComponent implements OnInit {
     const isLong = a.distanceKm >= 15;
     const isFast = a.paceMinPerKm < 5.5;
 
-    // Funny/Self-Deprecating
-    const funnyOptions = [
-      `${dist}km done. My legs are filing a complaint with HR. ${pace}/km never felt so personal. 🦵💀 #URC #NoPainNoGain`,
-      `Ran ${dist}km because I saw a croissant at the finish line (there was no croissant). ${dur} of pure betrayal. 🥐😤 #RunnerProblems`,
-      `${dist}km in ${dur}. The first 2km were "I love running!" The rest was just survival instinct. 🏃‍♂️💨 #HonestRunner`,
-    ];
-
-    // Inspirational
-    const inspirationalOptions = [
+    // Motivational
+    const motivationalOptions = [
       `${dist}km. ${dur}. Every step forward is a step toward the best version of yourself. Keep pushing. 💪🔥 #URC #NeverStop`,
-      `The road doesn't get easier — you get stronger. ${dist}km at ${pace}/km around ${loc}. 🏃‍♂️✨ #RunningMotivation #Grind`,
+      `The road doesn't get easier — you get stronger. ${dist}km at ${pace}/km around ${loc}. 🏃‍♂️✨ #RunningMotivation`,
       isLong
-        ? `${dist}km conquered today. Long runs build more than endurance — they build character. 🦁 #UltraRunner #MentalToughness`
+        ? `${dist}km conquered today. Long runs build more than endurance — they build character. 🦁 #MentalToughness`
         : `Another ${dist}km in the bank. Small runs, big changes. Consistency is the real superpower. 🔑 #DailyRunner`,
+      `Started running. Didn't stop until ${dist}km. That's the only mindset that matters. 🧠🔥 #URC #KeepGoing`,
     ];
 
-    // Just the Facts
-    const factsOptions = [
-      `📊 ${dist}km | ⏱ ${dur} | 🏃 ${pace}/km${a.location ? ` | 📍 ${a.location}` : ''}\n#URC #RunStats`,
-      `Today's session: ${dist}km at ${pace}/km (${dur}). ${isFast ? 'Tempo day.' : isLong ? 'Long run day.' : 'Easy miles.'} #RunData`,
-      `${a.title || 'Run'} complete — ${dist}km, ${pace}/km, ${dur}. Tracked with @URC 📈 #Running`,
+    // Aesthetic
+    const aestheticOptions = [
+      `${dist} km · ${pace}/km · ${loc}\n\nsilence. pavement. rhythm.\n\n#URC #RunAesthetic`,
+      `morning light. cold air. ${dist}km of moving meditation.\n${dur} well spent. ✨ #URC`,
+      `${dist}km through ${loc}. no music. just footsteps and breathing.\n\nthis is where clarity lives. 🌅 #RunCulture`,
+      `some days you don't run for the stats.\nyou run for the stillness after.\n\n${dist}km · ${pace}/km 🤍 #URC`,
+    ];
+
+    // Brag
+    const bragOptions = [
+      `${dist}km at ${pace}/km. ${dur}. No excuses, no shortcuts. While you were sleeping. 😤💨 #URC #DifferentBreed`,
+      isFast
+        ? `${pace}/km for ${dist}km. Speed doesn't lie. Built different. ⚡️ #URC #SpeedDemon`
+        : `${dist}km done before most people hit snooze. ${dur} of pure discipline. 🏃‍♂️🔥 #URC #EarlyBird`,
+      isLong
+        ? `${dist}km. Yes, you read that right. Marathon distance isn't a dream — it's a Tuesday. 👑 #URC #UltraMode`
+        : `Another day, another ${dist}km crushed. ${pace}/km pace. The grind never stops. 💎 #URC #NoRestDays`,
+      `${dist}km ✅ ${pace}/km ✅ Excuses ❌\nReceipts don't lie. 🧾🔥 #URC #ProveIt`,
     ];
 
     this.captions = [
-      { style: 'Funny', text: funnyOptions[Math.floor(Math.random() * funnyOptions.length)] },
-      { style: 'Inspirational', text: inspirationalOptions[Math.floor(Math.random() * inspirationalOptions.length)] },
-      { style: 'Just the Facts', text: factsOptions[Math.floor(Math.random() * factsOptions.length)] },
+      { style: 'Motivational', text: motivationalOptions[Math.floor(Math.random() * motivationalOptions.length)] },
+      { style: 'Aesthetic', text: aestheticOptions[Math.floor(Math.random() * aestheticOptions.length)] },
+      { style: 'Brag', text: bragOptions[Math.floor(Math.random() * bragOptions.length)] },
     ];
     this.showCaptions = true;
   }
@@ -702,6 +855,77 @@ export class ExportStudioComponent implements OnInit {
   getVerificationUrl(): string {
     if (!this.selectedActivity) return '';
     return `urc.run/verify/${this.selectedActivity.id}`;
+  }
+
+  // ── Template filtering ─────────────────────────────────────────────────
+  get filteredTemplates(): TemplateOption[] {
+    if (this.templateCategory === 'all') return this.templates;
+    return this.templates.filter(t => t.category === this.templateCategory);
+  }
+
+  // ── Card format ───────────────────────────────────────────────────────
+  get canvasWidth(): number {
+    return this.formatOptions.find(f => f.id === this.cardFormat)?.width ?? 1080;
+  }
+
+  get canvasHeight(): number {
+    return this.formatOptions.find(f => f.id === this.cardFormat)?.height ?? 1920;
+  }
+
+  selectFormat(format: CardFormat): void {
+    this.cardFormat = format;
+  }
+
+  // ── Background helpers ────────────────────────────────────────────────
+  get backgroundFilter(): string {
+    if (this.selectedTemplate === 'newspaper') {
+      return `grayscale(100%) contrast(120%)`;
+    }
+    const parts: string[] = [];
+    if (this.backgroundBlur > 0) parts.push(`blur(${this.backgroundBlur}px)`);
+    if (this.backgroundBrightness !== 100) parts.push(`brightness(${this.backgroundBrightness}%)`);
+    if (this.backgroundContrast !== 100) parts.push(`contrast(${this.backgroundContrast}%)`);
+    if (this.backgroundSaturation !== 100) parts.push(`saturate(${this.backgroundSaturation}%)`);
+    return parts.length ? parts.join(' ') : 'none';
+  }
+
+  selectGradient(id: string): void {
+    this.selectedGradient = id;
+    this.selectedPattern = null;
+    this.backgroundImageUrl = null;
+    this.backgroundImages = [];
+  }
+
+  selectPattern(id: string): void {
+    this.selectedPattern = id;
+    this.selectedGradient = null;
+    this.backgroundImageUrl = null;
+    this.backgroundImages = [];
+  }
+
+  clearBackgroundPreset(): void {
+    this.selectedGradient = null;
+    this.selectedPattern = null;
+  }
+
+  getGradientCss(id: string): string {
+    return this.gradientPresets.find(g => g.id === id)?.css ?? '';
+  }
+
+  // ── Mobile drawer ─────────────────────────────────────────────────────
+  openMobileDrawer(tab: 'templates' | 'style' | 'data' | 'export'): void {
+    this.mobileActiveTab = tab;
+    this.mobileDrawerOpen = true;
+  }
+
+  closeMobileDrawer(): void {
+    this.mobileDrawerOpen = false;
+  }
+
+  // ── Race Bib number ───────────────────────────────────────────────────
+  getRaceBibNumber(): string {
+    if (!this.selectedActivity) return '0001';
+    return this.selectedActivity.id.toString().padStart(4, '0');
   }
 
   goBack(): void {
