@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivityService } from '../../core/services/activity.service';
 import { UserService } from '../../core/services/user.service';
 import { Activity } from '../../core/models/activity.model';
@@ -256,7 +257,8 @@ export class ExportStudioComponent implements OnInit {
     private userService: UserService,
     private exportTemplateService: ExportTemplateService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
@@ -1093,5 +1095,314 @@ export class ExportStudioComponent implements OnInit {
     const g = Math.max(0, ((num >> 8) & 0xff) - amt);
     const b = Math.max(0, (num & 0xff) - amt);
     return `rgb(${r},${g},${b})`;
+  }
+
+  // ── Template SVG Wireframe Thumbnails ────────────────────────────────────
+  getTemplateSvg(id: TemplateName): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(this.buildTemplateSvg(id));
+  }
+
+  private buildTemplateSvg(id: TemplateName): string {
+    const W = 40, H = 55;
+    const base = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;">`;
+    const end = `</svg>`;
+
+    const svgs: Record<TemplateName, string> = {
+      // ── Minimal ──
+      'clear-info': `${base}
+        <rect width="40" height="55" fill="#0f172a"/>
+        <circle cx="8" cy="30" r="4" fill="#f59e0b"/>
+        <rect x="14" y="28" width="18" height="2" rx="1" fill="rgba(255,255,255,.7)"/>
+        <rect x="14" y="32" width="12" height="1.5" rx=".75" fill="rgba(255,255,255,.3)"/>
+        <rect x="3" y="39" width="34" height="13" rx="3" fill="rgba(255,255,255,.1)" stroke="rgba(255,255,255,.2)" stroke-width=".5"/>
+        <rect x="6" y="42" width="8" height="5" rx="1.5" fill="rgba(245,158,11,.35)"/>
+        <rect x="16" y="42" width="8" height="5" rx="1.5" fill="rgba(245,158,11,.35)"/>
+        <rect x="26" y="42" width="8" height="5" rx="1.5" fill="rgba(245,158,11,.35)"/>
+      ${end}`,
+
+      'large-stat': `${base}
+        <rect width="40" height="55" fill="#0f172a"/>
+        <text x="20" y="30" text-anchor="middle" font-size="22" font-weight="900" fill="rgba(245,158,11,.85)" font-family="sans-serif">10</text>
+        <text x="20" y="38" text-anchor="middle" font-size="6" fill="rgba(255,255,255,.5)" font-family="sans-serif">KM</text>
+        <rect x="4" y="43" width="32" height="2" rx="1" fill="rgba(255,255,255,.15)"/>
+        <rect x="10" y="47" width="20" height="1.5" rx=".75" fill="rgba(255,255,255,.1)"/>
+      ${end}`,
+
+      'receipt': `${base}
+        <rect width="40" height="55" fill="#1e293b"/>
+        <rect x="8" y="4" width="24" height="47" rx="2" fill="#fff"/>
+        <rect x="12" y="10" width="16" height="2" rx="1" fill="#e5e7eb"/>
+        <rect x="11" y="14" width="18" height="1" rx=".5" fill="#d1d5db"/>
+        <rect x="11" y="17" width="14" height="1" rx=".5" fill="#d1d5db"/>
+        <rect x="11" y="21" width="18" height=".5" rx=".25" fill="#e5e7eb"/>
+        <rect x="11" y="24" width="9" height="1" rx=".5" fill="#9ca3af"/>
+        <rect x="25" y="24" width="5" height="1" rx=".5" fill="#374151"/>
+        <rect x="11" y="27" width="9" height="1" rx=".5" fill="#9ca3af"/>
+        <rect x="25" y="27" width="5" height="1" rx=".5" fill="#374151"/>
+        <rect x="11" y="30" width="9" height="1" rx=".5" fill="#9ca3af"/>
+        <rect x="25" y="30" width="5" height="1" rx=".5" fill="#374151"/>
+        <rect x="11" y="34" width="18" height=".5" rx=".25" fill="#e5e7eb"/>
+        <rect x="13" y="38" width="14" height="2" rx="1" fill="#374151"/>
+      ${end}`,
+
+      'polaroid': `${base}
+        <rect width="40" height="55" fill="#1e293b"/>
+        <rect x="5" y="6" width="30" height="36" rx="2" fill="#fff"/>
+        <rect x="7" y="8" width="26" height="28" rx="1" fill="#d1d5db"/>
+        <rect x="7" y="37" width="26" height="3" rx="1" fill="#f8fafc"/>
+        <rect x="9" y="37.5" width="12" height="1.5" rx=".75" fill="#94a3b8"/>
+        <rect x="5" y="44" width="30" height="1.5" rx=".75" fill="rgba(255,255,255,.15)"/>
+        <rect x="10" y="47" width="20" height="1" rx=".5" fill="rgba(255,255,255,.1)"/>
+      ${end}`,
+
+      // ── Street ──
+      'cyberpunk': `${base}
+        <rect width="40" height="55" fill="#060618"/>
+        <rect x="0" y="0" width="40" height="55" fill="url(#cp-g)"/>
+        <defs>
+          <linearGradient id="cp-g" x1="0" y1="0" x2="40" y2="55" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#0d0030"/>
+            <stop offset="100%" stop-color="#00001a"/>
+          </linearGradient>
+        </defs>
+        <line x1="0" y1="15" x2="40" y2="15" stroke="#00f0ff" stroke-width=".4" opacity=".5"/>
+        <line x1="0" y1="30" x2="40" y2="30" stroke="#00f0ff" stroke-width=".4" opacity=".3"/>
+        <rect x="4" y="18" width="32" height="10" rx="1" fill="none" stroke="#00f0ff" stroke-width=".6" opacity=".7"/>
+        <rect x="6" y="20" width="20" height="2" rx=".5" fill="#00f0ff" opacity=".6"/>
+        <rect x="6" y="23" width="14" height="1.5" rx=".5" fill="#00f0ff" opacity=".35"/>
+        <rect x="0" y="44" width="40" height="2" fill="#ff0080" opacity=".75"/>
+        <rect x="4" y="48" width="14" height="1.5" rx=".5" fill="rgba(255,255,255,.4)"/>
+        <rect x="22" y="48" width="10" height="1.5" rx=".5" fill="#ff0080" opacity=".7"/>
+      ${end}`,
+
+      'graffiti': `${base}
+        <rect width="40" height="55" fill="#130505"/>
+        <rect x="0" y="12" width="44" height="24" fill="rgba(255,61,0,.18)" transform="rotate(-3 0 0)"/>
+        <rect x="3" y="16" width="34" height="14" rx="1" fill="rgba(255,61,0,.12)" transform="rotate(-2 0 0)"/>
+        <text x="20" y="27" text-anchor="middle" font-size="14" font-weight="900" fill="rgba(255,80,0,.8)" font-family="Impact,sans-serif" transform="rotate(-3 20 27)">RUN</text>
+        <rect x="3" y="38" width="34" height="2" rx="1" fill="rgba(255,255,255,.2)"/>
+        <rect x="3" y="42" width="22" height="1.5" rx=".75" fill="rgba(255,255,255,.15)"/>
+        <rect x="3" y="45" width="16" height="1" rx=".5" fill="rgba(255,255,255,.1)"/>
+      ${end}`,
+
+      'brutalist': `${base}
+        <rect width="40" height="55" fill="#fff"/>
+        <rect x="0" y="0" width="40" height="6" fill="#000"/>
+        <rect x="2" y="9" width="36" height="16" rx="0" fill="#000" opacity=".9"/>
+        <text x="20" y="21" text-anchor="middle" font-size="11" font-weight="900" fill="#fff" font-family="Impact,Arial,sans-serif">RUN</text>
+        <rect x="2" y="28" width="36" height="1.5" fill="#000"/>
+        <rect x="2" y="32" width="26" height="2" rx=".5" fill="#000" opacity=".7"/>
+        <rect x="2" y="36" width="20" height="2" rx=".5" fill="#000" opacity=".5"/>
+        <rect x="2" y="42" width="36" height="3" fill="#000"/>
+        <rect x="2" y="47" width="14" height="2" rx=".5" fill="#000" opacity=".6"/>
+      ${end}`,
+
+      'vhs-tape': `${base}
+        <rect width="40" height="55" fill="#0d0d12"/>
+        <rect x="0" y="8" width="40" height="1" fill="rgba(255,255,255,.06)"/>
+        <rect x="0" y="14" width="40" height=".5" fill="rgba(0,240,255,.2)"/>
+        <rect x="0" y="20" width="40" height="1.5" fill="rgba(255,255,255,.05)"/>
+        <text x="20" y="28" text-anchor="middle" font-size="7" font-weight="900" fill="#fff" font-family="monospace" opacity=".9">▶ REC</text>
+        <rect x="4" y="31" width="32" height="1" fill="rgba(0,240,255,.3)"/>
+        <rect x="4" y="34" width="26" height="1.5" rx=".5" fill="rgba(255,255,255,.3)"/>
+        <rect x="4" y="37" width="18" height="1" rx=".5" fill="rgba(255,255,255,.2)"/>
+        <rect x="0" y="44" width="40" height="2" fill="rgba(255,0,128,.4)"/>
+        <rect x="4" y="48" width="8" height="1" rx=".5" fill="rgba(255,255,255,.3)"/>
+        <rect x="15" y="48" width="6" height="1" rx=".5" fill="rgba(0,240,255,.5)"/>
+      ${end}`,
+
+      // ── Elite ──
+      'race-bib': `${base}
+        <rect width="40" height="55" fill="#0f172a"/>
+        <rect x="5" y="8" width="30" height="38" rx="2" fill="#fff" stroke="#e5e7eb" stroke-width=".5"/>
+        <rect x="5" y="8" width="30" height="6" rx="2" fill="#1e293b"/>
+        <rect x="5" y="12" width="30" height="2" fill="#1e293b"/>
+        <text x="20" y="30" text-anchor="middle" font-size="16" font-weight="900" fill="#1e293b" font-family="Arial,sans-serif">0042</text>
+        <rect x="9" y="34" width="22" height="1.5" rx=".75" fill="#6b7280"/>
+        <rect x="9" y="37" width="15" height="1" rx=".5" fill="#9ca3af"/>
+        <rect x="8" y="40" width="24" height="3" rx=".5" fill="#e5e7eb"/>
+      ${end}`,
+
+      'podium': `${base}
+        <rect width="40" height="55" fill="#0f172a"/>
+        <defs>
+          <linearGradient id="pod-g" x1="0" y1="0" x2="0" y2="55" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#1a1000"/>
+            <stop offset="100%" stop-color="#0f172a"/>
+          </linearGradient>
+        </defs>
+        <rect width="40" height="55" fill="url(#pod-g)"/>
+        <text x="20" y="18" text-anchor="middle" font-size="14" fill="#f59e0b" font-family="sans-serif">🏆</text>
+        <text x="20" y="26" text-anchor="middle" font-size="7" font-weight="900" fill="#f59e0b" font-family="Arial,sans-serif">FINISHER</text>
+        <rect x="8" y="30" width="24" height="1.5" rx=".75" fill="rgba(245,158,11,.3)"/>
+        <rect x="4" y="34" width="32" height="8" rx="2" fill="rgba(245,158,11,.1)" stroke="rgba(245,158,11,.3)" stroke-width=".5"/>
+        <text x="20" y="40" text-anchor="middle" font-size="5" fill="rgba(255,255,255,.8)" font-family="monospace">5.24 KM · 28:10</text>
+        <rect x="10" y="46" width="20" height="1.5" rx=".75" fill="rgba(255,255,255,.15)"/>
+      ${end}`,
+
+      'aesthetic-text': `${base}
+        <rect width="40" height="55" fill="#050a18"/>
+        <rect x="4" y="8" width="24" height="1" rx=".5" fill="rgba(255,255,255,.2)"/>
+        <rect x="4" y="11" width="16" height="1" rx=".5" fill="rgba(255,255,255,.1)"/>
+        <text x="20" y="32" text-anchor="middle" font-size="12" font-weight="900" fill="#fff" font-family="Arial,sans-serif" letter-spacing="-1">MORNING</text>
+        <text x="20" y="41" text-anchor="middle" font-size="12" font-weight="900" fill="#fff" font-family="Arial,sans-serif" letter-spacing="-1">RUN</text>
+        <rect x="4" y="46" width="14" height="1" rx=".5" fill="rgba(255,255,255,.25)"/>
+        <rect x="4" y="49" width="20" height=".75" rx=".375" fill="rgba(255,255,255,.1)"/>
+      ${end}`,
+
+      'cloud-text': `${base}
+        <defs>
+          <linearGradient id="sky-g" x1="0" y1="0" x2="0" y2="55" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#0a1628"/>
+            <stop offset="100%" stop-color="#1e3a5f"/>
+          </linearGradient>
+        </defs>
+        <rect width="40" height="55" fill="url(#sky-g)"/>
+        <text x="20" y="36" text-anchor="middle" font-size="22" font-weight="900" fill="rgba(255,255,255,.92)" font-family="Arial,sans-serif"
+          filter="url(#glow)">URC</text>
+        <defs>
+          <filter id="glow"><feGaussianBlur stdDeviation="1.5" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
+        </defs>
+        <rect x="8" y="44" width="24" height="1.5" rx=".75" fill="rgba(255,255,255,.2)"/>
+        <rect x="12" y="47" width="16" height="1" rx=".5" fill="rgba(255,255,255,.1)"/>
+      ${end}`,
+
+      // ── Editorial ──
+      'newspaper': `${base}
+        <rect width="40" height="55" fill="#f8f5f0"/>
+        <rect x="0" y="0" width="40" height="7" fill="#1a1a1a"/>
+        <text x="20" y="5.5" text-anchor="middle" font-size="4" font-weight="900" fill="#fff" font-family="serif">THE RUNNER TIMES</text>
+        <rect x="3" y="9" width="34" height="3" rx=".5" fill="#1a1a1a"/>
+        <rect x="3" y="14" width="34" height="1.5" rx=".5" fill="#1a1a1a" opacity=".6"/>
+        <rect x="3" y="17" width="22" height="1" rx=".5" fill="#1a1a1a" opacity=".4"/>
+        <rect x="0" y="20" width="40" height=".5" fill="#1a1a1a" opacity=".3"/>
+        <rect x="3" y="22" width="16" height="15" rx="1" fill="#d1d5db"/>
+        <rect x="21" y="22" width="16" height="2" rx=".5" fill="#374151" opacity=".7"/>
+        <rect x="21" y="26" width="16" height="1" rx=".5" fill="#374151" opacity=".4"/>
+        <rect x="21" y="29" width="14" height="1" rx=".5" fill="#374151" opacity=".35"/>
+        <rect x="21" y="32" width="16" height="1" rx=".5" fill="#374151" opacity=".3"/>
+        <rect x="3" y="40" width="34" height="1" fill="#1a1a1a" opacity=".15"/>
+        <rect x="3" y="43" width="34" height="1.5" rx=".5" fill="#374151" opacity=".4"/>
+        <rect x="3" y="46" width="26" height="1" rx=".5" fill="#374151" opacity=".3"/>
+      ${end}`,
+
+      'story-global': `${base}
+        <rect width="40" height="55" fill="#0f172a"/>
+        <rect x="0" y="0" width="40" height="28" fill="#1e293b"/>
+        <rect x="3" y="3" width="22" height="3" rx=".5" fill="rgba(255,255,255,.8)"/>
+        <rect x="3" y="8" width="34" height="1.5" rx=".75" fill="rgba(255,255,255,.3)"/>
+        <rect x="3" y="11" width="28" height="1" rx=".5" fill="rgba(255,255,255,.2)"/>
+        <rect x="0" y="28" width="40" height="1" fill="rgb(245,158,11)" opacity=".8"/>
+        <rect x="3" y="32" width="18" height="8" rx="1" fill="rgba(245,158,11,.15)" stroke="rgba(245,158,11,.3)" stroke-width=".5"/>
+        <rect x="23" y="32" width="14" height="2" rx=".5" fill="rgba(255,255,255,.25)"/>
+        <rect x="23" y="36" width="10" height="1.5" rx=".75" fill="rgba(255,255,255,.15)"/>
+        <rect x="3" y="44" width="34" height="1.5" rx=".75" fill="rgba(255,255,255,.2)"/>
+        <rect x="3" y="48" width="22" height="1" rx=".5" fill="rgba(255,255,255,.1)"/>
+      ${end}`,
+
+      'typography-poster': `${base}
+        <rect width="40" height="55" fill="#0a0a0a"/>
+        <text x="20" y="14" text-anchor="middle" font-size="8" font-weight="900" fill="#fff" font-family="sans-serif" letter-spacing="2">RUN</text>
+        <text x="20" y="24" text-anchor="middle" font-size="5" font-weight="700" fill="rgba(255,255,255,.5)" font-family="sans-serif" letter-spacing="3">FURTHER</text>
+        <rect x="8" y="27" width="24" height=".75" fill="rgba(255,255,255,.3)"/>
+        <text x="20" y="35" text-anchor="middle" font-size="14" font-weight="900" fill="rgba(245,158,11,.9)" font-family="sans-serif">5.24</text>
+        <text x="20" y="41" text-anchor="middle" font-size="4" fill="rgba(255,255,255,.4)" font-family="sans-serif" letter-spacing="2">KILOMETERS</text>
+        <rect x="8" y="44" width="24" height=".75" fill="rgba(255,255,255,.2)"/>
+        <text x="20" y="50" text-anchor="middle" font-size="3.5" fill="rgba(255,255,255,.3)" font-family="monospace">28:10 · 5:22/KM</text>
+      ${end}`,
+
+      'annual-wrapped': `${base}
+        <defs>
+          <linearGradient id="aw-g" x1="0" y1="0" x2="40" y2="55" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#7c3aed"/>
+            <stop offset="50%" stop-color="#ec4899"/>
+            <stop offset="100%" stop-color="#f59e0b"/>
+          </linearGradient>
+        </defs>
+        <rect width="40" height="55" fill="url(#aw-g)"/>
+        <text x="20" y="16" text-anchor="middle" font-size="6" font-weight="900" fill="rgba(255,255,255,.9)" font-family="sans-serif">YOUR YEAR</text>
+        <text x="20" y="26" text-anchor="middle" font-size="14" font-weight="900" fill="#fff" font-family="sans-serif">2025</text>
+        <rect x="3" y="31" width="34" height=".75" fill="rgba(255,255,255,.4)"/>
+        <rect x="3" y="34" width="16" height="8" rx="1.5" fill="rgba(255,255,255,.15)"/>
+        <rect x="21" y="34" width="16" height="8" rx="1.5" fill="rgba(255,255,255,.15)"/>
+        <rect x="3" y="45" width="16" height="7" rx="1.5" fill="rgba(255,255,255,.15)"/>
+        <rect x="21" y="45" width="16" height="7" rx="1.5" fill="rgba(255,255,255,.15)"/>
+      ${end}`,
+
+      // ── High-Concept ──
+      'minimalist-peak': `${base}
+        <rect width="40" height="55" fill="#060a14"/>
+        <text x="20" y="35" text-anchor="middle" font-size="34" font-weight="900" fill="rgba(255,255,255,.07)" font-family="Arial,sans-serif">21</text>
+        <text x="20" y="32" text-anchor="middle" font-size="20" font-weight="900" fill="rgba(255,255,255,.85)" font-family="Arial,sans-serif">21</text>
+        <text x="20" y="38" text-anchor="middle" font-size="5" fill="rgba(255,255,255,.4)" font-family="sans-serif" letter-spacing="2">KM</text>
+        <rect x="4" y="44" width="32" height=".75" fill="rgba(255,255,255,.2)"/>
+        <rect x="8" y="47" width="10" height="1.5" rx=".75" fill="rgba(255,255,255,.25)"/>
+        <rect x="22" y="47" width="10" height="1.5" rx=".75" fill="rgba(255,255,255,.25)"/>
+      ${end}`,
+
+      'split-screen-pro': `${base}
+        <rect width="40" height="55" fill="#0f172a"/>
+        <rect x="0" y="0" width="19" height="55" fill="#1e293b"/>
+        <rect x="19" y="0" width="1" height="55" fill="rgba(245,158,11,.8)"/>
+        <rect x="2" y="10" width="15" height="12" rx="1" fill="rgba(255,255,255,.12)"/>
+        <rect x="2" y="25" width="15" height="1.5" rx=".75" fill="rgba(255,255,255,.3)"/>
+        <rect x="2" y="28" width="12" height="1" rx=".5" fill="rgba(255,255,255,.2)"/>
+        <rect x="2" y="32" width="10" height="1" rx=".5" fill="rgba(255,255,255,.15)"/>
+        <rect x="22" y="10" width="14" height="2" rx=".5" fill="rgba(245,158,11,.7)"/>
+        <rect x="22" y="14" width="14" height="1.5" rx=".75" fill="rgba(255,255,255,.3)"/>
+        <rect x="22" y="18" width="10" height="1" rx=".5" fill="rgba(255,255,255,.2)"/>
+        <rect x="22" y="22" width="12" height="1" rx=".5" fill="rgba(255,255,255,.15)"/>
+        <rect x="22" y="26" width="14" height=".5" fill="rgba(255,255,255,.1)"/>
+        <rect x="22" y="29" width="10" height="1" rx=".5" fill="rgba(255,255,255,.15)"/>
+        <rect x="22" y="32" width="12" height="1" rx=".5" fill="rgba(255,255,255,.1)"/>
+      ${end}`,
+
+      'magazine-cover': `${base}
+        <rect width="40" height="55" fill="#0f172a"/>
+        <rect x="0" y="0" width="40" height="8" fill="#f59e0b"/>
+        <text x="20" y="6" text-anchor="middle" font-size="5" font-weight="900" fill="#000" font-family="serif" letter-spacing="1">RUNNER</text>
+        <rect x="0" y="8" width="40" height="30" fill="#1e293b"/>
+        <rect x="3" y="11" width="20" height="3" rx=".5" fill="rgba(255,255,255,.8)"/>
+        <rect x="3" y="16" width="34" height="1.5" rx=".75" fill="rgba(255,255,255,.3)"/>
+        <rect x="3" y="19" width="26" height="1" rx=".5" fill="rgba(255,255,255,.2)"/>
+        <text x="20" y="33" text-anchor="middle" font-size="14" font-weight="900" fill="rgba(245,158,11,.9)" font-family="sans-serif">5.24</text>
+        <rect x="3" y="42" width="34" height="1.5" rx=".75" fill="rgba(255,255,255,.2)"/>
+        <rect x="3" y="46" width="22" height="1" rx=".5" fill="rgba(255,255,255,.15)"/>
+        <rect x="3" y="49" width="28" height="1" rx=".5" fill="rgba(255,255,255,.1)"/>
+      ${end}`,
+    };
+
+    return svgs[id] ?? `${base}<rect width="40" height="55" fill="#0f172a"/>${end}`;
+  }
+
+  // ── Use Community Template ────────────────────────────────────────────────
+  useTemplate(ct: ExportTemplateDto): void {
+    try {
+      const config = JSON.parse(ct.cssLayout || '{}');
+      if (config.baseTemplate) {
+        this.selectedTemplate = config.baseTemplate as TemplateName;
+      }
+      if (config.accentColor) {
+        this.accentColor = config.accentColor;
+      }
+      if (config.brandColor) {
+        this.brandColor = config.brandColor;
+      }
+      if (config.brandPosition) {
+        this.brandPosition = config.brandPosition;
+      }
+      if (config.brandSize) {
+        this.brandSize = config.brandSize;
+      }
+    } catch {
+      // Invalid JSON — apply template name match by name
+      const match = this.templates.find(t =>
+        t.name.toLowerCase() === ct.name.toLowerCase()
+      );
+      if (match) this.selectedTemplate = match.id;
+    }
+    this.exportTemplateService.download(ct.id).subscribe();
+    this.switchTab('builder');
+    this.sidebarTab = 'layout';
   }
 }

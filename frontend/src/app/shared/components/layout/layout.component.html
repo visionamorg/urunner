@@ -4,11 +4,11 @@
   <aside class="hidden lg:flex flex-col fixed left-0 top-0 h-full w-64 bg-sidebar border-r border-sidebar-border z-30">
 
     <!-- Logo -->
-    <div class="flex items-center gap-3 px-6 py-5 border-b border-sidebar-border">
-      <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+    <div class="sidebar-logo-wrap flex items-center gap-3 px-6 py-5 border-b border-sidebar-border">
+      <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
         <span class="material-icons text-white text-base">directions_run</span>
       </div>
-      <span class="text-xl font-black text-primary tracking-wider">UR</span>
+      <span class="sidebar-logo-text text-xl font-black text-primary tracking-wider">UR</span>
     </div>
 
     <!-- Nav Items -->
@@ -18,9 +18,10 @@
           [routerLink]="item.path"
           routerLinkActive="bg-primary/15 text-primary border border-primary/30"
           [routerLinkActiveOptions]="{exact: false}"
-          class="flex items-center gap-3 px-4 py-3 rounded-xl text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-all duration-200 group no-underline">
-          <span class="material-icons text-xl group-[.active]:text-primary">{{ item.icon }}</span>
-          <span class="text-sm font-medium">{{ item.label }}</span>
+          class="sidebar-nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-all duration-200 group no-underline"
+          [title]="item.label">
+          <span class="material-icons text-xl group-[.active]:text-primary flex-shrink-0">{{ item.icon }}</span>
+          <span class="sidebar-nav-label text-sm font-medium">{{ item.label }}</span>
         </a>
       }
     </nav>
@@ -32,7 +33,7 @@
           <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold flex-shrink-0 overflow-hidden">
             <app-avatar [imageUrl]="profileImageUrl" [username]="user.username"></app-avatar>
           </div>
-          <div class="flex-1 min-w-0">
+          <div class="sidebar-user-info flex-1 min-w-0">
             <p class="text-sidebar-foreground text-sm font-semibold truncate">{{ user.username }}</p>
             <p class="text-muted-foreground text-xs truncate">{{ user.email }}</p>
           </div>
@@ -40,15 +41,17 @@
       }
       <button
         (click)="themeService.toggle()"
-        class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-all duration-200">
-        <span class="material-icons text-xl">{{ themeService.isDark() ? 'light_mode' : 'dark_mode' }}</span>
-        <span class="text-sm font-medium">{{ themeService.isDark() ? 'Light Mode' : 'Dark Mode' }}</span>
+        title="{{ themeService.isDark() ? 'Light Mode' : 'Dark Mode' }}"
+        class="sidebar-nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-all duration-200">
+        <span class="material-icons text-xl flex-shrink-0">{{ themeService.isDark() ? 'light_mode' : 'dark_mode' }}</span>
+        <span class="sidebar-nav-label text-sm font-medium">{{ themeService.isDark() ? 'Light Mode' : 'Dark Mode' }}</span>
       </button>
       <button
         (click)="logout()"
-        class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-200">
-        <span class="material-icons text-xl">logout</span>
-        <span class="text-sm font-medium">Sign Out</span>
+        title="Sign Out"
+        class="sidebar-nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-200">
+        <span class="material-icons text-xl flex-shrink-0">logout</span>
+        <span class="sidebar-nav-label text-sm font-medium">Sign Out</span>
       </button>
     </div>
   </aside>
@@ -121,7 +124,7 @@
   }
 
   <!-- Main Content -->
-  <main class="flex-1 lg:ml-64 flex flex-col min-h-screen bg-background">
+  <main class="flex-1 lg:ml-64 flex flex-col min-h-screen bg-background studio-content-area">
     <div class="lg:hidden h-14"></div>
     <div class="flex-1 p-4 lg:p-8 pb-20 lg:pb-8">
       <router-outlet />

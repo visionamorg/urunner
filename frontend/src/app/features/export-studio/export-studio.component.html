@@ -46,6 +46,19 @@
     </button>
   </div>
 
+  <!-- Format Bar — always visible above canvas when in Builder mode -->
+  @if (!loading && selectedActivity && studioTab === 'builder') {
+    <div class="format-bar">
+      @for (fmt of formatOptions; track fmt.id) {
+        <button class="format-bar-btn" [class.active]="cardFormat === fmt.id" (click)="selectFormat(fmt.id)">
+          <span class="material-icons">{{ fmt.icon }}</span>
+          <span>{{ fmt.label }}</span>
+          <span class="format-bar-ratio">{{ fmt.id }}</span>
+        </button>
+      }
+    </div>
+  }
+
   @if (loading) {
     <div class="flex items-center justify-center h-[80vh]">
       <div class="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent"></div>
@@ -118,7 +131,7 @@
                   <div class="explore-thumb-title">{{ ct.name }}</div>
                 </div>
 
-                <!-- Hover overlay: creator info -->
+                <!-- Hover overlay: creator info + use template -->
                 <div class="explore-card-overlay">
                   <div class="explore-creator-row">
                     <div class="explore-creator-avatar overflow-hidden">
@@ -126,6 +139,10 @@
                     </div>
                     <span class="explore-creator-name">{{ ct.creatorUsername }}</span>
                   </div>
+                  <button class="explore-use-btn" (click)="useTemplate(ct); $event.stopPropagation()">
+                    <span class="material-icons text-sm">open_in_new</span>
+                    Use this Template
+                  </button>
                   <div class="explore-overlay-actions">
                     <button class="explore-vote-btn" [class.voted]="ct.hasVoted" (click)="voteTemplate(ct.id); $event.stopPropagation()">
                       <span class="material-icons text-sm">{{ ct.hasVoted ? 'favorite' : 'favorite_border' }}</span>
@@ -1079,8 +1096,9 @@
                   <button
                     (click)="selectTemplate(tmpl.id)"
                     class="template-thumb"
-                    [class.active]="selectedTemplate === tmpl.id">
-                    <span class="material-icons text-2xl">{{ tmpl.icon }}</span>
+                    [class.active]="selectedTemplate === tmpl.id"
+                    [title]="tmpl.description">
+                    <div class="tmpl-svg-wrap" [innerHTML]="getTemplateSvg(tmpl.id)"></div>
                     <span class="template-thumb-name">{{ tmpl.name }}</span>
                   </button>
                 }
@@ -1090,23 +1108,6 @@
                   <span class="material-icons text-sm">explore</span>
                   <span>Explore Community</span>
                 </button>
-                <button (click)="openPublishModal()" class="publish-btn">
-                  <span class="material-icons text-sm">publish</span>
-                  <span>Publish to Community</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Card Format -->
-            <div class="control-section">
-              <h3 class="control-label">Format</h3>
-              <div class="format-row">
-                @for (fmt of formatOptions; track fmt.id) {
-                  <button class="format-btn" [class.active]="cardFormat === fmt.id" (click)="selectFormat(fmt.id)">
-                    <span class="material-icons">{{ fmt.icon }}</span>
-                    <span>{{ fmt.label }}</span>
-                  </button>
-                }
               </div>
             </div>
 
@@ -1424,27 +1425,11 @@
 
         </div>
 
-        <!-- Floating Action Bar (always visible) -->
+        <!-- Publish to Community (secondary action only) -->
         <div class="sidebar-action-bar">
-          @if (canShare) {
-            <button (click)="shareToOS()" [disabled]="!selectedActivity || exporting" class="action-bar-btn secondary">
-              <span class="material-icons">share</span>
-            </button>
-          }
-          <button (click)="exportToVideo()" [disabled]="!selectedActivity || exportingVideo" class="action-bar-btn secondary">
-            @if (exportingVideo) {
-              <div class="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
-            } @else {
-              <span class="material-icons">videocam</span>
-            }
-          </button>
-          <button (click)="exportToImage()" [disabled]="!selectedActivity || exporting" class="action-bar-btn primary">
-            @if (exporting) {
-              <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-            } @else {
-              <span class="material-icons">download</span>
-            }
-            <span>{{ exporting ? 'Exporting...' : 'Export' }}</span>
+          <button (click)="openPublishModal()" [disabled]="!selectedActivity" class="action-bar-btn secondary publish-action">
+            <span class="material-icons">publish</span>
+            <span>Publish to Community</span>
           </button>
         </div>
 

@@ -1,23 +1,26 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive, Router, RouterModule } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router, RouterModule, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService } from '../../../core/services/user.service';
 import { AuthResponse } from '../../../core/models/user.model';
 import { ThemeService } from '../../../core/services/theme.service';
 import { AvatarComponent } from '../../components/avatar/avatar.component';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
   imports: [CommonModule, RouterModule, RouterOutlet, RouterLinkActive, AvatarComponent],
   templateUrl: './layout.component.html',
-  styleUrl: './layout.component.scss'
+  styleUrl: './layout.component.scss',
+  host: { '[class.studio-mode]': 'isStudioMode' }
 })
 export class LayoutComponent implements OnInit {
   currentUser: AuthResponse | null = null;
   profileImageUrl: string | null = null;
   sidebarOpen = false;
+  isStudioMode = false;
 
   navItems = [
     { path: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
@@ -48,6 +51,13 @@ export class LayoutComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.isStudioMode = this.router.url.startsWith('/export-studio');
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd)
+    ).subscribe(e => {
+      this.isStudioMode = e.urlAfterRedirects.startsWith('/export-studio');
+    });
+
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
       if (user) {
