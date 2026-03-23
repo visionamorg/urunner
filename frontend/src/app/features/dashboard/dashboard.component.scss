@@ -1,1 +1,70 @@
-// Tailwind only
+// Dashboard premium effects
+
+@keyframes pulse-glow-orange {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(249, 115, 22, 0.08), 0 0 30px rgba(249, 115, 22, 0.04);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(249, 115, 22, 0.2), 0 0 50px rgba(249, 115, 22, 0.08);
+  }
+}
+
+@keyframes pulse-icon {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+
+@keyframes shimmer-gold {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes ring-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.3); }
+  50% { box-shadow: 0 0 0 5px rgba(245, 158, 11, 0.05); }
+}
+
+// Streak card pulsing aura
+.streak-card {
+  animation: pulse-glow-orange 3s ease-in-out infinite;
+}
+
+.streak-icon {
+  animation: pulse-icon 2s ease-in-out infinite;
+}
+
+// RunPoints shimmer overlay
+.runpoints-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(250, 204, 21, 0.04), transparent);
+  background-size: 200% 100%;
+  animation: shimmer-gold 4s ease-in-out infinite;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+// Today circle pulse ring
+.today-ring {
+  animation: ring-pulse 2.5s ease-in-out infinite;
+}
+
+// Gradient progress bars
+.progress-gradient {
+  background: linear-gradient(90deg, rgb(var(--primary)), rgb(var(--primary) / 0.65));
+}
+
+// Leaderboard accent borders
+.leader-accent-1 {
+  border-left: 3px solid #fbbf24;
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0.06), transparent);
+}
+.leader-accent-2 {
+  border-left: 3px solid #9ca3af;
+  background: linear-gradient(90deg, rgba(156, 163, 175, 0.06), transparent);
+}
+.leader-accent-3 {
+  border-left: 3px solid #d97706;
+  background: linear-gradient(90deg, rgba(217, 119, 6, 0.06), transparent);
+}

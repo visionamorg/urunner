@@ -1,13 +1,13 @@
-<div class="max-w-7xl mx-auto space-y-6 animate-fade-in">
+<div class="max-w-7xl mx-auto space-y-8 animate-fade-in">
 
     <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
       <div>
-        <h1 class="text-3xl font-black text-foreground">{{ getGreeting() }}, {{ currentUser?.username }} 👋</h1>
-        <p class="text-muted-foreground mt-1">{{ 'today' | date:'EEEE, MMMM d, y' }}</p>
+        <p class="text-muted-foreground text-sm font-medium tracking-wide uppercase mb-1">{{ 'today' | date:'EEEE, MMMM d, y' }}</p>
+        <h1 class="text-4xl font-black text-foreground tracking-tight">{{ getGreeting() }}, {{ currentUser?.username }} 👋</h1>
       </div>
-      <a routerLink="/activities" class="btn-primary inline-flex items-center gap-2 self-start">
-        <span class="material-icons text-xl">add</span>
+      <a routerLink="/activities" class="btn-primary inline-flex items-center gap-2 self-start group">
+        <span class="material-icons text-xl group-hover:rotate-90 transition-transform duration-300">add</span>
         Log Run
       </a>
     </div>
@@ -15,69 +15,75 @@
     <!-- Stats Grid (6 cards) — all navigate to /activities -->
     <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
 
-      <a routerLink="/activities" class="card relative overflow-hidden hover:border-primary/40 hover:scale-[1.02] transition-all cursor-pointer block">
-        <div class="absolute inset-0 bg-primary/5 pointer-events-none"></div>
+      <a routerLink="/activities" class="card relative overflow-hidden group hover:scale-105 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 cursor-pointer block border-transparent hover:border-primary/30">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pointer-events-none"></div>
+        <div class="absolute -top-8 -right-8 w-24 h-24 bg-primary/5 rounded-full blur-2xl pointer-events-none group-hover:bg-primary/10 transition-colors duration-500"></div>
         <div class="relative">
-          <div class="w-9 h-9 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center mb-3">
-            <span class="material-icons text-primary text-base">route</span>
+          <div class="w-10 h-10 rounded-xl bg-primary/15 border border-primary/20 flex items-center justify-center mb-3 group-hover:-translate-y-0.5 transition-transform duration-300">
+            <span class="material-icons text-primary text-lg">route</span>
           </div>
-          <div class="stat-value">{{ stats?.totalDistanceKm?.toFixed(1) || '0.0' }}</div>
-          <p class="text-muted-foreground text-xs font-medium uppercase tracking-wider mt-1">Total KM</p>
+          <div class="stat-value tracking-tight">{{ stats?.totalDistanceKm?.toFixed(1) || '0.0' }}</div>
+          <p class="text-muted-foreground text-[11px] font-semibold uppercase tracking-widest mt-1.5">Total KM</p>
         </div>
       </a>
 
-      <a routerLink="/activities" class="card relative overflow-hidden hover:border-primary/40 hover:scale-[1.02] transition-all cursor-pointer block">
-        <div class="absolute inset-0 bg-destructive/5 pointer-events-none"></div>
+      <a routerLink="/activities" class="card relative overflow-hidden group hover:scale-105 hover:shadow-xl hover:shadow-destructive/10 transition-all duration-300 cursor-pointer block border-transparent hover:border-destructive/30">
+        <div class="absolute inset-0 bg-gradient-to-br from-destructive/10 via-destructive/5 to-transparent pointer-events-none"></div>
+        <div class="absolute -top-8 -right-8 w-24 h-24 bg-destructive/5 rounded-full blur-2xl pointer-events-none group-hover:bg-destructive/10 transition-colors duration-500"></div>
         <div class="relative">
-          <div class="w-9 h-9 rounded-xl bg-destructive/20 border border-destructive/30 flex items-center justify-center mb-3">
-            <span class="material-icons text-destructive text-base">calendar_view_week</span>
+          <div class="w-10 h-10 rounded-xl bg-destructive/15 border border-destructive/20 flex items-center justify-center mb-3 group-hover:-translate-y-0.5 transition-transform duration-300">
+            <span class="material-icons text-destructive text-lg">calendar_view_week</span>
           </div>
-          <div class="stat-value">{{ stats?.weeklyDistanceKm?.toFixed(1) || '0.0' }}</div>
-          <p class="text-muted-foreground text-xs font-medium uppercase tracking-wider mt-1">This Week KM</p>
+          <div class="stat-value tracking-tight">{{ stats?.weeklyDistanceKm?.toFixed(1) || '0.0' }}</div>
+          <p class="text-muted-foreground text-[11px] font-semibold uppercase tracking-widest mt-1.5">This Week KM</p>
         </div>
       </a>
 
-      <a routerLink="/activities" class="card relative overflow-hidden hover:border-primary/40 hover:scale-[1.02] transition-all cursor-pointer block">
-        <div class="absolute inset-0 bg-primary/5 pointer-events-none"></div>
+      <a routerLink="/activities" class="card relative overflow-hidden group hover:scale-105 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 cursor-pointer block border-transparent hover:border-primary/30">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pointer-events-none"></div>
+        <div class="absolute -top-8 -right-8 w-24 h-24 bg-primary/5 rounded-full blur-2xl pointer-events-none group-hover:bg-primary/10 transition-colors duration-500"></div>
         <div class="relative">
-          <div class="w-9 h-9 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center mb-3">
-            <span class="material-icons text-primary text-base">calendar_month</span>
+          <div class="w-10 h-10 rounded-xl bg-primary/15 border border-primary/20 flex items-center justify-center mb-3 group-hover:-translate-y-0.5 transition-transform duration-300">
+            <span class="material-icons text-primary text-lg">calendar_month</span>
           </div>
-          <div class="stat-value">{{ stats?.monthlyDistanceKm?.toFixed(1) || '0.0' }}</div>
-          <p class="text-muted-foreground text-xs font-medium uppercase tracking-wider mt-1">This Month KM</p>
+          <div class="stat-value tracking-tight">{{ stats?.monthlyDistanceKm?.toFixed(1) || '0.0' }}</div>
+          <p class="text-muted-foreground text-[11px] font-semibold uppercase tracking-widest mt-1.5">This Month KM</p>
         </div>
       </a>
 
-      <a routerLink="/activities" class="card relative overflow-hidden hover:border-primary/40 hover:scale-[1.02] transition-all cursor-pointer block">
-        <div class="absolute inset-0 bg-destructive/5 pointer-events-none"></div>
+      <a routerLink="/activities" class="card relative overflow-hidden group hover:scale-105 hover:shadow-xl hover:shadow-destructive/10 transition-all duration-300 cursor-pointer block border-transparent hover:border-destructive/30">
+        <div class="absolute inset-0 bg-gradient-to-br from-destructive/10 via-destructive/5 to-transparent pointer-events-none"></div>
+        <div class="absolute -top-8 -right-8 w-24 h-24 bg-destructive/5 rounded-full blur-2xl pointer-events-none group-hover:bg-destructive/10 transition-colors duration-500"></div>
         <div class="relative">
-          <div class="w-9 h-9 rounded-xl bg-destructive/20 border border-destructive/30 flex items-center justify-center mb-3">
-            <span class="material-icons text-destructive text-base">directions_run</span>
+          <div class="w-10 h-10 rounded-xl bg-destructive/15 border border-destructive/20 flex items-center justify-center mb-3 group-hover:-translate-y-0.5 transition-transform duration-300">
+            <span class="material-icons text-destructive text-lg">directions_run</span>
           </div>
-          <div class="stat-value">{{ stats?.totalRuns || 0 }}</div>
-          <p class="text-muted-foreground text-xs font-medium uppercase tracking-wider mt-1">Total Runs</p>
+          <div class="stat-value tracking-tight">{{ stats?.totalRuns || 0 }}</div>
+          <p class="text-muted-foreground text-[11px] font-semibold uppercase tracking-widest mt-1.5">Total Runs</p>
         </div>
       </a>
 
-      <a routerLink="/activities" class="card relative overflow-hidden hover:border-primary/40 hover:scale-[1.02] transition-all cursor-pointer block">
-        <div class="absolute inset-0 bg-blue-500/5 pointer-events-none"></div>
+      <a routerLink="/activities" class="card relative overflow-hidden group hover:scale-105 hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 cursor-pointer block border-transparent hover:border-blue-500/30">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent pointer-events-none"></div>
+        <div class="absolute -top-8 -right-8 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl pointer-events-none group-hover:bg-blue-500/10 transition-colors duration-500"></div>
         <div class="relative">
-          <div class="w-9 h-9 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center mb-3">
-            <span class="material-icons text-blue-400 text-base">speed</span>
+          <div class="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/20 flex items-center justify-center mb-3 group-hover:-translate-y-0.5 transition-transform duration-300">
+            <span class="material-icons text-blue-400 text-lg">speed</span>
           </div>
-          <div class="stat-value">{{ formatPace(stats?.avgPaceMinPerKm || 0).split(' ')[0] }}</div>
-          <p class="text-muted-foreground text-xs font-medium uppercase tracking-wider mt-1">Avg Pace /km</p>
+          <div class="stat-value tracking-tight">{{ formatPace(stats?.avgPaceMinPerKm || 0).split(' ')[0] }}</div>
+          <p class="text-muted-foreground text-[11px] font-semibold uppercase tracking-widest mt-1.5">Avg Pace /km</p>
         </div>
       </a>
 
-      <a routerLink="/activities" class="card relative overflow-hidden hover:border-primary/40 hover:scale-[1.02] transition-all cursor-pointer block">
-        <div class="absolute inset-0 bg-purple-500/5 pointer-events-none"></div>
+      <a routerLink="/activities" class="card relative overflow-hidden group hover:scale-105 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 cursor-pointer block border-transparent hover:border-purple-500/30">
+        <div class="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-transparent pointer-events-none"></div>
+        <div class="absolute -top-8 -right-8 w-24 h-24 bg-purple-500/5 rounded-full blur-2xl pointer-events-none group-hover:bg-purple-500/10 transition-colors duration-500"></div>
         <div class="relative">
-          <div class="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center mb-3">
-            <span class="material-icons text-purple-400 text-base">timer</span>
+          <div class="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/20 flex items-center justify-center mb-3 group-hover:-translate-y-0.5 transition-transform duration-300">
+            <span class="material-icons text-purple-400 text-lg">timer</span>
           </div>
-          <div class="stat-value">{{ getTotalHours() }}</div>
-          <p class="text-muted-foreground text-xs font-medium uppercase tracking-wider mt-1">Total Time</p>
+          <div class="stat-value tracking-tight">{{ getTotalHours() }}</div>
+          <p class="text-muted-foreground text-[11px] font-semibold uppercase tracking-widest mt-1.5">Total Time</p>
         </div>
       </a>
 
@@ -87,38 +93,49 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
       <!-- Run Streak -->
-      <div class="card relative overflow-hidden border-orange-500/20 hover:border-orange-500/40 transition-all">
-        <div class="absolute inset-0 bg-gradient-to-br from-orange-500/8 to-transparent pointer-events-none"></div>
-        <div class="relative flex items-center gap-4">
-          <div class="w-14 h-14 rounded-2xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center flex-shrink-0">
-            <span class="material-icons text-orange-400 text-2xl">local_fire_department</span>
+      <div class="card relative overflow-hidden streak-card border-orange-500/20 hover:border-orange-500/40 transition-all">
+        <div class="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-orange-400/5 to-transparent pointer-events-none"></div>
+        <div class="absolute -top-12 -right-12 w-40 h-40 bg-orange-500/[0.08] rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative flex items-center gap-5">
+          <div class="relative flex-shrink-0">
+            <div class="absolute inset-0 bg-orange-500/20 rounded-2xl blur-xl streak-icon"></div>
+            <div class="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500/25 to-orange-600/15 border border-orange-500/30 flex items-center justify-center">
+              <span class="material-icons text-orange-400 text-3xl streak-icon">local_fire_department</span>
+            </div>
           </div>
           <div class="flex-1">
             <div class="flex items-baseline gap-2">
-              <span class="text-4xl font-black text-foreground">{{ streak?.currentStreak ?? 0 }}</span>
-              <span class="text-muted-foreground text-sm font-medium">day streak</span>
+              <span class="text-5xl font-black text-foreground tracking-tight">{{ streak?.currentStreak ?? 0 }}</span>
+              <span class="text-muted-foreground text-sm font-semibold tracking-wide">day streak</span>
               @if (streak?.activeToday) {
                 <span class="text-xs bg-orange-500/20 text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded-full font-semibold">🔥 Active</span>
               }
             </div>
-            <p class="text-muted-foreground text-xs mt-0.5">Best: <strong class="text-foreground">{{ streak?.longestStreak ?? 0 }} days</strong> · {{ streak?.totalActiveDays ?? 0 }} total active days</p>
+            <div class="flex items-center gap-3 mt-1.5">
+              <p class="text-muted-foreground text-xs">Best: <strong class="text-foreground">{{ streak?.longestStreak ?? 0 }} days</strong></p>
+              <span class="w-1 h-1 rounded-full bg-border"></span>
+              <p class="text-muted-foreground text-xs">{{ streak?.totalActiveDays ?? 0 }} total active days</p>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- RunPoints -->
-      <div class="card relative overflow-hidden border-yellow-500/20 hover:border-yellow-500/40 transition-all">
-        <div class="absolute inset-0 bg-gradient-to-br from-yellow-500/8 to-transparent pointer-events-none"></div>
-        <div class="relative flex items-center gap-4">
-          <div class="w-14 h-14 rounded-2xl bg-yellow-500/20 border border-yellow-500/30 flex items-center justify-center flex-shrink-0">
-            <span class="material-icons text-yellow-400 text-2xl">stars</span>
+      <div class="card relative overflow-hidden runpoints-card border-yellow-500/20 hover:border-yellow-500/40 transition-all">
+        <div class="absolute inset-0 bg-gradient-to-br from-yellow-500/10 via-amber-400/5 to-transparent pointer-events-none"></div>
+        <div class="absolute -top-12 -right-12 w-40 h-40 bg-yellow-500/[0.08] rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative flex items-center gap-5">
+          <div class="relative flex-shrink-0">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-500/25 to-amber-600/15 border border-yellow-500/30 flex items-center justify-center">
+              <span class="material-icons text-yellow-400 text-3xl">stars</span>
+            </div>
           </div>
           <div class="flex-1">
             <div class="flex items-baseline gap-2">
-              <span class="text-4xl font-black text-foreground">{{ runPoints | number }}</span>
-              <span class="text-muted-foreground text-sm font-medium">RunPoints</span>
+              <span class="text-5xl font-black text-foreground tracking-tight">{{ runPoints | number }}</span>
+              <span class="text-yellow-400 text-sm font-bold tracking-wide uppercase">RP</span>
             </div>
-            <p class="text-muted-foreground text-xs mt-0.5">Earn <strong class="text-yellow-400">10 pts/km</strong> for every run you log</p>
+            <p class="text-muted-foreground text-xs mt-1.5">Earn <strong class="text-yellow-400">10 pts/km</strong> for every run you log</p>
           </div>
         </div>
       </div>
@@ -129,49 +146,76 @@
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
       <!-- This Week → navigate to /calendar -->
-      <div class="xl:col-span-2 card cursor-pointer hover:border-primary/30 transition-colors group"
+      <div class="xl:col-span-2 card cursor-pointer hover:border-primary/30 transition-all duration-300 group"
            (click)="navigateToCalendar()">
-        <h2 class="text-foreground font-bold mb-4 flex items-center gap-2">
-          <span class="material-icons text-primary">calendar_view_week</span>
-          This Week
-          <span class="ml-auto text-primary text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity">View calendar →</span>
-        </h2>
-        <div class="grid grid-cols-7 gap-2">
-          @for (day of thisWeekDays; track day.date.toISOString()) {
-            <div class="flex flex-col items-center gap-1.5 cursor-pointer"
-                 (click)="$event.stopPropagation(); navigateToCalendar(day.date)">
-              <span class="text-xs text-muted-foreground font-medium">{{ day.date | date:'EEE' }}</span>
-              <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold hover:ring-2 hover:ring-primary/40 transition-all"
-                [class]="day.isToday ? 'bg-primary text-foreground' : day.hasActivity ? 'bg-primary/20 text-primary border border-primary/30' : 'bg-secondary text-muted-foreground border border-border'">
-                {{ day.date | date:'d' }}
-              </div>
-              @if (day.hasActivity) {
-                <div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
-              } @else {
-                <div class="w-1.5 h-1.5"></div>
-              }
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-foreground font-bold text-lg flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center">
+              <span class="material-icons text-primary text-base">calendar_view_week</span>
             </div>
-          }
+            This Week
+          </h2>
+          <span class="text-primary text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+            View calendar
+            <span class="material-icons text-sm">arrow_forward</span>
+          </span>
+        </div>
+
+        <!-- Timeline week view -->
+        <div class="relative">
+          <div class="absolute top-[42px] left-[7%] right-[7%] h-px bg-border"></div>
+          <div class="grid grid-cols-7 gap-2">
+            @for (day of thisWeekDays; track day.date.toISOString()) {
+              <div class="flex flex-col items-center gap-2 cursor-pointer relative z-10"
+                   (click)="$event.stopPropagation(); navigateToCalendar(day.date)">
+                <span class="text-[11px] text-muted-foreground font-semibold uppercase tracking-wider">{{ day.date | date:'EEE' }}</span>
+                <div class="w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 hover:scale-110"
+                  [class]="day.isToday
+                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30 ring-4 ring-primary/20 today-ring'
+                    : day.hasActivity
+                      ? 'bg-primary/15 text-primary border-2 border-primary/40 shadow-md shadow-primary/10'
+                      : 'bg-secondary text-muted-foreground border border-border hover:border-muted-foreground/30'">
+                  {{ day.date | date:'d' }}
+                </div>
+                @if (day.hasActivity) {
+                  <div class="w-1.5 h-1.5 rounded-full bg-primary shadow-sm shadow-primary/50"></div>
+                } @else {
+                  <div class="w-1.5 h-1.5"></div>
+                }
+              </div>
+            }
+          </div>
         </div>
       </div>
 
       <!-- Today's Schedule -->
-      <div class="card cursor-pointer hover:border-primary/30 transition-colors group"
+      <div class="card cursor-pointer hover:border-primary/30 transition-all duration-300 group"
            (click)="navigateToCalendar()">
-        <div class="flex items-center gap-3 mb-4">
-          <span class="material-icons text-primary">today</span>
-          <h2 class="text-foreground font-bold">Today's Schedule</h2>
-          <span class="ml-auto text-primary text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity">View →</span>
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center">
+            <span class="material-icons text-primary text-base">today</span>
+          </div>
+          <h2 class="text-foreground font-bold text-lg">Today</h2>
+          <span class="ml-auto text-primary text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+            View
+            <span class="material-icons text-sm">arrow_forward</span>
+          </span>
         </div>
 
         @if (todaySchedule.length === 0) {
-          <div class="text-center py-6">
-            <span class="material-icons text-muted-foreground text-3xl">wb_sunny</span>
-            <p class="text-muted-foreground mt-2 text-sm">Nothing scheduled today. Rest day?</p>
-            <a routerLink="/activities" (click)="$event.stopPropagation()" class="text-primary text-sm hover:underline mt-1 inline-block">Log a run</a>
+          <div class="text-center py-8">
+            <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/10 flex items-center justify-center mb-4">
+              <span class="material-icons text-primary/60 text-3xl">wb_sunny</span>
+            </div>
+            <p class="text-foreground font-semibold text-sm">Rest day</p>
+            <p class="text-muted-foreground mt-1 text-xs">Nothing scheduled — enjoy the recovery!</p>
+            <a routerLink="/activities" (click)="$event.stopPropagation()" class="inline-flex items-center gap-1 text-primary text-xs font-semibold hover:underline mt-3">
+              <span class="material-icons text-sm">add</span>
+              Log a run
+            </a>
           </div>
         } @else {
-          <div class="space-y-2">
+          <div class="space-y-2.5">
             @for (item of todaySchedule; track item.id) {
               <a [routerLink]="item.routerLink" (click)="$event.stopPropagation()"
                 [ngClass]="getScheduleItemClass(item)">
@@ -186,7 +230,7 @@
                   <p class="text-muted-foreground text-xs">{{ item.subtitle }}</p>
                 </div>
                 @if (item.time) {
-                  <span class="text-muted-foreground text-xs flex-shrink-0">{{ item.time }}</span>
+                  <span class="text-muted-foreground text-xs flex-shrink-0 font-mono">{{ item.time }}</span>
                 }
               </a>
             }
@@ -200,37 +244,48 @@
 
       <!-- Recent Activities -->
       <div class="xl:col-span-2 card">
-        <div class="flex items-center justify-between mb-5">
+        <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
-            <span class="material-icons text-primary">directions_run</span>
+            <div class="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center">
+              <span class="material-icons text-primary text-base">directions_run</span>
+            </div>
             <h2 class="text-foreground font-bold text-lg">Recent Activities</h2>
           </div>
-          <a routerLink="/activities" class="text-primary hover:text-primary text-sm font-semibold transition-colors">View all →</a>
+          <a routerLink="/activities" class="text-primary hover:text-primary text-xs font-semibold transition-colors flex items-center gap-1">
+            View all
+            <span class="material-icons text-sm">arrow_forward</span>
+          </a>
         </div>
 
         @if (recentActivities.length === 0) {
-          <div class="flex flex-col items-center justify-center py-12 gap-3 text-center">
-            <div class="w-16 h-16 rounded-2xl bg-secondary border border-border flex items-center justify-center">
-              <span class="material-icons text-muted-foreground text-3xl">directions_run</span>
+          <div class="flex flex-col items-center justify-center py-16 gap-4 text-center">
+            <div class="relative">
+              <div class="absolute inset-0 bg-primary/10 rounded-3xl blur-2xl"></div>
+              <div class="relative w-20 h-20 rounded-3xl bg-gradient-to-br from-primary/15 to-primary/5 border border-primary/10 flex items-center justify-center">
+                <span class="material-icons text-primary/50 text-4xl">directions_run</span>
+              </div>
             </div>
-            <p class="text-muted-foreground">No activities yet.</p>
-            <a routerLink="/activities" class="text-primary hover:text-primary text-sm font-semibold">Log your first run!</a>
+            <div>
+              <p class="text-foreground font-semibold">No activities yet</p>
+              <p class="text-muted-foreground text-sm mt-1">Your running journey starts with a single step</p>
+            </div>
+            <a routerLink="/activities" class="btn-primary text-sm px-5 py-2.5">Log your first run</a>
           </div>
         }
 
-        <div class="space-y-3">
+        <div class="space-y-2.5">
           @for (activity of recentActivities; track activity.id) {
             <a routerLink="/activities"
-              class="flex items-center gap-4 p-4 bg-secondary rounded-xl border border-border hover:border-primary/30 hover:scale-[1.01] transition-all cursor-pointer group">
-              <div class="w-10 h-10 rounded-xl bg-primary/20 border border-primary/20 flex items-center justify-center flex-shrink-0">
+              class="flex items-center gap-4 p-4 rounded-xl border border-transparent hover:border-primary/20 hover:bg-secondary/80 hover:scale-[1.01] transition-all duration-300 cursor-pointer group -mx-2">
+              <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/15 flex items-center justify-center flex-shrink-0 group-hover:shadow-lg group-hover:shadow-primary/10 transition-shadow">
                 <span class="material-icons text-primary text-xl">directions_run</span>
               </div>
               <div class="flex-1 min-w-0">
                 <p class="text-foreground font-semibold text-sm truncate group-hover:text-primary transition-colors">{{ activity.title }}</p>
-                <p class="text-muted-foreground text-xs mt-0.5">{{ activity.activityDate | date:'MMM d' }} · {{ formatDuration(activity.durationMinutes) }} · {{ formatPace(activity.paceMinPerKm) }}</p>
+                <p class="text-muted-foreground text-xs mt-0.5 tracking-wide">{{ activity.activityDate | date:'MMM d' }} · {{ formatDuration(activity.durationMinutes) }} · {{ formatPace(activity.paceMinPerKm) }}</p>
               </div>
               <div class="flex-shrink-0">
-                <span class="badge bg-primary/15 text-primary border border-primary/20">{{ activity.distanceKm.toFixed(1) }} km</span>
+                <span class="badge bg-primary/10 text-primary border border-primary/15 font-bold">{{ activity.distanceKm.toFixed(1) }} km</span>
               </div>
             </a>
           }
@@ -242,24 +297,32 @@
 
         <!-- Upcoming Events -->
         <div class="card">
-          <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center justify-between mb-5">
             <div class="flex items-center gap-3">
-              <span class="material-icons text-primary">event</span>
+              <div class="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center">
+                <span class="material-icons text-primary text-base">event</span>
+              </div>
               <h2 class="text-foreground font-bold">Upcoming Events</h2>
             </div>
             <a routerLink="/events" class="text-primary hover:text-primary text-xs font-semibold transition-colors">See all</a>
           </div>
 
           @if (upcomingEvents.length === 0) {
-            <p class="text-muted-foreground text-sm text-center py-4">No upcoming events. <a routerLink="/events" class="text-primary">Browse!</a></p>
+            <div class="text-center py-8">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-blue-500/10 to-blue-500/5 border border-blue-500/10 flex items-center justify-center mb-3">
+                <span class="material-icons text-blue-400/50 text-2xl">event_available</span>
+              </div>
+              <p class="text-foreground text-sm font-medium">No upcoming events</p>
+              <a routerLink="/events" class="text-primary text-xs font-semibold hover:underline mt-1 inline-block">Browse events</a>
+            </div>
           }
 
           <div class="space-y-3">
             @for (event of upcomingEvents; track event.id) {
-              <a [routerLink]="['/events', event.id]" class="flex items-center gap-3 group hover:scale-[1.01] transition-all cursor-pointer">
-                <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-primary flex flex-col items-center justify-center">
-                  <span class="text-foreground font-black text-lg leading-none">{{ event.eventDate | date:'d' }}</span>
-                  <span class="text-white/80 text-[10px] uppercase tracking-wider">{{ event.eventDate | date:'MMM' }}</span>
+              <a [routerLink]="['/events', event.id]" class="flex items-center gap-3 group hover:scale-[1.02] transition-all duration-300 cursor-pointer p-2 -mx-2 rounded-xl hover:bg-secondary/50">
+                <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex flex-col items-center justify-center shadow-lg shadow-primary/20">
+                  <span class="text-primary-foreground font-black text-lg leading-none">{{ event.eventDate | date:'d' }}</span>
+                  <span class="text-primary-foreground/70 text-[10px] uppercase tracking-wider font-semibold">{{ event.eventDate | date:'MMM' }}</span>
                 </div>
                 <div class="flex-1 overflow-hidden">
                   <p class="text-foreground text-sm font-semibold truncate group-hover:text-primary transition-colors">{{ event.name || 'Untitled Event' }}</p>
@@ -272,29 +335,42 @@
 
         <!-- Weekly Leaders -->
         <div class="card">
-          <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center justify-between mb-5">
             <div class="flex items-center gap-3">
-              <span class="material-icons text-primary">leaderboard</span>
+              <div class="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center">
+                <span class="material-icons text-primary text-base">leaderboard</span>
+              </div>
               <h2 class="text-foreground font-bold">Weekly Leaders</h2>
             </div>
             <a routerLink="/rankings" class="text-primary hover:text-primary text-xs font-semibold transition-colors">Full board</a>
           </div>
-          <div class="space-y-2">
+          <div class="space-y-1.5">
             @for (r of topRankings; track r.rank) {
               <a routerLink="/rankings"
-                class="flex items-center gap-3 p-2 rounded-lg hover:bg-secondary transition-colors cursor-pointer group"
-                [class.bg-primary]="r.rank === 1" [class.bg-opacity-10]="r.rank === 1">
+                class="flex items-center gap-3 p-2.5 rounded-xl transition-all duration-300 cursor-pointer group"
+                [ngClass]="{
+                  'leader-accent-1': r.rank === 1,
+                  'leader-accent-2': r.rank === 2,
+                  'leader-accent-3': r.rank === 3,
+                  'hover:bg-secondary': r.rank > 3
+                }">
                 <div class="w-7 text-center text-sm font-bold flex-shrink-0">
-                  @if (r.rank === 1) { <span>🥇</span> }
-                  @else if (r.rank === 2) { <span>🥈</span> }
-                  @else if (r.rank === 3) { <span>🥉</span> }
+                  @if (r.rank === 1) { <span class="text-lg">🥇</span> }
+                  @else if (r.rank === 2) { <span class="text-lg">🥈</span> }
+                  @else if (r.rank === 3) { <span class="text-lg">🥉</span> }
                   @else { <span class="text-muted-foreground">{{ r.rank }}</span> }
                 </div>
-                <div class="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                  [ngClass]="{
+                    'bg-gradient-to-br from-yellow-400 to-amber-500 text-black shadow-lg shadow-yellow-500/20': r.rank === 1,
+                    'bg-gradient-to-br from-gray-300 to-gray-400 text-black': r.rank === 2,
+                    'bg-gradient-to-br from-amber-600 to-orange-700 text-white': r.rank === 3,
+                    'bg-primary/20 text-primary': r.rank > 3
+                  }">
                   {{ getInitials(r.username) }}
                 </div>
                 <span class="flex-1 text-foreground text-sm font-medium truncate group-hover:text-primary transition-colors">{{ r.username }}</span>
-                <span class="text-primary font-bold text-sm">{{ r.totalDistanceKm?.toFixed(1) }} km</span>
+                <span class="text-primary font-bold text-sm tabular-nums">{{ r.totalDistanceKm?.toFixed(1) }} km</span>
               </a>
             }
           </div>
@@ -308,31 +384,40 @@
 
       <!-- Challenges → navigate to /activities -->
       <div class="card">
-        <div class="flex items-center gap-3 mb-5">
-          <span class="material-icons text-primary">emoji_events</span>
-          <h2 class="text-foreground font-bold">Active Challenges</h2>
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center">
+            <span class="material-icons text-primary text-base">emoji_events</span>
+          </div>
+          <h2 class="text-foreground font-bold text-lg">Active Challenges</h2>
         </div>
-        <div class="space-y-5">
+        <div class="space-y-4">
           @for (challenge of challenges; track challenge.id) {
             <a routerLink="/activities"
-              class="block space-y-2 p-3 -mx-3 rounded-xl hover:bg-secondary transition-colors cursor-pointer group">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <span class="material-icons text-xl"
+              class="block p-4 rounded-xl border border-border hover:border-primary/20 hover:bg-secondary/50 transition-all duration-300 cursor-pointer group">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-lg flex items-center justify-center"
                     [ngClass]="{
-                      'text-primary': challenge.color === 'orange',
-                      'text-destructive': challenge.color === 'red',
-                      'text-blue-400': challenge.color === 'blue'
-                    }">{{ challenge.icon }}</span>
+                      'bg-primary/15': challenge.color === 'orange',
+                      'bg-destructive/15': challenge.color === 'red',
+                      'bg-blue-500/15': challenge.color === 'blue'
+                    }">
+                    <span class="material-icons text-lg"
+                      [ngClass]="{
+                        'text-primary': challenge.color === 'orange',
+                        'text-destructive': challenge.color === 'red',
+                        'text-blue-400': challenge.color === 'blue'
+                      }">{{ challenge.icon }}</span>
+                  </div>
                   <div>
-                    <p class="text-foreground text-sm font-semibold group-hover:text-primary transition-colors">{{ challenge.title }}</p>
+                    <p class="text-foreground text-sm font-bold group-hover:text-primary transition-colors">{{ challenge.title }}</p>
                     <p class="text-muted-foreground text-xs">{{ challenge.description }}</p>
                   </div>
                 </div>
-                <span class="text-primary font-bold text-sm">{{ getChallengeValue(challenge) }}</span>
+                <span class="text-primary font-bold text-sm tabular-nums">{{ getChallengeValue(challenge) }}</span>
               </div>
-              <div class="w-full bg-secondary rounded-full h-2">
-                <div class="h-2 rounded-full bg-primary transition-all duration-500"
+              <div class="w-full bg-secondary rounded-full h-2 overflow-hidden">
+                <div class="h-2 rounded-full progress-gradient transition-all duration-700 ease-out"
                   [style.width.%]="getChallengeProgress(challenge)"></div>
               </div>
             </a>
@@ -342,34 +427,47 @@
 
       <!-- Active Training Programs -->
       <div class="card flex flex-col">
-        <div class="flex items-center gap-3 mb-4">
-          <span class="material-icons text-primary">fitness_center</span>
-          <h2 class="text-foreground font-bold">Active Programs</h2>
-          <a routerLink="/programs" class="ml-auto text-primary hover:text-primary text-xs font-semibold transition-colors">View all →</a>
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-lg bg-purple-500/15 flex items-center justify-center">
+            <span class="material-icons text-purple-400 text-base">fitness_center</span>
+          </div>
+          <h2 class="text-foreground font-bold text-lg">Active Programs</h2>
+          <a routerLink="/programs" class="ml-auto text-primary hover:text-primary text-xs font-semibold transition-colors flex items-center gap-1">
+            View all
+            <span class="material-icons text-sm">arrow_forward</span>
+          </a>
         </div>
 
         @if (programProgress.length === 0) {
-          <div class="flex flex-col items-center justify-center py-6 gap-2 text-center">
-            <span class="material-icons text-muted-foreground text-3xl">fitness_center</span>
-            <p class="text-muted-foreground text-sm">No active programs</p>
-            <a routerLink="/programs" class="text-primary text-sm hover:underline">Browse training plans</a>
+          <div class="flex flex-col items-center justify-center py-10 gap-4 text-center flex-1">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500/10 to-purple-500/5 border border-purple-500/10 flex items-center justify-center">
+              <span class="material-icons text-purple-400/50 text-3xl">fitness_center</span>
+            </div>
+            <div>
+              <p class="text-foreground font-semibold text-sm">No active programs</p>
+              <p class="text-muted-foreground text-xs mt-1">Start a training plan to reach your goals</p>
+            </div>
+            <a routerLink="/programs" class="text-primary text-xs font-semibold hover:underline flex items-center gap-1">
+              <span class="material-icons text-sm">explore</span>
+              Browse training plans
+            </a>
           </div>
         } @else {
           <div class="space-y-3">
             @for (prog of programProgress; track prog.id) {
               <a routerLink="/programs"
-                class="block p-3 bg-secondary rounded-xl border border-border space-y-2 hover:border-primary/30 hover:scale-[1.01] transition-all cursor-pointer group">
+                class="block p-4 bg-secondary/50 rounded-xl border border-border space-y-3 hover:border-purple-500/30 hover:scale-[1.01] transition-all duration-300 cursor-pointer group">
                 <div class="flex items-center justify-between">
                   <div class="min-w-0 flex-1">
-                    <p class="text-foreground font-semibold text-sm truncate group-hover:text-primary transition-colors">{{ prog.programName || 'Training Program' }}</p>
-                    <span class="text-muted-foreground text-xs uppercase">{{ prog.status || 'Active' }}</span>
+                    <p class="text-foreground font-bold text-sm truncate group-hover:text-purple-400 transition-colors">{{ prog.programName || 'Training Program' }}</p>
+                    <span class="text-muted-foreground text-xs uppercase tracking-wider font-medium">{{ prog.status || 'Active' }}</span>
                   </div>
-                  <span class="text-primary font-bold text-sm flex-shrink-0 ml-3">
+                  <span class="text-primary font-bold text-sm flex-shrink-0 ml-3 tabular-nums">
                     {{ prog.completedSessions || 0 }} / {{ prog.totalSessions || '?' }}
                   </span>
                 </div>
-                <div class="w-full bg-card rounded-full h-1.5">
-                  <div class="h-1.5 rounded-full bg-primary transition-all duration-500"
+                <div class="w-full bg-card rounded-full h-2 overflow-hidden">
+                  <div class="h-2 rounded-full bg-gradient-to-r from-purple-500 to-purple-400 transition-all duration-700 ease-out"
                     [style.width.%]="getProgramProgress(prog)">
                   </div>
                 </div>
