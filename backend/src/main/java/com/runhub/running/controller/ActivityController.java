@@ -27,6 +27,13 @@ public class ActivityController {
         return ResponseEntity.ok(activityService.getAllActivities());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ActivityDto> getActivityById(@PathVariable Long id, Principal principal) {
+        return activityService.getActivityById(id, principal.getName())
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/user")
     public ResponseEntity<List<ActivityDto>> getMyActivities(Principal principal) {
         return ResponseEntity.ok(activityService.getUserActivities(principal.getName()));

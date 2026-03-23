@@ -38,6 +38,10 @@ application:
     frontend-callback-url: ${FRONTEND_URL:http://localhost:4200}/oauth/callback
   drive:
     api-key: ${GOOGLE_DRIVE_API_KEY:}
+  ai:
+    stitch-api-key: ${STITCH_API_KEY:}
+    api-url: ${AI_API_URL:https://api.openai.com/v1/chat/completions}
+    model: ${AI_MODEL:gpt-4o-mini}
 
 logging:
   level:

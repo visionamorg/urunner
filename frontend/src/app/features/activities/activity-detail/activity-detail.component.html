@@ -1,0 +1,243 @@
+<!-- Loading State -->
+@if (loading) {
+  <div class="flex justify-center py-20">
+    <div class="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent"></div>
+  </div>
+}
+
+@if (activity) {
+  <div class="max-w-6xl mx-auto space-y-6 animate-fade-in">
+
+    <!-- Back + Header -->
+    <div class="flex items-center gap-4">
+      <a routerLink="/activities" class="p-2 rounded-xl bg-secondary border border-border hover:border-primary/30 transition-colors">
+        <span class="material-icons text-foreground">arrow_back</span>
+      </a>
+      <div class="flex-1 min-w-0">
+        <h1 class="text-2xl sm:text-3xl font-black text-foreground truncate">{{ activity.title }}</h1>
+        <p class="text-muted-foreground text-sm mt-0.5">
+          {{ activity.activityDate | date:'EEEE, MMMM d, yyyy' }}
+          @if (activity.location) {
+            <span class="mx-1">·</span>
+            <span class="material-icons text-xs align-middle">location_on</span> {{ activity.location }}
+          }
+        </p>
+      </div>
+      <button (click)="openExportStudio()" class="btn-secondary inline-flex items-center gap-2 hidden sm:flex">
+        <span class="material-icons text-lg">photo_camera</span>
+        Share
+      </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-3 gap-4">
+      <div class="card text-center">
+        <div class="stat-value text-2xl sm:text-3xl">{{ activity.distanceKm.toFixed(2) }}</div>
+        <p class="text-muted-foreground text-xs uppercase tracking-wider mt-1">Kilometers</p>
+      </div>
+      <div class="card text-center">
+        <div class="stat-value text-2xl sm:text-3xl">{{ formatDuration(activity.durationMinutes) }}</div>
+        <p class="text-muted-foreground text-xs uppercase tracking-wider mt-1">Duration</p>
+      </div>
+      <div class="card text-center">
+        <div class="stat-value text-2xl sm:text-3xl">{{ formatPace(activity.paceMinPerKm) }}</div>
+        <p class="text-muted-foreground text-xs uppercase tracking-wider mt-1">Pace</p>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    @if (activity.notes) {
+      <div class="card">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="material-icons text-primary text-lg">notes</span>
+          <h3 class="text-foreground font-semibold">Runner's Notes</h3>
+        </div>
+        <p class="text-muted-foreground leading-relaxed">{{ activity.notes }}</p>
+      </div>
+    }
+
+    <!-- AI Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- AI Insights Panel (2 cols) -->
+      <div class="lg:col-span-2 space-y-4">
+
+        <!-- AI Summary Card -->
+        @if (insight) {
+          <div class="card border-primary/20 animate-slide-up">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/30 to-amber-600/30 border border-primary/20 flex items-center justify-center">
+                  <span class="material-icons text-primary">psychology</span>
+                </div>
+                <div>
+                  <h3 class="text-foreground font-bold">AI Coach Analysis</h3>
+                  <p class="text-muted-foreground text-xs">Powered by RunHub AI</p>
+                </div>
+              </div>
+              <span class="badge border {{ getIntensityColor(insight.intensity) }}">
+                {{ insight.intensity }}
+              </span>
+            </div>
+
+            <p class="text-foreground leading-relaxed mb-5">{{ insight.summaryText }}</p>
+
+            <!-- Next Run Suggestion -->
+            @if (insight.nextRunSuggestion) {
+              <div class="bg-secondary/50 border border-border rounded-xl p-4 mb-4">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="material-icons text-primary text-lg">event_upcoming</span>
+                  <h4 class="text-foreground font-semibold text-sm">Next Run Suggestion</h4>
+                </div>
+                <p class="text-muted-foreground text-sm leading-relaxed">{{ insight.nextRunSuggestion }}</p>
+              </div>
+            }
+
+            <!-- Injury Risk -->
+            @if (insight.injuryRiskNotes && insight.injuryRiskNotes !== 'No concerns') {
+              <div class="bg-red-500/5 border border-red-500/20 rounded-xl p-4 mb-4">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="material-icons text-red-400 text-lg">healing</span>
+                  <h4 class="text-red-400 font-semibold text-sm">Injury Risk Notes</h4>
+                </div>
+                <p class="text-red-300/80 text-sm leading-relaxed">{{ insight.injuryRiskNotes }}</p>
+              </div>
+            } @else if (insight.injuryRiskNotes === 'No concerns') {
+              <div class="bg-green-500/5 border border-green-500/20 rounded-xl p-4 mb-4">
+                <div class="flex items-center gap-2">
+                  <span class="material-icons text-green-400 text-lg">verified</span>
+                  <p class="text-green-400 font-semibold text-sm">No injury concerns detected</p>
+                </div>
+              </div>
+            }
+
+            <!-- Social Caption -->
+            @if (insight.socialCaption) {
+              <div class="bg-secondary/50 border border-border rounded-xl p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <div class="flex items-center gap-2">
+                    <span class="material-icons text-primary text-lg">share</span>
+                    <h4 class="text-foreground font-semibold text-sm">Social Caption</h4>
+                  </div>
+                  <button (click)="copyCaption()" class="text-xs px-3 py-1 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
+                    {{ copiedCaption ? 'Copied!' : 'Copy' }}
+                  </button>
+                </div>
+                <p class="text-muted-foreground text-sm italic">"{{ insight.socialCaption }}"</p>
+              </div>
+            }
+          </div>
+
+          <!-- Re-analyze button -->
+          <button (click)="analyzeActivity()" [disabled]="analyzing" class="btn-secondary w-full flex items-center justify-center gap-2">
+            @if (analyzing) {
+              <div class="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
+            } @else {
+              <span class="material-icons text-lg">refresh</span>
+            }
+            Re-analyze with AI
+          </button>
+        } @else {
+          <!-- No insight yet — CTA -->
+          <div class="card border-dashed border-2 border-primary/20 text-center py-12">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-amber-600/20 border border-primary/20 flex items-center justify-center mx-auto mb-4">
+              <span class="material-icons text-primary text-3xl">auto_awesome</span>
+            </div>
+            <h3 class="text-foreground font-bold text-lg mb-2">AI Activity Analysis</h3>
+            <p class="text-muted-foreground text-sm max-w-md mx-auto mb-6">
+              Get a personalized coach's analysis of this run, including intensity classification, next-run suggestions, and injury risk assessment.
+            </p>
+            <button (click)="analyzeActivity()" [disabled]="analyzing" class="btn-primary inline-flex items-center gap-2">
+              @if (analyzing) {
+                <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                Analyzing...
+              } @else {
+                <span class="material-icons text-lg">psychology</span>
+                Request AI Summary
+              }
+            </button>
+          </div>
+        }
+      </div>
+
+      <!-- Chat Panel (1 col) -->
+      <div class="lg:col-span-1">
+        <div class="card h-full flex flex-col" style="min-height: 500px;">
+          <!-- Chat Header -->
+          <div class="flex items-center gap-3 pb-4 border-b border-border">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary/30 to-amber-600/30 border border-primary/20 flex items-center justify-center">
+              <span class="material-icons text-primary text-lg">smart_toy</span>
+            </div>
+            <div>
+              <h3 class="text-foreground font-bold text-sm">AI Running Coach</h3>
+              <p class="text-muted-foreground text-xs">Ask about this activity</p>
+            </div>
+          </div>
+
+          <!-- Messages -->
+          <div #chatContainer class="flex-1 overflow-y-auto py-4 space-y-3" style="max-height: 400px;">
+            @if (chatMessages.length === 0) {
+              <div class="text-center py-8">
+                <span class="material-icons text-muted-foreground/40 text-4xl">forum</span>
+                <p class="text-muted-foreground text-sm mt-3">Ask me anything about this run</p>
+                <div class="mt-4 space-y-2">
+                  <button (click)="chatInput = 'How does this run compare to my recent average?'; sendChatMessage()" class="block w-full text-left text-xs px-3 py-2 rounded-lg bg-secondary border border-border text-muted-foreground hover:border-primary/30 hover:text-foreground transition-colors">
+                    "How does this run compare to my recent average?"
+                  </button>
+                  <button (click)="chatInput = 'What should my next training session look like?'; sendChatMessage()" class="block w-full text-left text-xs px-3 py-2 rounded-lg bg-secondary border border-border text-muted-foreground hover:border-primary/30 hover:text-foreground transition-colors">
+                    "What should my next training session look like?"
+                  </button>
+                  <button (click)="chatInput = 'Any tips to improve my pace?'; sendChatMessage()" class="block w-full text-left text-xs px-3 py-2 rounded-lg bg-secondary border border-border text-muted-foreground hover:border-primary/30 hover:text-foreground transition-colors">
+                    "Any tips to improve my pace?"
+                  </button>
+                </div>
+              </div>
+            }
+
+            @for (msg of chatMessages; track $index) {
+              <div [class]="msg.role === 'user' ? 'flex justify-end' : 'flex justify-start'">
+                <div [class]="msg.role === 'user'
+                  ? 'bg-primary text-primary-foreground rounded-2xl rounded-br-md px-4 py-2.5 max-w-[85%]'
+                  : 'bg-secondary border border-border text-foreground rounded-2xl rounded-bl-md px-4 py-2.5 max-w-[85%]'">
+                  <p class="text-sm leading-relaxed whitespace-pre-wrap">{{ msg.content }}</p>
+                </div>
+              </div>
+            }
+
+            @if (chatLoading) {
+              <div class="flex justify-start">
+                <div class="bg-secondary border border-border rounded-2xl rounded-bl-md px-4 py-3">
+                  <div class="flex items-center gap-1.5">
+                    <div class="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" style="animation-delay: 0ms"></div>
+                    <div class="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" style="animation-delay: 150ms"></div>
+                    <div class="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" style="animation-delay: 300ms"></div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Chat Input -->
+          <div class="pt-3 border-t border-border">
+            <div class="flex items-center gap-2">
+              <input
+                [(ngModel)]="chatInput"
+                (keydown.enter)="sendChatMessage()"
+                [disabled]="chatLoading"
+                placeholder="Ask about this run..."
+                class="flex-1 bg-secondary border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors">
+              <button
+                (click)="sendChatMessage()"
+                [disabled]="!chatInput.trim() || chatLoading"
+                class="p-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                <span class="material-icons text-lg">send</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+}

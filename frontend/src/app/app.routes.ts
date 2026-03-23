@@ -33,6 +33,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/activities/activities.component').then(m => m.ActivitiesComponent)
       },
       {
+        path: 'activities/:id',
+        loadComponent: () => import('./features/activities/activity-detail/activity-detail.component').then(m => m.ActivityDetailComponent)
+      },
+      {
         path: 'communities',
         loadComponent: () => import('./features/communities/communities.component').then(m => m.CommunitiesComponent)
       },

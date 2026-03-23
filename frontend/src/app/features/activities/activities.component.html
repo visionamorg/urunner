@@ -124,7 +124,7 @@
   } @else {
     <div class="space-y-3">
       @for (activity of activities; track activity.id) {
-        <div class="card hover:border-primary/20 transition-colors">
+        <div class="card hover:border-primary/20 transition-colors cursor-pointer" (click)="router.navigate(['/activities', activity.id])">
           <div class="flex items-center gap-4">
             <div class="w-12 h-12 rounded-xl bg-primary/20 border border-primary/20 flex items-center justify-center flex-shrink-0">
               <span class="material-icons text-primary text-2xl">directions_run</span>

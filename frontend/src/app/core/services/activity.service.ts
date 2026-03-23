@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Activity, ActivityStats, CreateActivityRequest } from '../models/activity.model';
+import { Activity, ActivityStats, CreateActivityRequest, ActivityInsight, ActivityChatRequest, ActivityChatResponse } from '../models/activity.model';
 
 export interface Streak {
   currentStreak: number;
@@ -46,5 +46,21 @@ export class ActivityService {
 
   syncGarmin(): Observable<SyncResult> {
     return this.http.post<SyncResult>('/api/sync/garmin', {});
+  }
+
+  getActivityById(id: number): Observable<Activity> {
+    return this.http.get<Activity>(`/api/activities/${id}`);
+  }
+
+  analyzeActivity(id: number): Observable<ActivityInsight> {
+    return this.http.post<ActivityInsight>(`/api/activities/${id}/analyze`, {});
+  }
+
+  getActivityInsight(id: number): Observable<ActivityInsight> {
+    return this.http.get<ActivityInsight>(`/api/activities/${id}/insight`);
+  }
+
+  chatAboutActivity(id: number, request: ActivityChatRequest): Observable<ActivityChatResponse> {
+    return this.http.post<ActivityChatResponse>(`/api/activities/${id}/chat`, request);
   }
 }

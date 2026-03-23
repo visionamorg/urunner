@@ -23,7 +23,7 @@ export class ActivitiesComponent implements OnInit {
   constructor(
     private activityService: ActivityService,
     private fb: FormBuilder,
-    private router: Router
+    public router: Router
   ) {
     const today = new Date().toISOString().split('T')[0];
     this.form = this.fb.group({

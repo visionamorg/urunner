@@ -29,3 +29,28 @@ export interface CreateActivityRequest {
   location?: string;
   notes?: string;
 }
+
+export interface ActivityInsight {
+  id: number;
+  activityId: number;
+  summaryText: string;
+  intensity: string;
+  nextRunSuggestion: string;
+  injuryRiskNotes: string;
+  socialCaption: string;
+  createdAt: string;
+}
+
+export interface ActivityChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+export interface ActivityChatRequest {
+  message: string;
+  history: ActivityChatMessage[];
+}
+
+export interface ActivityChatResponse {
+  reply: string;
+}

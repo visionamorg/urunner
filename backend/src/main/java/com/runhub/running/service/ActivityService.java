@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +27,13 @@ public class ActivityService {
     public List<ActivityDto> getAllActivities() {
         return activityRepository.findAllByOrderByActivityDateDesc()
                 .stream().map(activityMapper::toDto).toList();
+    }
+
+    public Optional<ActivityDto> getActivityById(Long id, String email) {
+        User user = userService.getUserEntityByEmail(email);
+        return activityRepository.findById(id)
+                .filter(a -> a.getUser().getId().equals(user.getId()))
+                .map(activityMapper::toDto);
     }
 
     public List<ActivityDto> getUserActivities(String email) {
