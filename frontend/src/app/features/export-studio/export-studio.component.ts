@@ -347,37 +347,210 @@ export class ExportStudioComponent implements OnInit {
     return map[this.brandPosition] ?? map['tl'];
   }
 
-  /** Convert any image URL to a base64 data URL so html2canvas can render it without CORS issues */
-  private toDataUrl(url: string): Promise<string> {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        const c = document.createElement('canvas');
-        c.width = img.naturalWidth;
-        c.height = img.naturalHeight;
-        c.getContext('2d')!.drawImage(img, 0, 0);
-        resolve(c.toDataURL('image/png'));
-      };
-      img.onerror = () => resolve(url); // fallback: keep original url
-      img.src = url;
-    });
+  /** Convert any image URL to a base64 data URL for CORS-safe canvas rendering */
+  private async toDataUrl(url: string): Promise<string> {
+    if (url.startsWith('data:')) return url;
+
+    // Try fetch + FileReader (most reliable for same-origin & CORS-enabled URLs)
+    try {
+      const resp = await fetch(url, { mode: 'cors' });
+      if (!resp.ok) throw new Error('fetch failed');
+      const blob = await resp.blob();
+      return await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = () => reject();
+        reader.readAsDataURL(blob);
+      });
+    } catch {
+      // Fallback: Image element + canvas
+      return new Promise<string>((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          try {
+            const c = document.createElement('canvas');
+            c.width = img.naturalWidth;
+            c.height = img.naturalHeight;
+            c.getContext('2d')!.drawImage(img, 0, 0);
+            resolve(c.toDataURL('image/png'));
+          } catch {
+            resolve(url);
+          }
+        };
+        img.onerror = () => resolve(url);
+        img.src = url;
+      });
+    }
   }
 
+  /**
+   * Two-pass canvas render that:
+   *  1) Captures a clean background (backdrop-filter elements hidden)
+   *  2) Blurs the relevant regions via Canvas filter API
+   *  3) Composites them as background-image to simulate backdrop-filter
+   *  Also pre-converts all <img> to base64 and fixes <app-avatar> sizing
+   */
   private async renderCanvas(): Promise<HTMLCanvasElement> {
     const element = this.canvasContainer.nativeElement;
-    return html2canvas(element, {
+    const containerRect = element.getBoundingClientRect();
+    const scaleX = this.canvasWidth / containerRect.width;
+    const scaleY = this.canvasHeight / containerRect.height;
+
+    // ── 1. Identify elements with backdrop-filter ────────────────────
+    const blurTargets: {
+      id: string; blurPx: number; bgColor: string;
+      x: number; y: number; w: number; h: number;
+    }[] = [];
+
+    element.querySelectorAll('*').forEach((el: Element, i: number) => {
+      const cs = getComputedStyle(el);
+      const bf = cs.getPropertyValue('backdrop-filter') ||
+                 cs.getPropertyValue('-webkit-backdrop-filter');
+      const match = bf?.match(/blur\((\d+)px\)/);
+      if (match) {
+        const r = el.getBoundingClientRect();
+        const id = `bf${i}`;
+        (el as HTMLElement).setAttribute('data-bf', id);
+        blurTargets.push({
+          id,
+          blurPx: parseInt(match[1]),
+          bgColor: cs.backgroundColor,
+          x: (r.left - containerRect.left) * scaleX,
+          y: (r.top - containerRect.top) * scaleY,
+          w: r.width * scaleX,
+          h: r.height * scaleY,
+        });
+      }
+    });
+
+    // ── 2. Pre-convert every live <img> src to base64 ────────────────
+    const imgB64 = new Map<string, string>();
+    const allImgs = Array.from(
+      element.querySelectorAll('img') as NodeListOf<HTMLImageElement>
+    );
+    await Promise.all(
+      allImgs
+        .filter(img => img.src && !img.src.startsWith('data:'))
+        .map(async img => {
+          const b64 = await this.toDataUrl(img.src);
+          if (b64 !== img.src) imgB64.set(img.src, b64);
+        })
+    );
+
+    // ── Shared helper applied to every onclone ───────────────────────
+    const fixCloneBase = (clone: HTMLElement) => {
+      clone.style.transform = 'none';
+      clone.style.transformOrigin = 'top left';
+      // Prevent app global navy (#050a18) from bleeding through the
+      // canvas-frame, which has no explicit background-color of its own.
+      clone.style.background = '#0a0a0a';
+
+      // Kill all CSS animations/transitions — they restart from frame 0
+      // in the html2canvas clone iframe, causing elements (canvas-photo-bg,
+      // templates) to render at opacity:0 instead of their intended opacity.
+      clone.style.animation = 'none';
+      clone.style.transition = 'none';
+      clone.querySelectorAll('*').forEach(el => {
+        const h = el as HTMLElement;
+        h.style.animation = 'none';
+        h.style.transition = 'none';
+      });
+
+      // Restore photo-bg opacity explicitly so killing bgFadeIn doesn't
+      // leave it at the inline value potentially clobbered by the keyframe.
+      const photoBg = clone.querySelector('.canvas-photo-bg') as HTMLElement | null;
+      if (photoBg) photoBg.style.opacity = String(this.backgroundOpacity / 100);
+      const collage = clone.querySelector('.canvas-collage') as HTMLElement | null;
+      if (collage) collage.style.opacity = String(this.backgroundOpacity / 100);
+
+      // Swap image sources to base64
+      clone.querySelectorAll('img').forEach((img: HTMLImageElement) => {
+        const b64 = imgB64.get(img.src);
+        if (b64) img.src = b64;
+      });
+
+      // <app-avatar> is display:inline by default → collapses to 0×0
+      // in html2canvas. Force it to fill its sized parent container.
+      clone.querySelectorAll('app-avatar').forEach(av => {
+        const h = av as HTMLElement;
+        h.style.display = 'block';
+        h.style.width = '100%';
+        h.style.height = '100%';
+      });
+    };
+
+    // ── 3. First pass: clean background (blur overlays hidden) ───────
+    const blurDataUrls = new Map<string, string>();
+
+    if (blurTargets.length > 0) {
+      const bgSnap = await html2canvas(element, {
+        width: this.canvasWidth,
+        height: this.canvasHeight,
+        scale: 1,
+        useCORS: true,
+        backgroundColor: '#0a0a0a',
+        logging: false,
+        onclone: (_d: Document, clone: HTMLElement) => {
+          fixCloneBase(clone);
+          clone.querySelectorAll('[data-bf]').forEach(e =>
+            (e as HTMLElement).style.visibility = 'hidden'
+          );
+        }
+      });
+
+      // Generate a blurred snippet for each target region
+      for (const t of blurTargets) {
+        const w = Math.max(1, Math.ceil(t.w));
+        const h = Math.max(1, Math.ceil(t.h));
+        const c = document.createElement('canvas');
+        c.width = w;
+        c.height = h;
+        const ctx = c.getContext('2d')!;
+        const m = t.blurPx * 3; // extra margin so blur doesn't clip at edges
+        ctx.filter = `blur(${t.blurPx}px)`;
+        ctx.drawImage(
+          bgSnap,
+          t.x - m, t.y - m, w + m * 2, h + m * 2,
+          -m, -m, w + m * 2, h + m * 2
+        );
+        blurDataUrls.set(t.id, c.toDataURL());
+      }
+    }
+
+    // ── 4. Final render with simulated backdrop-filter ────────────────
+    const result = await html2canvas(element, {
       width: this.canvasWidth,
       height: this.canvasHeight,
       scale: 1,
       useCORS: true,
       backgroundColor: '#0a0a0a',
       logging: false,
-      onclone: (_doc: Document, clonedElement: HTMLElement) => {
-        clonedElement.style.transform = 'none';
-        clonedElement.style.transformOrigin = 'top left';
+      onclone: (_d: Document, clone: HTMLElement) => {
+        fixCloneBase(clone);
+
+        // Replace each backdrop-filter with a pre-blurred background-image
+        for (const t of blurTargets) {
+          const el = clone.querySelector(`[data-bf="${t.id}"]`) as HTMLElement | null;
+          const blurUrl = blurDataUrls.get(t.id);
+          if (!el || !blurUrl) continue;
+          // Layer: original semi-transparent bg on top of blurred background
+          el.style.backgroundImage =
+            `linear-gradient(${t.bgColor}, ${t.bgColor}), url(${blurUrl})`;
+          el.style.backgroundSize = '100% 100%, 100% 100%';
+          el.style.backgroundColor = 'transparent';
+          el.style.setProperty('backdrop-filter', 'none');
+          el.style.setProperty('-webkit-backdrop-filter', 'none');
+        }
       }
     });
+
+    // ── 5. Cleanup marker attributes from live DOM ───────────────────
+    element.querySelectorAll('[data-bf]').forEach((el: Element) =>
+      el.removeAttribute('data-bf')
+    );
+
+    return result;
   }
 
   async exportToImage(): Promise<void> {
