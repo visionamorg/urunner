@@ -51,7 +51,7 @@ The current application allows users to record basic activity data (Title, Dista
 
 ---
 
-### **Acceptance Criteria**
+### **Acceptance Criteria** Done 
 - [ ] User can navigate to a single activity and see a "Request AI Summary" button.
 - [ ] AI Summary is generated using activity data and user notes, and is persisted in the database.
 - [ ] A chat window allows the user to ask at least 3 follow-up questions about the specific activity.
