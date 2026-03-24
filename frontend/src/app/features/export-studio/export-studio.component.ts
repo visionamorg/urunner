@@ -438,6 +438,33 @@ export class ExportStudioComponent implements OnInit {
         })
     );
 
+    // ── 2.5 Pre-filter background images via Canvas 2D API ──────────
+    // html2canvas cannot reliably render CSS `filter` (blur, brightness,
+    // contrast, saturate) on elements. We pre-apply the filter using the
+    // Canvas 2D API and swap the filtered images into the clone.
+    const filterStr = this.backgroundFilter;
+    const preFilteredBg = new Map<string, string>();
+
+    if (filterStr !== 'none' && this.backgroundImages.length > 0) {
+      await Promise.all(this.backgroundImages.map(async (imgUrl) => {
+        try {
+          const src = imgB64.get(imgUrl) || imgUrl;
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.src = src;
+          await new Promise<void>((res, rej) => { img.onload = () => res(); img.onerror = rej; });
+
+          const c = document.createElement('canvas');
+          c.width = img.naturalWidth;
+          c.height = img.naturalHeight;
+          const ctx = c.getContext('2d')!;
+          ctx.filter = filterStr;
+          ctx.drawImage(img, 0, 0);
+          preFilteredBg.set(imgUrl, c.toDataURL('image/jpeg', 0.92));
+        } catch { /* silently fall back to CSS filter in clone */ }
+      }));
+    }
+
     // ── Shared helper applied to every onclone ───────────────────────
     const fixCloneBase = (clone: HTMLElement) => {
       clone.style.transform = 'none';
@@ -463,6 +490,26 @@ export class ExportStudioComponent implements OnInit {
       if (photoBg) photoBg.style.opacity = String(this.backgroundOpacity / 100);
       const collage = clone.querySelector('.canvas-collage') as HTMLElement | null;
       if (collage) collage.style.opacity = String(this.backgroundOpacity / 100);
+
+      // Swap background images with pre-filtered versions and strip CSS
+      // filter — html2canvas doesn't reliably render element-level filters.
+      if (preFilteredBg.size > 0) {
+        if (photoBg) {
+          const filtered = preFilteredBg.get(this.backgroundImages[0]);
+          if (filtered) {
+            photoBg.style.backgroundImage = `url(${filtered})`;
+            photoBg.style.filter = 'none';
+          }
+        }
+        if (collage) {
+          collage.style.filter = 'none';
+          collage.querySelectorAll('.collage-panel').forEach((panel, i) => {
+            const h = panel as HTMLElement;
+            const filtered = preFilteredBg.get(this.backgroundImages[i]);
+            if (filtered) h.style.backgroundImage = `url(${filtered})`;
+          });
+        }
+      }
 
       // Swap image sources to base64
       clone.querySelectorAll('img').forEach((img: HTMLImageElement) => {

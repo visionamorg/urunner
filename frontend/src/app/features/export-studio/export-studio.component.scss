@@ -3509,11 +3509,22 @@
 }
 
 .ss-photo {
+  position: relative;
   width: 100%;
   height: 100%;
   background-size: cover;
   background-position: center;
-  filter: contrast(1.1) saturate(1.1);
+
+  /* Subtle dark overlay to add depth — replaces filter: contrast(1.1) saturate(1.1)
+     which html2canvas cannot render. The overlay is universally supported. */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.06);
+    pointer-events: none;
+    z-index: 1;
+  }
 }
 
 .ss-photo-placeholder {
