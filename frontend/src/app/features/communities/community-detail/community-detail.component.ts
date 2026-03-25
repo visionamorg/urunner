@@ -41,6 +41,7 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
   savingEvent = false;
   eventError = '';
   eventPhotoInput = '';
+  gpxFile: File | null = null;
 
   // ── Event Detail Modal ──────────────────────────────────────────────────────
   selectedEvent: RunEvent | null = null;
@@ -777,6 +778,10 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  isEnrolledInProgramme(): boolean {
+    return this.programmeEnrollees.some((e: any) => e.username === this.currentUsername);
+  }
+
   completeSessionInProgramme(prog: any): void {
     this.completingSession = true;
     this.communityService.completeProgramSession(this.communityId, prog.id).subscribe({
@@ -852,6 +857,7 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     };
     this.eventPhotoInput = '';
     this.eventError = '';
+    this.gpxFile = null;
     this.showEventForm = true;
   }
 
@@ -863,11 +869,24 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     this.savingEvent = true;
     this.eventError = '';
 
+    const uploadGpxIfNeeded = (eventId: number) => {
+      if (this.gpxFile) {
+        this.eventService.uploadGpx(eventId, this.gpxFile).subscribe({
+          next: (res) => {
+            const ev = this.communityEvents.find(e => e.id === eventId);
+            if (ev) { ev.routeGpxUrl = res.routeGpxUrl; ev.elevationGainMeters = res.elevationGainMeters; ev.distanceKm = res.distanceKm || ev.distanceKm; }
+            this.gpxFile = null;
+          }
+        });
+      }
+    };
+
     if (this.editingEvent) {
       this.communityService.updateCommunityEvent(this.communityId, this.editingEvent.id, this.eventForm).subscribe({
         next: (updated) => {
           const idx = this.communityEvents.findIndex(e => e.id === updated.id);
           if (idx !== -1) this.communityEvents[idx] = updated;
+          uploadGpxIfNeeded(updated.id);
           this.showEventForm = false;
           this.savingEvent = false;
         },
@@ -877,6 +896,7 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
       this.communityService.createCommunityEvent(this.communityId, this.eventForm).subscribe({
         next: (event) => {
           this.communityEvents.unshift(event);
+          uploadGpxIfNeeded(event.id);
           this.showEventForm = false;
           this.savingEvent = false;
         },
@@ -1077,6 +1097,13 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     }
   }
 
+  onGpxFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.gpxFile = input.files[0];
+    }
+  }
+
   // ── Event Detail Modal ──────────────────────────────────────────────────────
 
   openEventDetail(event: RunEvent): void {
@@ -1087,7 +1114,10 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     this.galleryPhotos = [];
 
     this.eventService.getParticipants(event.id).subscribe({
-      next: (participants) => { this.eventParticipants = participants; },
+      next: (participants) => { 
+        this.eventParticipants = participants; 
+        this.eventRegistered[event.id] = participants.some((p: any) => p.username === this.currentUsername);
+      },
       error: () => {}
     });
 

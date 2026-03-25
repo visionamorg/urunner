@@ -61,6 +61,12 @@ public class Event {
     @Column(name = "drive_folder_id")
     private String driveFolderId;
 
+    @Column(name = "route_gpx_url", length = 500)
+    private String routeGpxUrl;
+
+    @Column(name = "elevation_gain_meters")
+    private Double elevationGainMeters;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();

@@ -27,6 +27,8 @@ export interface RunEvent {
   photoUrls?: string[];
   driveFolderId?: string;
   galleryCount?: number;
+  routeGpxUrl?: string;
+  elevationGainMeters?: number;
 }
 
 export interface CreateEventRequest {

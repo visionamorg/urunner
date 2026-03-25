@@ -26,4 +26,6 @@ public class EventDto {
     private List<String> photoUrls;
     private String driveFolderId;
     private Long galleryCount;
+    private String routeGpxUrl;
+    private Double elevationGainMeters;
 }

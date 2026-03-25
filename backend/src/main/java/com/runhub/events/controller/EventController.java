@@ -6,11 +6,18 @@ import com.runhub.events.dto.EventParticipantDto;
 import com.runhub.events.dto.GalleryPhotoDto;
 import com.runhub.events.service.EventService;
 import com.runhub.events.service.EventGalleryService;
+import com.runhub.events.service.GpxService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Path;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +29,7 @@ public class EventController {
 
     private final EventService eventService;
     private final EventGalleryService galleryService;
+    private final GpxService gpxService;
 
     @GetMapping
     public ResponseEntity<List<EventDto>> getAllEvents() {
@@ -74,5 +82,33 @@ public class EventController {
                                                       Principal principal) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(galleryService.addPhoto(id, body.get("photoUrl"), principal.getName()));
+    }
+
+    // ── GPX Route ───────────────────────────────────────────────────────────────
+
+    @PostMapping("/{id}/gpx")
+    public ResponseEntity<EventDto> uploadGpx(@PathVariable Long id,
+                                               @RequestParam("file") MultipartFile file) {
+        return ResponseEntity.ok(gpxService.uploadGpx(id, file));
+    }
+
+    @GetMapping("/{id}/gpx/download")
+    public ResponseEntity<Resource> downloadGpx(@PathVariable Long id) {
+        try {
+            Path path = gpxService.getGpxFile(id);
+            Resource resource = new UrlResource(path.toUri());
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_XML)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"route.gpx\"")
+                    .body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{id}/gpx")
+    public ResponseEntity<Void> deleteGpx(@PathVariable Long id) {
+        gpxService.deleteGpx(id);
+        return ResponseEntity.ok().build();
     }
 }

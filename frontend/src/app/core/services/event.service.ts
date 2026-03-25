@@ -43,4 +43,15 @@ export class EventService {
   addGalleryPhoto(eventId: number, photoUrl: string): Observable<GalleryPhoto> {
     return this.http.post<GalleryPhoto>(`/api/events/${eventId}/gallery`, { photoUrl });
   }
+
+  // GPX Route
+  uploadGpx(eventId: number, file: File): Observable<any> {
+    const fd = new FormData();
+    fd.append('file', file);
+    return this.http.post(`/api/events/${eventId}/gpx`, fd);
+  }
+
+  deleteGpx(eventId: number): Observable<void> {
+    return this.http.delete<void>(`/api/events/${eventId}/gpx`);
+  }
 }
