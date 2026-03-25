@@ -15,12 +15,13 @@ import { Message } from '../../../core/models/message.model';
 import { CommunityCalendarComponent } from '../community-calendar/community-calendar.component';
 import { CommunityRoomsComponent } from '../community-rooms/community-rooms.component';
 import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
+import { AgendaImageGeneratorComponent } from '../../../shared/components/agenda-image-generator/agenda-image-generator.component';
 import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-community-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, CommunityCalendarComponent, CommunityRoomsComponent, AvatarComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, CommunityCalendarComponent, CommunityRoomsComponent, AvatarComponent, AgendaImageGeneratorComponent],
   templateUrl: './community-detail.component.html',
   styleUrl: './community-detail.component.scss'
 })
@@ -42,6 +43,10 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
   eventError = '';
   eventPhotoInput = '';
   gpxFile: File | null = null;
+
+  // ── Agenda Image Generator ──────────────────────────────────────────────────
+  showDailyExport = false;
+  showWeeklyExport = false;
 
   // ── Event Detail Modal ──────────────────────────────────────────────────────
   selectedEvent: RunEvent | null = null;

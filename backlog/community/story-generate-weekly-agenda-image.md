@@ -1,5 +1,6 @@
 # Epic: Community Management & Growth
 ## Story: Feature - Generate Weekly Agenda Image for Social Media
+### Status: DONE (2026-03-25)
 
 **As a** Community Admin
 **I want to** automatically generate an "Agenda of the Week" image based on my community's scheduled events and programmes
@@ -9,17 +10,17 @@
 Many running communities post a weekly agenda on their Instagram stories (e.g., "AGENDA OF THE WEEK: FROM MARCH 23 TO 29"). Instead of typing this out manually every week, admins can click an "Export Weekly Agenda" button. The system will gather the upcoming week's events from the calendar, overlay them onto a default or custom background image, and produce a downloadable image perfectly formatted for an Instagram Story (9:16 ratio).
 
 ### Acceptance Criteria
-- [ ] On the Community Calendar or Events tab, admins see an "Export Agenda Image" button.
-- [ ] Clicking the button opens a modal allowing the admin to:
+- [x] On the Community Calendar or Events tab, admins see an "Export Agenda Image" button.
+- [x] Clicking the button opens a modal allowing the admin to:
     - Select the Start and End Date for the week (defaults to upcoming Monday to Sunday).
     - Upload or select a background image (defaults to the community's cover photo).
     - Toggle which events/sessions to include in the visual list.
-- [ ] The feature generates a high-quality (PNG/JPG) image incorporating:
+- [x] The feature generates a high-quality (PNG/JPG) image incorporating:
     - The word "AGENDA" in a bold, stylized font (e.g., serif/classic like the reference).
     - The date range (e.g., "OF THE WEEK FROM MARCH 23 TO 29").
     - A stylized list of the events (Date + Title + Time + Location).
     - The community's Instagram handle and hashtags (e.g., `@runnerscasablanca #URBANRUNNERSCASABLANCA`).
-- [ ] The generated image is instantly downloaded to the admin's device, ready to be posted.
+- [x] The generated image is instantly downloaded to the admin's device, ready to be posted.
 
 ### Technical Notes for Claude
 - **Frontend-First Approach (Recommended):** Use a library like `html2canvas` or `dom-to-image-more`. 

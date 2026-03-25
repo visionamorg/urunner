@@ -1,0 +1,280 @@
+@if (visible) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" (click)="close()">
+  <div class="bg-card border border-border rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto flex flex-col lg:flex-row gap-0" (click)="$event.stopPropagation()">
+
+    <!-- Preview -->
+    <div class="lg:w-1/2 p-5 flex flex-col items-center bg-secondary/30">
+      <h3 class="text-foreground font-bold text-sm mb-3">Preview</h3>
+      <div class="canvas-wrapper overflow-hidden rounded-xl border border-border shadow-2xl">
+        <!-- The actual 1080x1920 canvas, scaled down for preview -->
+        <div #agendaCanvas class="canvas-9-16 relative overflow-hidden" style="background: #0a0a0a;">
+
+          <!-- Background Image -->
+          @if (backgroundUrl) {
+            <div class="absolute inset-0 bg-cover bg-center" [style.backgroundImage]="'url(' + backgroundUrl + ')'"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80"></div>
+          } @else {
+            <div class="absolute inset-0 bg-gradient-to-b from-[#1a1a2e] via-[#16213e] to-[#0f3460]"></div>
+          }
+
+          <!-- Content -->
+          <div class="relative z-10 flex flex-col h-full px-[80px] py-[100px]">
+
+            <!-- Top accent line -->
+            <div class="w-[120px] h-[6px] bg-white/90 mb-[50px]"></div>
+
+            <!-- Header -->
+            <h1 class="font-playfair text-white leading-none tracking-tight"
+              [style.fontSize]="mode === 'daily' ? '120px' : '140px'"
+              style="font-weight: 900; letter-spacing: 2px;">
+              {{ headerText }}
+            </h1>
+            <p class="font-inter text-white/70 mt-[20px] tracking-[4px] leading-tight"
+              style="font-size: 32px; font-weight: 600;">
+              {{ subHeaderText }}
+            </p>
+
+            <!-- Separator -->
+            <div class="w-full h-[2px] bg-white/20 my-[50px]"></div>
+
+            <!-- DAILY MODE: Single event focus -->
+            @if (mode === 'daily' && selectedEvent) {
+              <!-- Time (big) -->
+              <div class="mb-[40px]">
+                <p class="font-inter text-white/50 tracking-[6px]" style="font-size: 28px; font-weight: 700;">TIME</p>
+                <p class="font-inter text-white" style="font-size: 80px; font-weight: 800; letter-spacing: 2px;">
+                  {{ formatTime(selectedEvent.eventDate) }}
+                </p>
+              </div>
+
+              <!-- Location (big) -->
+              <div class="mb-[40px]">
+                <p class="font-inter text-white/50 tracking-[6px]" style="font-size: 28px; font-weight: 700;">MEETING POINT</p>
+                <p class="font-inter text-white leading-tight" style="font-size: 52px; font-weight: 700;">
+                  {{ meetingPoint }}
+                </p>
+              </div>
+
+              <!-- Distance -->
+              @if (selectedEvent.distanceKm) {
+                <div class="mb-[40px]">
+                  <p class="font-inter text-white/50 tracking-[6px]" style="font-size: 28px; font-weight: 700;">DISTANCE</p>
+                  <p class="font-inter text-white" style="font-size: 52px; font-weight: 800;">
+                    {{ selectedEvent.distanceKm }} KM
+                  </p>
+                </div>
+              }
+
+              <!-- Pace Groups -->
+              @if (paceGroups) {
+                <div class="mb-[40px]">
+                  <p class="font-inter text-white/50 tracking-[6px]" style="font-size: 28px; font-weight: 700;">PACE GROUPS</p>
+                  <p class="font-inter text-white" style="font-size: 42px; font-weight: 600;">
+                    {{ paceGroups }}
+                  </p>
+                </div>
+              }
+
+              <!-- Tags -->
+              @if (dailyTags.length > 0) {
+                <div class="flex flex-wrap gap-[16px] mt-[10px]">
+                  @for (tag of dailyTags; track tag) {
+                    <div class="px-[28px] py-[12px] border-[3px] border-white/60 rounded-full">
+                      <span class="font-inter text-white tracking-[2px]" style="font-size: 26px; font-weight: 700;">{{ tag }}</span>
+                    </div>
+                  }
+                </div>
+              }
+            }
+
+            <!-- WEEKLY MODE: Event list -->
+            @if (mode === 'weekly') {
+              <div class="flex-1 flex flex-col gap-[30px]">
+                @for (ev of filteredEvents; track ev.id; let i = $index) {
+                  <div class="flex gap-[30px] items-start">
+                    <!-- Day badge -->
+                    <div class="flex flex-col items-center flex-shrink-0" style="min-width: 120px;">
+                      <span class="font-inter text-white/50" style="font-size: 26px; font-weight: 700; letter-spacing: 3px;">
+                        {{ formatDay(ev.eventDate) }}
+                      </span>
+                      <span class="font-inter text-white" style="font-size: 48px; font-weight: 800;">
+                        {{ formatDate(ev.eventDate) }}
+                      </span>
+                    </div>
+                    <!-- Event details -->
+                    <div class="flex-1 border-l-[4px] border-white/30 pl-[30px]">
+                      <p class="font-inter text-white leading-tight" style="font-size: 38px; font-weight: 700;">
+                        {{ ev.name }}
+                      </p>
+                      <p class="font-inter text-white/60 mt-[8px]" style="font-size: 28px; font-weight: 500;">
+                        {{ formatTime(ev.eventDate) }} · {{ ev.location }}
+                      </p>
+                      @if (ev.distanceKm) {
+                        <p class="font-inter text-white/40 mt-[4px]" style="font-size: 26px; font-weight: 600;">
+                          {{ ev.distanceKm }} KM
+                        </p>
+                      }
+                    </div>
+                  </div>
+                }
+                @if (filteredEvents.length === 0) {
+                  <p class="font-inter text-white/40 text-center" style="font-size: 36px; font-weight: 500;">
+                    No events in this period
+                  </p>
+                }
+              </div>
+            }
+
+            <!-- Spacer -->
+            <div class="flex-1"></div>
+
+            <!-- Bottom: Handle + Hashtag -->
+            <div class="mt-[40px]">
+              <div class="w-full h-[2px] bg-white/20 mb-[30px]"></div>
+              @if (instagramHandle) {
+                <p class="font-inter text-white/80 tracking-[3px]" style="font-size: 30px; font-weight: 700;">
+                  {{ instagramHandle }}
+                </p>
+              }
+              @if (hashtag) {
+                <p class="font-inter text-white/40 tracking-[2px] mt-[8px]" style="font-size: 26px; font-weight: 600;">
+                  {{ hashtag }}
+                </p>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Config Panel -->
+    <div class="lg:w-1/2 p-5 space-y-4 border-t lg:border-t-0 lg:border-l border-border overflow-y-auto max-h-[85vh]">
+      <div class="flex items-center justify-between">
+        <h2 class="text-foreground font-bold text-lg">
+          {{ mode === 'daily' ? 'Daily Event Image' : 'Weekly Agenda Image' }}
+        </h2>
+        <button (click)="close()" class="text-muted-foreground hover:text-foreground">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <!-- Background -->
+      <div>
+        <label class="label">Background Image URL</label>
+        <input type="url" [(ngModel)]="backgroundUrl" placeholder="https://..." class="input-field !text-sm" />
+      </div>
+
+      <!-- Header -->
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="label">Header Text</label>
+          <input type="text" [(ngModel)]="headerText" class="input-field !text-sm" />
+        </div>
+        <div>
+          <label class="label">Sub-header</label>
+          <input type="text" [(ngModel)]="subHeaderText" class="input-field !text-sm" />
+        </div>
+      </div>
+
+      @if (mode === 'daily') {
+        <!-- Select Event -->
+        <div>
+          <label class="label">Select Event</label>
+          <select (change)="onEventSelect(events[$any($event.target).selectedIndex])" class="input-field !text-sm">
+            @for (ev of events; track ev.id) {
+              <option [selected]="selectedEvent?.id === ev.id">{{ ev.name }} — {{ formatFullDate(ev.eventDate) }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="label">Meeting Point</label>
+            <input type="text" [(ngModel)]="meetingPoint" class="input-field !text-sm" />
+          </div>
+          <div>
+            <label class="label">Pace Groups</label>
+            <input type="text" [(ngModel)]="paceGroups" placeholder="5:00/km | 6:00/km" class="input-field !text-sm" />
+          </div>
+        </div>
+
+        <!-- Tags -->
+        <div>
+          <label class="label">Tags / Badges</label>
+          <div class="flex gap-2">
+            <input type="text" [(ngModel)]="tagInput" placeholder="e.g. Beginner Friendly"
+              (keyup.enter)="addTag()" class="input-field !text-sm flex-1" />
+            <button (click)="addTag()" [disabled]="!tagInput.trim() || dailyTags.length >= 4"
+              class="btn-secondary !text-xs !py-1.5 disabled:opacity-40">Add</button>
+          </div>
+          @if (dailyTags.length > 0) {
+            <div class="flex flex-wrap gap-1.5 mt-2">
+              @for (tag of dailyTags; track tag; let i = $index) {
+                <span class="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full flex items-center gap-1">
+                  {{ tag }}
+                  <button (click)="removeTag(i)" class="text-primary/60 hover:text-primary">
+                    <span class="material-icons text-xs">close</span>
+                  </button>
+                </span>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      @if (mode === 'weekly') {
+        <!-- Date Range -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="label">Start Date</label>
+            <input type="date" [(ngModel)]="startDate" (ngModelChange)="onDateChange()" class="input-field !text-sm" />
+          </div>
+          <div>
+            <label class="label">End Date</label>
+            <input type="date" [(ngModel)]="endDate" (ngModelChange)="onDateChange()" class="input-field !text-sm" />
+          </div>
+        </div>
+
+        <!-- Toggle events -->
+        <div>
+          <label class="label">Include Events</label>
+          <div class="space-y-1.5 max-h-40 overflow-y-auto">
+            @for (ev of events; track ev.id) {
+              <label class="flex items-center gap-2 p-2 bg-secondary rounded-lg border border-border cursor-pointer hover:border-primary/30">
+                <input type="checkbox" [checked]="selectedEventIds.has(ev.id)"
+                  (change)="toggleEvent(ev.id)" class="w-3.5 h-3.5 accent-primary" />
+                <span class="text-foreground text-xs font-semibold flex-1">{{ ev.name }}</span>
+                <span class="text-muted-foreground text-xs">{{ formatDate(ev.eventDate) }}</span>
+              </label>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Social -->
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="label">Instagram Handle</label>
+          <input type="text" [(ngModel)]="instagramHandle" placeholder="@handle" class="input-field !text-sm" />
+        </div>
+        <div>
+          <label class="label">Hashtag</label>
+          <input type="text" [(ngModel)]="hashtag" placeholder="#HASHTAG" class="input-field !text-sm" />
+        </div>
+      </div>
+
+      <!-- Download -->
+      <button (click)="download()" [disabled]="downloading"
+        class="btn-primary w-full justify-center inline-flex items-center gap-2 disabled:opacity-50">
+        @if (downloading) {
+          <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+          Generating...
+        } @else {
+          <span class="material-icons text-base">download</span>
+          Download Image (1080x1920)
+        }
+      </button>
+    </div>
+  </div>
+</div>
+}

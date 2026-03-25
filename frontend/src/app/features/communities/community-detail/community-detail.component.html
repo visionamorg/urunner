@@ -553,15 +553,25 @@
   @if (activeTab === 'events') {
   <div class="space-y-4">
 
-    <!-- Admin: Add Event -->
-    @if (community.isAdmin) {
-    <div class="flex justify-end">
+    <!-- Admin: Add Event + Export Buttons -->
+    <div class="flex items-center justify-between flex-wrap gap-2">
+      <div class="flex items-center gap-2">
+        <button (click)="showDailyExport = true" class="btn-secondary !py-2 !px-3 inline-flex items-center gap-1.5 !text-xs">
+          <span class="material-icons text-sm">image</span>
+          Daily Image
+        </button>
+        <button (click)="showWeeklyExport = true" class="btn-secondary !py-2 !px-3 inline-flex items-center gap-1.5 !text-xs">
+          <span class="material-icons text-sm">calendar_month</span>
+          Weekly Agenda
+        </button>
+      </div>
+      @if (community.isAdmin) {
       <button (click)="openCreateEvent()" class="btn-primary !py-2 !px-4 inline-flex items-center gap-2">
         <span class="material-icons text-base">add</span>
         New Event
       </button>
+      }
     </div>
-    }
 
     <!-- Event Form -->
     @if (showEventForm && community.isAdmin) {
@@ -2088,4 +2098,25 @@
 </div>
 }
 
+<!-- Agenda Image Generator (Daily) -->
+<app-agenda-image-generator
+  mode="daily"
+  [events]="communityEvents"
+  [communityName]="community?.name || ''"
+  [communityHandle]="''"
+  [coverUrl]="community?.coverUrl || ''"
+  [visible]="showDailyExport"
+  (visibleChange)="showDailyExport = $event"
+></app-agenda-image-generator>
+
+<!-- Agenda Image Generator (Weekly) -->
+<app-agenda-image-generator
+  mode="weekly"
+  [events]="communityEvents"
+  [communityName]="community?.name || ''"
+  [communityHandle]="''"
+  [coverUrl]="community?.coverUrl || ''"
+  [visible]="showWeeklyExport"
+  (visibleChange)="showWeeklyExport = $event"
+></app-agenda-image-generator>
 }
