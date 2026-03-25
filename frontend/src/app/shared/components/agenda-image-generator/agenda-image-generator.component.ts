@@ -110,6 +110,14 @@ export class AgendaImageGeneratorComponent implements OnChanges {
     else this.selectedEventIds.add(id);
   }
 
+  onBackgroundFileSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => { this.backgroundUrl = reader.result as string; };
+    reader.readAsDataURL(file);
+  }
+
   addTag(): void {
     const t = this.tagInput.trim();
     if (t && this.dailyTags.length < 4) { this.dailyTags.push(t); this.tagInput = ''; }
@@ -126,6 +134,14 @@ export class AgendaImageGeneratorComponent implements OnChanges {
         width: 1080, height: 1920, scale: 1,
         useCORS: true, allowTaint: true,
         backgroundColor: '#0a0a0a', logging: false,
+        windowWidth: 1080, windowHeight: 1920,
+        imageTimeout: 15000,
+        onclone: (_doc: Document, clonedEl: HTMLElement) => {
+          clonedEl.style.transform = 'none';
+          clonedEl.style.transformOrigin = 'top left';
+          clonedEl.style.width = '1080px';
+          clonedEl.style.height = '1920px';
+        },
       });
       const link = document.createElement('a');
       link.download = `${this.communityName.replace(/\s+/g, '_')}_${this.mode}_agenda.png`;

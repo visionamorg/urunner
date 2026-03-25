@@ -11,7 +11,7 @@
 
           <!-- Background Image -->
           @if (backgroundUrl) {
-            <div class="absolute inset-0 bg-cover bg-center" [style.backgroundImage]="'url(' + backgroundUrl + ')'"></div>
+            <img [src]="backgroundUrl" class="absolute inset-0 w-full h-full object-cover" crossorigin="anonymous" style="object-fit:cover;" />
             <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80"></div>
           } @else {
             <div class="absolute inset-0 bg-gradient-to-b from-[#1a1a2e] via-[#16213e] to-[#0f3460]"></div>
@@ -160,8 +160,15 @@
 
       <!-- Background -->
       <div>
-        <label class="label">Background Image URL</label>
-        <input type="url" [(ngModel)]="backgroundUrl" placeholder="https://..." class="input-field !text-sm" />
+        <label class="label">Background Image</label>
+        <div class="flex gap-2">
+          <input type="url" [(ngModel)]="backgroundUrl" placeholder="Paste URL or upload below..." class="input-field !text-sm flex-1" />
+          <label class="btn-secondary !py-1.5 !px-3 !text-xs cursor-pointer inline-flex items-center gap-1">
+            <span class="material-icons text-sm">upload</span>
+            Upload
+            <input type="file" accept="image/*" (change)="onBackgroundFileSelected($event)" class="hidden" />
+          </label>
+        </div>
       </div>
 
       <!-- Header -->
