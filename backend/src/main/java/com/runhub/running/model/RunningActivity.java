@@ -51,7 +51,7 @@ public class RunningActivity {
     @Builder.Default
     private ActivitySource source = ActivitySource.MANUAL;
 
-    @Column(name = "external_id")
+    @Column(name = "external_id", unique = true)
     private String externalId;
 
     @Column(name = "created_at", nullable = false, updatable = false)

@@ -14,4 +14,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
     boolean existsByUsername(String username);
     Optional<User> findByProviderIdAndAuthProvider(String providerId, AuthProvider authProvider);
+
+    java.util.List<User> findAllByAuthProviderAndProviderAccessTokenIsNotNull(AuthProvider authProvider);
 }

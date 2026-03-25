@@ -68,7 +68,7 @@ CREATE TABLE running_activities (
     location VARCHAR(300),
     notes TEXT,
     source VARCHAR(20) NOT NULL DEFAULT 'MANUAL',
-    external_id VARCHAR(255),
+    external_id VARCHAR(255) UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 

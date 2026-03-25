@@ -8,10 +8,14 @@ import com.runhub.running.model.ActivitySource;
 import com.runhub.running.model.ActivitySplit;
 import com.runhub.running.model.RunningActivity;
 import com.runhub.running.repository.ActivityRepository;
+import com.runhub.users.model.AuthProvider;
 import com.runhub.users.model.User;
+import com.runhub.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -20,6 +24,7 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -34,6 +39,7 @@ public class StravaSyncService {
     private final ActivityRepository activityRepository;
     private final StravaOAuthService stravaOAuthService;
     private final BadgeService badgeService;
+    private final UserRepository userRepository;
 
     @Transactional
     public SyncResultDto syncActivities(User user) {
@@ -116,8 +122,13 @@ public class StravaSyncService {
             // Fetch detailed activity for full polyline + splits
             enrichFromDetail(activity, node.get("id").asLong(), accessToken, rt, headers);
 
-            activityRepository.save(activity);
-            imported++;
+            try {
+                activityRepository.save(activity);
+                imported++;
+            } catch (DataIntegrityViolationException e) {
+                log.info("Skipping duplicate Strava activity {}: {}", externalId, e.getMessage());
+                skipped++;
+            }
         }
 
         if (imported > 0) {
@@ -129,6 +140,22 @@ public class StravaSyncService {
                 .skipped(skipped)
                 .message("Sync complete: " + imported + " imported, " + skipped + " already existed")
                 .build();
+    }
+
+    @Scheduled(fixedRate = 3600000) // every 60 minutes
+    public void scheduledSyncAllStravaUsers() {
+        List<User> stravaUsers = userRepository
+                .findAllByAuthProviderAndProviderAccessTokenIsNotNull(AuthProvider.STRAVA);
+        log.info("Scheduled Strava sync starting for {} users", stravaUsers.size());
+
+        for (User user : stravaUsers) {
+            try {
+                SyncResultDto result = syncActivities(user);
+                log.info("Auto-sync for user {} (id={}): {}", user.getUsername(), user.getId(), result.getMessage());
+            } catch (Exception e) {
+                log.error("Auto-sync failed for user {} (id={}): {}", user.getUsername(), user.getId(), e.getMessage());
+            }
+        }
     }
 
     private void enrichFromDetail(RunningActivity activity, long stravaId,
