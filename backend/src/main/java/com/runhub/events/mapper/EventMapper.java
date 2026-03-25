@@ -15,6 +15,8 @@ public interface EventMapper {
     @Mapping(source = "community.id", target = "communityId")
     @Mapping(source = "community.name", target = "communityName")
     @Mapping(target = "participantCount", ignore = true)
+    @Mapping(target = "volunteersCount", ignore = true)
+    @Mapping(target = "waitlistCount", ignore = true)
     @Mapping(target = "photoUrls", ignore = true)
     @Mapping(target = "galleryCount", ignore = true)
     EventDto toDto(Event event);

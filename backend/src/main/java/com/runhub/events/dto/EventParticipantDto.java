@@ -12,5 +12,6 @@ public class EventParticipantDto {
     private String lastName;
     private String profileImageUrl;
     private String status;
+    private String role;
     private LocalDateTime registeredAt;
 }

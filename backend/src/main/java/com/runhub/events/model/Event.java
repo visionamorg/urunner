@@ -61,6 +61,9 @@ public class Event {
     @Column(name = "drive_folder_id")
     private String driveFolderId;
 
+    @Column(name = "max_volunteers")
+    private Integer maxVolunteers;
+
     @Column(name = "route_gpx_url", length = 500)
     private String routeGpxUrl;
 

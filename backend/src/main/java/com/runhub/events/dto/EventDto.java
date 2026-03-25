@@ -28,4 +28,7 @@ public class EventDto {
     private Long galleryCount;
     private String routeGpxUrl;
     private Double elevationGainMeters;
+    private Integer maxVolunteers;
+    private Long volunteersCount;
+    private Long waitlistCount;
 }

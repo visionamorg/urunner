@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Community, CommunityMember, CommunityTag, CreateCommunityRequest, InviteDto, DriveFolderDto } from '../models/community.model';
+import { Community, CommunityMember, CommunityTag, CreateCommunityRequest, InviteDto, DriveFolderDto, Sponsor } from '../models/community.model';
 import { Post, PageResponse } from '../models/post.model';
 import { RunEvent, CreateEventRequest, UpdateEventRequest } from '../models/event.model';
 import { RoomDto, CreateRoomRequest, RoomMemberDto } from '../models/room.model';
@@ -228,5 +228,14 @@ export class CommunityService {
 
   completeProgramSession(communityId: number, programId: number): Observable<ProgramProgress> {
     return this.http.post<ProgramProgress>(`/api/communities/${communityId}/programs/${programId}/complete-session`, {});
+  }
+
+  // Sponsors
+  addSponsor(communityId: number, sponsor: Sponsor): Observable<Sponsor> {
+    return this.http.post<Sponsor>(`/api/communities/${communityId}/sponsors`, sponsor);
+  }
+
+  removeSponsor(communityId: number, sponsorId: number): Observable<void> {
+    return this.http.delete<void>(`/api/communities/${communityId}/sponsors/${sponsorId}`);
   }
 }

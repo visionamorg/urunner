@@ -20,6 +20,7 @@ import com.runhub.events.repository.EventRegistrationRepository;
 import com.runhub.events.repository.EventRepository;
 import com.runhub.users.model.User;
 import com.runhub.users.service.UserService;
+import com.runhub.notifications.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +39,7 @@ public class EventService {
     private final UserService userService;
     private final CommunityRepository communityRepository;
     private final CommunityMemberRepository communityMemberRepository;
+    private final NotificationService notificationService;
     private final ObjectMapper objectMapper;
 
     private List<String> parsePhotoUrls(String json) {
@@ -87,7 +89,7 @@ public class EventService {
     }
 
     @Transactional
-    public void registerForEvent(Long eventId, String email) {
+    public EventParticipantDto registerForEvent(Long eventId, String email) {
         User user = userService.getUserEntityByEmail(email);
         Event event = findById(eventId);
 
@@ -95,25 +97,110 @@ public class EventService {
             throw new BadRequestException("Already registered for this event");
         }
 
-        if (event.getMaxParticipants() != null) {
+        String status;
+        if (event.getPrice() != null && event.getPrice().compareTo(java.math.BigDecimal.ZERO) > 0) {
+            status = "PENDING_PAYMENT";
+        } else if (event.getMaxParticipants() != null) {
             long count = registrationRepository.countActiveByEventId(eventId);
-            if (count >= event.getMaxParticipants()) {
-                throw new BadRequestException("Event is full");
+            status = count >= event.getMaxParticipants() ? "WAITLISTED" : "CONFIRMED";
+        } else {
+            status = "CONFIRMED";
+        }
+
+        EventRegistration registration = EventRegistration.builder()
+                .event(event)
+                .user(user)
+                .status(status)
+                .role("RUNNER")
+                .build();
+        registration = registrationRepository.save(registration);
+
+        if ("WAITLISTED".equals(status)) {
+            notificationService.create(user, "EVENT",
+                    "Waitlisted for " + event.getName(),
+                    "The event is full. You've been added to the waitlist and will be notified if a spot opens up.",
+                    "/events/" + eventId);
+        }
+
+        return eventMapper.toParticipantDto(registration);
+    }
+
+    @Transactional
+    public EventParticipantDto registerVolunteer(Long eventId, String email) {
+        User user = userService.getUserEntityByEmail(email);
+        Event event = findById(eventId);
+
+        if (registrationRepository.existsByEventIdAndUserId(eventId, user.getId())) {
+            throw new BadRequestException("Already registered for this event");
+        }
+
+        if (event.getMaxVolunteers() != null) {
+            long count = registrationRepository.countVolunteersByEventId(eventId);
+            if (count >= event.getMaxVolunteers()) {
+                throw new BadRequestException("Volunteer spots are full");
             }
         }
 
         EventRegistration registration = EventRegistration.builder()
                 .event(event)
                 .user(user)
-                .status("REGISTERED")
+                .status("CONFIRMED")
+                .role("VOLUNTEER")
                 .build();
-        registrationRepository.save(registration);
+        registration = registrationRepository.save(registration);
+        return eventMapper.toParticipantDto(registration);
+    }
+
+    @Transactional
+    public void cancelRegistration(Long eventId, String email) {
+        User user = userService.getUserEntityByEmail(email);
+        Event event = findById(eventId);
+
+        EventRegistration reg = registrationRepository.findByEventIdAndUserId(eventId, user.getId())
+                .orElseThrow(() -> new BadRequestException("Not registered for this event"));
+
+        boolean wasConfirmedRunner = "RUNNER".equals(reg.getRole())
+                && ("CONFIRMED".equals(reg.getStatus()) || "REGISTERED".equals(reg.getStatus()));
+
+        reg.setStatus("CANCELLED");
+        registrationRepository.save(reg);
+
+        // Auto-promote first waitlisted user
+        if (wasConfirmedRunner) {
+            promoteFromWaitlist(event);
+        }
+    }
+
+    private void promoteFromWaitlist(Event event) {
+        List<EventRegistration> waitlisted = registrationRepository.findWaitlistedByEventId(event.getId());
+        if (!waitlisted.isEmpty()) {
+            EventRegistration next = waitlisted.get(0);
+            next.setStatus("CONFIRMED");
+            registrationRepository.save(next);
+            notificationService.create(next.getUser(), "EVENT",
+                    "You're in! Spot opened for " + event.getName(),
+                    "A spot has opened up and you've been confirmed for the event!",
+                    "/events/" + event.getId());
+        }
     }
 
     public List<EventParticipantDto> getEventParticipants(Long eventId) {
+        return getEventParticipants(eventId, null, null);
+    }
+
+    public List<EventParticipantDto> getEventParticipants(Long eventId, String role, String status) {
         findById(eventId);
-        return registrationRepository.findByEventId(eventId)
-                .stream().map(eventMapper::toParticipantDto).toList();
+        List<EventRegistration> regs;
+        if (role != null && status != null) {
+            regs = registrationRepository.findByEventIdAndRoleAndStatus(eventId, role, status);
+        } else if (role != null) {
+            regs = registrationRepository.findByEventIdAndRole(eventId, role);
+        } else if (status != null) {
+            regs = registrationRepository.findByEventIdAndStatus(eventId, status);
+        } else {
+            regs = registrationRepository.findByEventId(eventId);
+        }
+        return regs.stream().map(eventMapper::toParticipantDto).toList();
     }
 
     // ── Community-scoped Event Methods ────────────────────────────────────────
@@ -197,6 +284,8 @@ public class EventService {
     private EventDto enrichDto(Event event) {
         EventDto dto = eventMapper.toDto(event);
         dto.setParticipantCount(registrationRepository.countActiveByEventId(event.getId()));
+        dto.setVolunteersCount(registrationRepository.countVolunteersByEventId(event.getId()));
+        dto.setWaitlistCount(registrationRepository.countWaitlistedByEventId(event.getId()));
         dto.setPhotoUrls(parsePhotoUrls(event.getPhotoUrls()));
         dto.setGalleryCount(galleryRepository.countByEventId(event.getId()));
         return dto;

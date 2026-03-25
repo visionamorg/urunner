@@ -47,14 +47,27 @@ public class EventController {
     }
 
     @PostMapping("/{id}/register")
-    public ResponseEntity<Void> registerForEvent(@PathVariable Long id, Principal principal) {
-        eventService.registerForEvent(id, principal.getName());
+    public ResponseEntity<EventParticipantDto> registerForEvent(@PathVariable Long id, Principal principal) {
+        return ResponseEntity.ok(eventService.registerForEvent(id, principal.getName()));
+    }
+
+    @PostMapping("/{id}/register/volunteer")
+    public ResponseEntity<EventParticipantDto> registerVolunteer(@PathVariable Long id, Principal principal) {
+        return ResponseEntity.ok(eventService.registerVolunteer(id, principal.getName()));
+    }
+
+    @PostMapping("/{id}/cancel")
+    public ResponseEntity<Void> cancelRegistration(@PathVariable Long id, Principal principal) {
+        eventService.cancelRegistration(id, principal.getName());
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{id}/participants")
-    public ResponseEntity<List<EventParticipantDto>> getParticipants(@PathVariable Long id) {
-        return ResponseEntity.ok(eventService.getEventParticipants(id));
+    public ResponseEntity<List<EventParticipantDto>> getParticipants(
+            @PathVariable Long id,
+            @RequestParam(required = false) String role,
+            @RequestParam(required = false) String status) {
+        return ResponseEntity.ok(eventService.getEventParticipants(id, role, status));
     }
 
     // ── Gallery ────────────────────────────────────────────────────────────────

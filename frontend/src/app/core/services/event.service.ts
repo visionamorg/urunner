@@ -19,12 +19,23 @@ export class EventService {
     return this.http.post<RunEvent>('/api/events', data);
   }
 
-  register(id: number): Observable<void> {
-    return this.http.post<void>(`/api/events/${id}/register`, {});
+  register(id: number): Observable<any> {
+    return this.http.post<any>(`/api/events/${id}/register`, {});
   }
 
-  getParticipants(id: number): Observable<any[]> {
-    return this.http.get<any[]>(`/api/events/${id}/participants`);
+  registerVolunteer(id: number): Observable<any> {
+    return this.http.post<any>(`/api/events/${id}/register/volunteer`, {});
+  }
+
+  cancelRegistration(id: number): Observable<void> {
+    return this.http.post<void>(`/api/events/${id}/cancel`, {});
+  }
+
+  getParticipants(id: number, role?: string, status?: string): Observable<any[]> {
+    let params: any = {};
+    if (role) params.role = role;
+    if (status) params.status = status;
+    return this.http.get<any[]>(`/api/events/${id}/participants`, { params });
   }
 
   // Gallery

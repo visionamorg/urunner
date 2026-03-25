@@ -29,6 +29,9 @@ export interface RunEvent {
   galleryCount?: number;
   routeGpxUrl?: string;
   elevationGainMeters?: number;
+  maxVolunteers?: number;
+  volunteersCount?: number;
+  waitlistCount?: number;
 }
 
 export interface CreateEventRequest {

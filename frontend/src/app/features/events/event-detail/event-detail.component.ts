@@ -27,6 +27,7 @@ export class EventDetailComponent implements OnInit {
   registering = false;
   registered = false;
   currentUsername = '';
+  myRegistration: any = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -66,8 +67,10 @@ export class EventDetailComponent implements OnInit {
   loadParticipants(id: number): void {
     this.eventService.getParticipants(id).subscribe({
       next: p => {
-        this.participants = p;
-        this.registered = p.some((x: any) => x.username === this.currentUsername);
+        this.participants = p.filter((x: any) => x.status !== 'CANCELLED');
+        const mine = p.find((x: any) => x.username === this.currentUsername && x.status !== 'CANCELLED');
+        this.myRegistration = mine || null;
+        this.registered = !!mine;
         this.cdr.detectChanges();
       },
       error: () => {}
@@ -85,10 +88,11 @@ export class EventDetailComponent implements OnInit {
     if (!this.event) return;
     this.registering = true;
     this.eventService.register(this.event.id).subscribe({
-      next: () => {
+      next: (reg) => {
         this.registered = true;
         this.registering = false;
-        this.snackBar.open('Successfully registered!', 'Close', { duration: 3000 });
+        const msg = reg.status === 'WAITLISTED' ? 'Added to waitlist!' : 'Successfully registered!';
+        this.snackBar.open(msg, 'Close', { duration: 3000 });
         this.loadParticipants(this.event!.id);
       },
       error: (err) => {
@@ -96,6 +100,40 @@ export class EventDetailComponent implements OnInit {
         this.snackBar.open(err.error?.message || 'Registration failed', 'Close', { duration: 3000 });
       }
     });
+  }
+
+  registerAsVolunteer(): void {
+    if (!this.event) return;
+    this.registering = true;
+    this.eventService.registerVolunteer(this.event.id).subscribe({
+      next: () => {
+        this.registered = true;
+        this.registering = false;
+        this.snackBar.open('Signed up as volunteer!', 'Close', { duration: 3000 });
+        this.loadParticipants(this.event!.id);
+      },
+      error: (err) => {
+        this.registering = false;
+        this.snackBar.open(err.error?.message || 'Registration failed', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
+  cancelReg(): void {
+    if (!this.event) return;
+    this.eventService.cancelRegistration(this.event.id).subscribe({
+      next: () => {
+        this.myRegistration = null;
+        this.registered = false;
+        this.snackBar.open('Registration cancelled', 'Close', { duration: 3000 });
+        this.loadParticipants(this.event!.id);
+      },
+      error: (err) => this.snackBar.open(err.error?.message || 'Failed to cancel', 'Close', { duration: 3000 })
+    });
+  }
+
+  isEventFull(): boolean {
+    return !!this.event?.maxParticipants && this.event.participantCount >= this.event.maxParticipants;
   }
 
   sendMessage(): void {

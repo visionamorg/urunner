@@ -35,6 +35,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/oauth/**").permitAll()
+                .requestMatchers("/api/stripe-webhook").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/rankings/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/events/**").permitAll()
                 .requestMatchers("/api/communities/*/rooms/**").authenticated()

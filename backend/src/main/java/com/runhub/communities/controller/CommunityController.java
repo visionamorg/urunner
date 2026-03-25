@@ -359,4 +359,26 @@ public class CommunityController {
         PostDto post = weeklyDigestService.generateDigest(id, user);
         return ResponseEntity.ok(post);
     }
+
+    // ── Sponsors ─────────────────────────────────────────────────────────────
+
+    @GetMapping("/{id}/sponsors")
+    public List<SponsorDto> getSponsors(@PathVariable Long id) {
+        return communityService.getSponsors(id);
+    }
+
+    @PostMapping("/{id}/sponsors")
+    public ResponseEntity<SponsorDto> addSponsor(@PathVariable Long id,
+                                                   @RequestBody SponsorDto sponsor,
+                                                   @AuthenticationPrincipal User user) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(communityService.addSponsor(id, sponsor, user));
+    }
+
+    @DeleteMapping("/{id}/sponsors/{sponsorId}")
+    public ResponseEntity<Void> removeSponsor(@PathVariable Long id,
+                                                @PathVariable Long sponsorId,
+                                                @AuthenticationPrincipal User user) {
+        communityService.removeSponsor(id, sponsorId, user);
+        return ResponseEntity.ok().build();
+    }
 }

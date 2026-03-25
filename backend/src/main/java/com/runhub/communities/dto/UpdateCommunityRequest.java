@@ -9,4 +9,6 @@ public class UpdateCommunityRequest {
     private String driveFolderId;
     private String coverUrl;
     private String imageUrl;
+    private Boolean isPremium;
+    private String stripePaymentUrl;
 }

@@ -31,7 +31,11 @@ public class EventRegistration {
 
     @Column(nullable = false, length = 20)
     @Builder.Default
-    private String status = "REGISTERED";
+    private String status = "CONFIRMED";  // CONFIRMED, WAITLISTED, PENDING_PAYMENT, CANCELLED
+
+    @Column(nullable = false, length = 20)
+    @Builder.Default
+    private String role = "RUNNER";  // RUNNER, VOLUNTEER
 
     @Column(name = "registered_at", nullable = false, updatable = false)
     @Builder.Default

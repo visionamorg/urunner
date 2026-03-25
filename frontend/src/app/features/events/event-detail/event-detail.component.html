@@ -146,7 +146,9 @@
                   }
                   <div class="min-w-0">
                     <p class="text-foreground text-xs font-semibold truncate">{{ p.username }}</p>
-                    <p class="text-muted-foreground text-xs">{{ p.status || 'Registered' }}</p>
+                    <p class="text-xs" [class]="p.status === 'WAITLISTED' ? 'text-yellow-400' : p.role === 'VOLUNTEER' ? 'text-purple-400' : 'text-muted-foreground'">
+                      {{ p.role === 'VOLUNTEER' ? 'Volunteer' : (p.status === 'WAITLISTED' ? 'Waitlisted' : (p.status || 'Confirmed')) }}
+                    </p>
                   </div>
                 </div>
               }
@@ -163,24 +165,63 @@
         @if (!event.isCancelled) {
           <div class="card">
             <h2 class="text-foreground font-bold mb-1">Join this Event</h2>
-            <p class="text-muted-foreground text-xs mb-4">
-              {{ event.maxParticipants
-                ? (event.maxParticipants - event.participantCount) + ' spots remaining'
-                : 'Unlimited spots' }}
+            <p class="text-muted-foreground text-xs mb-2">
+              @if (event.maxParticipants && (event.maxParticipants - event.participantCount) <= 0) {
+                Event is full
+                @if (event.waitlistCount) { · {{ event.waitlistCount }} on waitlist }
+              } @else if (event.maxParticipants) {
+                {{ event.maxParticipants - event.participantCount }} spots remaining
+              } @else {
+                Unlimited spots
+              }
             </p>
-            @if (registered) {
-              <div class="flex items-center gap-2 py-3 px-4 bg-green-500/10 border border-green-500/30 rounded-xl">
-                <span class="material-icons text-green-400 text-xl">check_circle</span>
-                <span class="text-green-400 font-semibold text-sm">You're registered!</span>
+            @if (event.volunteersCount !== undefined) {
+              <p class="text-muted-foreground text-xs mb-3">
+                {{ event.volunteersCount }} volunteer{{ event.volunteersCount !== 1 ? 's' : '' }}
+                @if (event.maxVolunteers) { / {{ event.maxVolunteers }} }
+              </p>
+            }
+            @if (myRegistration) {
+              <div class="flex items-center gap-2 py-3 px-4 rounded-xl mb-3"
+                [class]="myRegistration.status === 'WAITLISTED'
+                  ? 'bg-yellow-500/10 border border-yellow-500/30'
+                  : myRegistration.status === 'PENDING_PAYMENT'
+                    ? 'bg-orange-500/10 border border-orange-500/30'
+                    : 'bg-green-500/10 border border-green-500/30'">
+                <span class="material-icons text-xl"
+                  [class]="myRegistration.status === 'WAITLISTED' ? 'text-yellow-400'
+                    : myRegistration.status === 'PENDING_PAYMENT' ? 'text-orange-400' : 'text-green-400'">
+                  {{ myRegistration.status === 'WAITLISTED' ? 'hourglass_top'
+                    : myRegistration.status === 'PENDING_PAYMENT' ? 'payment' : 'check_circle' }}
+                </span>
+                <div>
+                  <span class="font-semibold text-sm"
+                    [class]="myRegistration.status === 'WAITLISTED' ? 'text-yellow-400'
+                      : myRegistration.status === 'PENDING_PAYMENT' ? 'text-orange-400' : 'text-green-400'">
+                    {{ myRegistration.status === 'WAITLISTED' ? 'On Waitlist'
+                      : myRegistration.status === 'PENDING_PAYMENT' ? 'Awaiting Payment' : 'Registered' }}
+                  </span>
+                  <span class="text-muted-foreground text-xs block">as {{ myRegistration.role === 'VOLUNTEER' ? 'Volunteer' : 'Runner' }}</span>
+                </div>
               </div>
+              @if (isUpcoming() && myRegistration.status !== 'CANCELLED') {
+                <button (click)="cancelReg()" class="text-xs text-destructive hover:underline">Cancel registration</button>
+              }
             } @else if (isUpcoming()) {
-              <button (click)="register()" [disabled]="registering"
-                class="btn-primary w-full justify-center disabled:opacity-50 inline-flex items-center gap-2">
-                @if (registering) {
-                  <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                }
-                Register Now
-              </button>
+              <div class="space-y-2">
+                <button (click)="register()" [disabled]="registering"
+                  class="btn-primary w-full justify-center disabled:opacity-50 inline-flex items-center gap-2">
+                  @if (registering) {
+                    <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  }
+                  {{ isEventFull() ? 'Join Waitlist' : 'Register as Runner' }}
+                </button>
+                <button (click)="registerAsVolunteer()" [disabled]="registering"
+                  class="w-full py-2.5 px-5 text-sm font-semibold rounded-xl bg-secondary border border-border text-foreground hover:border-primary/40 transition-colors inline-flex items-center justify-center gap-2">
+                  <span class="material-icons text-sm">volunteer_activism</span>
+                  Sign up to Volunteer
+                </button>
+              </div>
             } @else {
               <span class="badge bg-secondary border border-border text-muted-foreground w-full justify-center py-2.5">Past Event</span>
             }

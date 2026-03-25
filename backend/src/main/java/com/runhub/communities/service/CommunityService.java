@@ -49,6 +49,7 @@ public class CommunityService {
     private final MemberTagRepository memberTagRepository;
     private final ActivityRepository activityRepository;
     private final MessageRepository messageRepository;
+    private final CommunitySponsorRepository sponsorRepository;
 
     // ── List / Get ──────────────────────────────────────────────────────────
 
@@ -117,6 +118,10 @@ public class CommunityService {
             community.setCoverUrl(request.getCoverUrl());
         if (request.getImageUrl() != null)
             community.setImageUrl(request.getImageUrl());
+        if (request.getIsPremium() != null)
+            community.setIsPremium(request.getIsPremium());
+        if (request.getStripePaymentUrl() != null)
+            community.setStripePaymentUrl(request.getStripePaymentUrl().isBlank() ? null : request.getStripePaymentUrl());
 
         return toDtoWithMembership(communityRepository.save(community), user);
     }
@@ -451,7 +456,46 @@ public class CommunityService {
                         .findByCommunityIdAndStatus(community.getId(), "PENDING").size());
             }
         }
+        // Sponsors
+        dto.setSponsors(sponsorRepository.findByCommunityId(community.getId()).stream()
+                .map(s -> { SponsorDto sd = new SponsorDto(); sd.setId(s.getId()); sd.setLogoUrl(s.getLogoUrl()); sd.setLinkUrl(s.getLinkUrl()); sd.setName(s.getName()); return sd; })
+                .toList());
         return dto;
+    }
+
+    // ── Sponsor Management ──────────────────────────────────────────────────
+
+    @Transactional
+    public SponsorDto addSponsor(Long communityId, SponsorDto request, User user) {
+        Community community = findById(communityId);
+        requireAdmin(communityId, user, community);
+        if (sponsorRepository.countByCommunityId(communityId) >= 3) {
+            throw new BadRequestException("Maximum 3 sponsors allowed");
+        }
+        var sponsor = com.runhub.communities.model.CommunitySponsor.builder()
+                .community(community)
+                .logoUrl(request.getLogoUrl())
+                .linkUrl(request.getLinkUrl())
+                .name(request.getName())
+                .build();
+        sponsor = sponsorRepository.save(sponsor);
+        SponsorDto dto = new SponsorDto();
+        dto.setId(sponsor.getId()); dto.setLogoUrl(sponsor.getLogoUrl());
+        dto.setLinkUrl(sponsor.getLinkUrl()); dto.setName(sponsor.getName());
+        return dto;
+    }
+
+    @Transactional
+    public void removeSponsor(Long communityId, Long sponsorId, User user) {
+        Community community = findById(communityId);
+        requireAdmin(communityId, user, community);
+        sponsorRepository.deleteById(sponsorId);
+    }
+
+    public List<SponsorDto> getSponsors(Long communityId) {
+        return sponsorRepository.findByCommunityId(communityId).stream()
+                .map(s -> { SponsorDto sd = new SponsorDto(); sd.setId(s.getId()); sd.setLogoUrl(s.getLogoUrl()); sd.setLinkUrl(s.getLinkUrl()); sd.setName(s.getName()); return sd; })
+                .toList();
     }
 
     private String getMemberRole(Long communityId, Long userId) {

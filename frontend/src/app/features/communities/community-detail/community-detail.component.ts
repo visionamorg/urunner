@@ -52,6 +52,17 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
   loadingEventDetail = false;
   eventRegistered: { [eventId: number]: boolean } = {};
 
+  // ── Registrant Roster ─────────────────────────────────────────────────────
+  rosterTab: 'runners' | 'waitlisted' | 'volunteers' = 'runners';
+  rosterTabs = [
+    { key: 'runners' as const, label: 'Runners' },
+    { key: 'waitlisted' as const, label: 'Waitlisted' },
+    { key: 'volunteers' as const, label: 'Volunteers' }
+  ];
+  rosterRunners: any[] = [];
+  rosterWaitlisted: any[] = [];
+  rosterVolunteers: any[] = [];
+
   // ── Event Gallery ─────────────────────────────────────────────────────────
   galleryPhotos: any[] = [];
   galleryLoading = false;
@@ -136,6 +147,11 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
   settingsImageUrl = '';
   settingsSaving = false;
   settingsSuccess = false;
+  settingsPremium = false;
+  settingsStripeUrl = '';
+  sponsorName = '';
+  sponsorLogo = '';
+  sponsorLink = '';
 
   // Role change state
   changingRole: { [userId: number]: boolean } = {};
@@ -193,6 +209,8 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
         this.settingsDriveFolderId = c.driveFolderId || '';
         this.settingsCoverUrl = c.coverUrl || '';
         this.settingsImageUrl = c.imageUrl || '';
+        this.settingsPremium = c.isPremium || false;
+        this.settingsStripeUrl = c.stripePaymentUrl || '';
         this.loading = false;
         this.loadFeed();
         this.loadMembers();
@@ -502,8 +520,10 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
       description: this.settingsDescription,
       driveFolderId: this.settingsDriveFolderId,
       coverUrl: this.settingsCoverUrl,
-      imageUrl: this.settingsImageUrl
-    }).subscribe({
+      imageUrl: this.settingsImageUrl,
+      isPremium: this.settingsPremium,
+      stripePaymentUrl: this.settingsStripeUrl
+    } as any).subscribe({
       next: (updated) => {
         this.community = updated;
         this.settingsSaving = false;
@@ -514,6 +534,32 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
         console.error(err);
         this.settingsSaving = false;
       }
+    });
+  }
+
+  addSponsor(): void {
+    if (!this.sponsorLogo.trim() || !this.community) return;
+    this.communityService.addSponsor(this.communityId, {
+      logoUrl: this.sponsorLogo.trim(),
+      linkUrl: this.sponsorLink.trim() || undefined,
+      name: this.sponsorName.trim() || undefined
+    }).subscribe({
+      next: (s) => {
+        if (!this.community!.sponsors) this.community!.sponsors = [];
+        this.community!.sponsors.push(s);
+        this.sponsorName = ''; this.sponsorLogo = ''; this.sponsorLink = '';
+      },
+      error: (err) => this.toast.error(err.error?.message || 'Failed to add sponsor')
+    });
+  }
+
+  removeSponsor(sponsorId: number): void {
+    if (!this.community) return;
+    this.communityService.removeSponsor(this.communityId, sponsorId).subscribe({
+      next: () => {
+        this.community!.sponsors = this.community!.sponsors?.filter(s => s.id !== sponsorId);
+      },
+      error: (err) => this.toast.error(err.error?.message || 'Failed to remove sponsor')
     });
   }
 
@@ -1114,9 +1160,13 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     this.galleryPhotos = [];
 
     this.eventService.getParticipants(event.id).subscribe({
-      next: (participants) => { 
-        this.eventParticipants = participants; 
-        this.eventRegistered[event.id] = participants.some((p: any) => p.username === this.currentUsername);
+      next: (participants) => {
+        this.eventParticipants = participants.filter((p: any) => p.status !== 'CANCELLED');
+        this.eventRegistered[event.id] = this.eventParticipants.some((p: any) => p.username === this.currentUsername);
+        this.rosterRunners = this.eventParticipants.filter((p: any) => p.role === 'RUNNER' && p.status !== 'WAITLISTED');
+        this.rosterWaitlisted = this.eventParticipants.filter((p: any) => p.status === 'WAITLISTED');
+        this.rosterVolunteers = this.eventParticipants.filter((p: any) => p.role === 'VOLUNTEER');
+        this.rosterTab = 'runners';
       },
       error: () => {}
     });
@@ -1207,12 +1257,69 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
 
   registerForEvent(event: RunEvent): void {
     this.eventService.register(event.id).subscribe({
-      next: () => {
+      next: (reg) => {
         this.eventRegistered[event.id] = true;
-        event.participantCount = (event.participantCount || 0) + 1;
+        if (reg.status === 'WAITLISTED') {
+          this.toast.show('Added to waitlist');
+          event.waitlistCount = (event.waitlistCount || 0) + 1;
+        } else {
+          event.participantCount = (event.participantCount || 0) + 1;
+        }
+        this.openEventDetail(event); // refresh roster
       },
       error: (err) => this.toast.error(err.error?.message || 'Failed to register for event')
     });
+  }
+
+  volunteerForEvent(event: RunEvent): void {
+    this.eventService.registerVolunteer(event.id).subscribe({
+      next: () => {
+        this.eventRegistered[event.id] = true;
+        event.volunteersCount = (event.volunteersCount || 0) + 1;
+        this.toast.show('Signed up as volunteer!');
+        this.openEventDetail(event);
+      },
+      error: (err) => this.toast.error(err.error?.message || 'Failed to register as volunteer')
+    });
+  }
+
+  cancelEventRegistration(event: RunEvent): void {
+    this.eventService.cancelRegistration(event.id).subscribe({
+      next: () => {
+        this.eventRegistered[event.id] = false;
+        this.toast.show('Registration cancelled');
+        this.openEventDetail(event);
+      },
+      error: (err) => this.toast.error(err.error?.message || 'Failed to cancel registration')
+    });
+  }
+
+  isEventFull(event: RunEvent): boolean {
+    return !!event.maxParticipants && event.participantCount >= event.maxParticipants;
+  }
+
+  get activeRoster(): any[] {
+    switch (this.rosterTab) {
+      case 'waitlisted': return this.rosterWaitlisted;
+      case 'volunteers': return this.rosterVolunteers;
+      default: return this.rosterRunners;
+    }
+  }
+
+  exportRosterCsv(): void {
+    if (!this.selectedEvent) return;
+    const all = [...this.rosterRunners, ...this.rosterWaitlisted, ...this.rosterVolunteers];
+    const header = 'Username,First Name,Last Name,Role,Status,Registered At\n';
+    const rows = all.map((p: any) =>
+      `${p.username},${p.firstName || ''},${p.lastName || ''},${p.role},${p.status},${p.registeredAt || ''}`
+    ).join('\n');
+    const blob = new Blob([header + rows], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${this.selectedEvent.name.replace(/\s+/g, '_')}_roster.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   // ── Chat Media ──────────────────────────────────────────────────────────────

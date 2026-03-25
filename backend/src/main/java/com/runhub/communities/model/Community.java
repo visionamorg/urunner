@@ -42,6 +42,13 @@ public class Community {
     @JoinColumn(name = "creator_id", nullable = false)
     private User creator;
 
+    @Column(name = "is_premium", nullable = false)
+    @Builder.Default
+    private Boolean isPremium = false;
+
+    @Column(name = "stripe_payment_url", length = 500)
+    private String stripePaymentUrl;
+
     @Column(name = "member_count", nullable = false)
     @Builder.Default
     private Integer memberCount = 0;

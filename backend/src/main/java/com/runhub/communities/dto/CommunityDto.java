@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class CommunityDto {
@@ -23,4 +24,7 @@ public class CommunityDto {
     @JsonProperty("isAdmin")
     private boolean isAdmin;
     private int pendingInviteCount;
+    private Boolean isPremium;
+    private String stripePaymentUrl;
+    private List<SponsorDto> sponsors;
 }

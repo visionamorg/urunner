@@ -14,6 +14,16 @@ export interface Community {
   isAdmin: boolean;
   createdAt: string;
   pendingInviteCount?: number;
+  isPremium?: boolean;
+  stripePaymentUrl?: string;
+  sponsors?: Sponsor[];
+}
+
+export interface Sponsor {
+  id?: number;
+  logoUrl: string;
+  linkUrl?: string;
+  name?: string;
 }
 
 export interface DriveFolderDto {
