@@ -21,7 +21,8 @@
       "Bash(python3 -c \"import sys,json; data=json.load\\(sys.stdin\\); [print\\(t[''''name'''']\\) for t in data]\")",
       "Bash(npx:*)",
       "Bash(/Users/macbook/.stitch-mcp/google-cloud-sdk/bin/gcloud auth:*)",
-      "Bash(find /Users/macbook/Documents/CODE/urunner/runhub/frontend/src -name *ai* -o -name *coach*)"
+      "Bash(find /Users/macbook/Documents/CODE/urunner/runhub/frontend/src -name *ai* -o -name *coach*)",
+      "Bash(npm install:*)"
     ]
   }
 }

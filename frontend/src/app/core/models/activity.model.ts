@@ -1,3 +1,10 @@
+export interface ActivitySplit {
+  splitKm: number;
+  splitPace: number;
+  splitElevation: number;
+  splitHeartRate: number;
+}
+
 export interface Activity {
   id: number;
   userId: number;
@@ -10,6 +17,12 @@ export interface Activity {
   location?: string;
   notes?: string;
   createdAt: string;
+  elevationGainMeters?: number;
+  avgHeartRate?: number;
+  maxHeartRate?: number;
+  avgCadence?: number;
+  mapPolyline?: string;
+  splits?: ActivitySplit[];
 }
 
 export interface ActivityStats {

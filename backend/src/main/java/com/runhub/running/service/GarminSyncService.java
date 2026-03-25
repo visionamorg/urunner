@@ -114,6 +114,16 @@ public class GarminSyncService {
             User userRef = new User();
             userRef.setId(user.getId());
 
+            // Telemetry from Garmin summary
+            Integer elevationGain = node.has("elevationGainInMeters")
+                    ? (int) node.get("elevationGainInMeters").asDouble() : null;
+            Integer avgHr = node.has("averageHeartRateInBeatsPerMinute")
+                    ? node.get("averageHeartRateInBeatsPerMinute").asInt() : null;
+            Integer maxHr = node.has("maxHeartRateInBeatsPerMinute")
+                    ? node.get("maxHeartRateInBeatsPerMinute").asInt() : null;
+            Integer avgCadence = node.has("averageRunCadenceInStepsPerMinute")
+                    ? node.get("averageRunCadenceInStepsPerMinute").asInt() : null;
+
             RunningActivity activity = RunningActivity.builder()
                     .user(userRef)
                     .title(node.has("activityName") ? node.get("activityName").asText() : "Garmin Run")
@@ -122,6 +132,10 @@ public class GarminSyncService {
                     .activityDate(activityDate)
                     .source(ActivitySource.GARMIN)
                     .externalId(externalId)
+                    .elevationGainMeters(elevationGain)
+                    .avgHeartRate(avgHr)
+                    .maxHeartRate(maxHr)
+                    .avgCadence(avgCadence)
                     .build();
 
             activityRepository.save(activity);

@@ -6,6 +6,8 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "running_activities")
@@ -55,6 +57,27 @@ public class RunningActivity {
     @Column(name = "created_at", nullable = false, updatable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    // Telemetry fields
+    @Column(name = "elevation_gain_meters")
+    private Integer elevationGainMeters;
+
+    @Column(name = "avg_heart_rate")
+    private Integer avgHeartRate;
+
+    @Column(name = "max_heart_rate")
+    private Integer maxHeartRate;
+
+    @Column(name = "avg_cadence")
+    private Integer avgCadence;
+
+    @Column(name = "map_polyline", columnDefinition = "TEXT")
+    private String mapPolyline;
+
+    @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("splitKm ASC")
+    @Builder.Default
+    private List<ActivitySplit> splits = new ArrayList<>();
 
     @PrePersist
     @PreUpdate
