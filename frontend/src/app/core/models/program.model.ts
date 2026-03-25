@@ -6,6 +6,8 @@ export interface Program {
   durationWeeks: number;
   targetDistanceKm: number;
   sessionsCount: number;
+  communityId?: number;
+  createdByUsername?: string;
   createdAt: string;
 }
 
@@ -29,4 +31,20 @@ export interface ProgramProgress {
   completedSessions: number;
   totalSessions: number;
   status: string;
+}
+
+export interface EnrolleeProgress {
+  username: string;
+  completedSessions: number;
+  totalSessions: number;
+  status: string;
+}
+
+export interface CreateProgramRequest {
+  name: string;
+  description: string;
+  level: string;
+  durationWeeks: number;
+  targetDistanceKm?: number;
+  sessions?: Partial<ProgramSession>[];
 }

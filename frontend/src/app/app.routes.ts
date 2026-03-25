@@ -77,6 +77,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/calendar/calendar.component').then(m => m.CalendarComponent)
       },
       {
+        path: 'notifications',
+        loadComponent: () => import('./features/notifications/notifications.component').then(m => m.NotificationsComponent)
+      },
+      {
         path: 'export-studio',
         loadComponent: () => import('./features/export-studio/export-studio.component').then(m => m.ExportStudioComponent)
       }

@@ -13,5 +13,7 @@ public class ProgramDto {
     private Integer durationWeeks;
     private Double targetDistanceKm;
     private Integer sessionsCount;
+    private Long communityId;
+    private String createdByUsername;
     private LocalDateTime createdAt;
 }

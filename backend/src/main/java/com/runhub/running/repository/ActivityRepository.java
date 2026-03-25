@@ -16,6 +16,9 @@ public interface ActivityRepository extends JpaRepository<RunningActivity, Long>
 
     boolean existsByExternalId(String externalId);
 
+    @Query("SELECT MAX(a.activityDate) FROM RunningActivity a WHERE a.user.id = :userId")
+    LocalDate findLastActivityDateByUserId(@Param("userId") Long userId);
+
     List<RunningActivity> findAllByOrderByActivityDateDesc();
 
     @Query("SELECT COALESCE(SUM(a.distanceKm), 0) FROM RunningActivity a WHERE a.user.id = :userId")

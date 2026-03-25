@@ -3,6 +3,8 @@ package com.runhub.communities.dto;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 public class CommunityMemberDto {
@@ -14,4 +16,7 @@ public class CommunityMemberDto {
     private String role;
     private LocalDateTime joinedAt;
     private String initials;
+    private List<CommunityTagDto> tags = new ArrayList<>();
+    private LocalDateTime lastRunDate;
+    private Long messageCount30d;
 }

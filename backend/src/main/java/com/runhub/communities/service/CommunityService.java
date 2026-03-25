@@ -7,14 +7,17 @@ import com.runhub.communities.model.Community;
 import com.runhub.communities.model.CommunityInvite;
 import com.runhub.communities.model.CommunityMember;
 import com.runhub.communities.model.CommunityMemberId;
-import com.runhub.communities.repository.CommunityInviteRepository;
-import com.runhub.communities.repository.CommunityMemberRepository;
-import com.runhub.communities.repository.CommunityRepository;
+import com.runhub.communities.model.CommunityTag;
+import com.runhub.communities.model.MemberTag;
+import com.runhub.communities.repository.*;;
+import com.runhub.notifications.service.NotificationService;
 import com.runhub.config.BadRequestException;
 import com.runhub.config.ResourceNotFoundException;
+import com.runhub.chat.repository.MessageRepository;
 import com.runhub.feed.dto.PostDto;
 import com.runhub.feed.repository.PostRepository;
 import com.runhub.feed.service.FeedService;
+import com.runhub.running.repository.ActivityRepository;
 import com.runhub.users.model.User;
 import com.runhub.users.repository.UserRepository;
 import com.runhub.users.service.UserService;
@@ -22,7 +25,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +44,11 @@ public class CommunityService {
     private final GoogleDriveService googleDriveService;
     private final FeedService feedService;
     private final PostRepository postRepository;
+    private final NotificationService notificationService;
+    private final CommunityTagRepository tagRepository;
+    private final MemberTagRepository memberTagRepository;
+    private final ActivityRepository activityRepository;
+    private final MessageRepository messageRepository;
 
     // ── List / Get ──────────────────────────────────────────────────────────
 
@@ -220,6 +232,12 @@ public class CommunityService {
         CommunityInvite invite = CommunityInvite.builder()
                 .community(community).invitedUser(target).invitedBy(admin).build();
         invite = communityInviteRepository.save(invite);
+
+        notificationService.create(target, "INVITE",
+                "Community Invite",
+                admin.getDisplayUsername() + " invited you to join " + community.getName(),
+                "/notifications");
+
         return toInviteDto(invite);
     }
 
@@ -244,6 +262,8 @@ public class CommunityService {
             throw new BadRequestException("This invite is not for you");
         if (!"PENDING".equals(invite.getStatus()))
             throw new BadRequestException("Invite already responded to");
+        if (invite.getExpiresAt() != null && invite.getExpiresAt().isBefore(java.time.LocalDateTime.now()))
+            throw new BadRequestException("This invite has expired");
 
         invite.setStatus(accept ? "ACCEPTED" : "DECLINED");
         communityInviteRepository.save(invite);
@@ -267,12 +287,98 @@ public class CommunityService {
 
     public List<CommunityMemberDto> getMembers(Long communityId) {
         findById(communityId);
-        return communityMemberRepository.findByCommunityId(communityId)
-                .stream().map(communityMapper::toMemberDto).toList();
+        List<MemberTag> allTags = memberTagRepository.findByCommunityId(communityId);
+        Map<Long, List<CommunityTagDto>> tagsByUser = allTags.stream()
+                .collect(Collectors.groupingBy(mt -> mt.getUser().getId(),
+                        Collectors.mapping(mt -> CommunityTagDto.builder()
+                                .id(mt.getTag().getId())
+                                .name(mt.getTag().getName())
+                                .color(mt.getTag().getColor())
+                                .build(), Collectors.toList())));
+
+        LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
+
+        return communityMemberRepository.findByCommunityId(communityId).stream().map(m -> {
+            CommunityMemberDto dto = communityMapper.toMemberDto(m);
+            dto.setTags(tagsByUser.getOrDefault(m.getUser().getId(), List.of()));
+            LocalDate lastRun = activityRepository.findLastActivityDateByUserId(m.getUser().getId());
+            dto.setLastRunDate(lastRun != null ? lastRun.atStartOfDay() : null);
+            dto.setMessageCount30d(messageRepository.countBySenderIdAndCommunityIdAndSentAtAfter(
+                    m.getUser().getId(), communityId, thirtyDaysAgo));
+            return dto;
+        }).toList();
     }
 
     public List<CommunityMemberDto> getCommunityMembers(Long communityId) {
         return getMembers(communityId);
+    }
+
+    // ── Tags ─────────────────────────────────────────────────────────────────
+
+    public List<CommunityTagDto> getCommunityTags(Long communityId) {
+        return tagRepository.findByCommunityIdOrderByNameAsc(communityId).stream()
+                .map(t -> CommunityTagDto.builder().id(t.getId()).name(t.getName()).color(t.getColor()).build())
+                .toList();
+    }
+
+    @Transactional
+    public CommunityTagDto createTag(Long communityId, String name, String color, User admin) {
+        Community community = findById(communityId);
+        requireAdmin(communityId, admin, community);
+        CommunityTag tag = CommunityTag.builder()
+                .community(community).name(name).color(color != null ? color : "#3b82f6").build();
+        tag = tagRepository.save(tag);
+        return CommunityTagDto.builder().id(tag.getId()).name(tag.getName()).color(tag.getColor()).build();
+    }
+
+    @Transactional
+    public void deleteTag(Long communityId, Long tagId, User admin) {
+        Community community = findById(communityId);
+        requireAdmin(communityId, admin, community);
+        tagRepository.deleteById(tagId);
+    }
+
+    @Transactional
+    public void assignTag(Long communityId, Long userId, Long tagId, User admin) {
+        Community community = findById(communityId);
+        requireAdmin(communityId, admin, community);
+        if (memberTagRepository.existsByCommunityIdAndUserIdAndTagId(communityId, userId, tagId)) return;
+        User target = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        CommunityTag tag = tagRepository.findById(tagId)
+                .orElseThrow(() -> new ResourceNotFoundException("Tag not found"));
+        memberTagRepository.save(MemberTag.builder().community(community).user(target).tag(tag).build());
+    }
+
+    @Transactional
+    public void removeTag(Long communityId, Long userId, Long tagId, User admin) {
+        Community community = findById(communityId);
+        requireAdmin(communityId, admin, community);
+        memberTagRepository.deleteByCommunityIdAndUserIdAndTagId(communityId, userId, tagId);
+    }
+
+    @Transactional
+    public void batchNotifyInactive(Long communityId, List<Long> userIds, User admin) {
+        Community community = findById(communityId);
+        requireAdmin(communityId, admin, community);
+        for (Long uid : userIds) {
+            User target = userRepository.findById(uid).orElse(null);
+            if (target != null) {
+                notificationService.create(target, "GENERAL",
+                        "We miss you!",
+                        "Hey " + target.getDisplayUsername() + ", your community \"" + community.getName() + "\" misses your runs! Come back and log one.",
+                        "/communities/" + communityId);
+            }
+        }
+    }
+
+    @Transactional
+    public void batchKickMembers(Long communityId, List<Long> userIds, User admin) {
+        Community community = findById(communityId);
+        requireAdmin(communityId, admin, community);
+        for (Long uid : userIds) {
+            kickMember(communityId, uid, admin);
+        }
     }
 
     // ── Drive Sync ───────────────────────────────────────────────────────────

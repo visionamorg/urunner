@@ -11,6 +11,8 @@ import com.runhub.events.service.EventService;
 import com.runhub.feed.dto.CreatePostRequest;
 import com.runhub.feed.dto.PostDto;
 import com.runhub.feed.service.FeedService;
+import com.runhub.programs.dto.*;
+import com.runhub.programs.service.ProgramService;
 import com.runhub.users.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,6 +32,7 @@ public class CommunityController {
     private final FeedService feedService;
     private final EventService eventService;
     private final CommunityGoalService goalService;
+    private final ProgramService programService;
     private final com.runhub.communities.service.WeeklyDigestService weeklyDigestService;
 
     // ── Community CRUD ────────────────────────────────────────────────────────
@@ -92,6 +95,62 @@ public class CommunityController {
                                            @RequestBody Map<String, String> body,
                                            @AuthenticationPrincipal User user) {
         communityService.changeMemberRole(id, userId, body.get("role"), user);
+        return ResponseEntity.ok().build();
+    }
+
+    // ── Tags ────────────────────────────────────────────────────────────────────
+
+    @GetMapping("/{id}/tags")
+    public List<CommunityTagDto> getTags(@PathVariable Long id) {
+        return communityService.getCommunityTags(id);
+    }
+
+    @PostMapping("/{id}/tags")
+    public CommunityTagDto createTag(@PathVariable Long id,
+                                      @RequestBody Map<String, String> body,
+                                      @AuthenticationPrincipal User user) {
+        return communityService.createTag(id, body.get("name"), body.get("color"), user);
+    }
+
+    @DeleteMapping("/{id}/tags/{tagId}")
+    public ResponseEntity<Void> deleteTag(@PathVariable Long id,
+                                           @PathVariable Long tagId,
+                                           @AuthenticationPrincipal User user) {
+        communityService.deleteTag(id, tagId, user);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/members/{userId}/tags/{tagId}")
+    public ResponseEntity<Void> assignTag(@PathVariable Long id,
+                                           @PathVariable Long userId,
+                                           @PathVariable Long tagId,
+                                           @AuthenticationPrincipal User user) {
+        communityService.assignTag(id, userId, tagId, user);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}/members/{userId}/tags/{tagId}")
+    public ResponseEntity<Void> removeTag(@PathVariable Long id,
+                                           @PathVariable Long userId,
+                                           @PathVariable Long tagId,
+                                           @AuthenticationPrincipal User user) {
+        communityService.removeTag(id, userId, tagId, user);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/members/batch-notify")
+    public ResponseEntity<Void> batchNotify(@PathVariable Long id,
+                                             @RequestBody Map<String, List<Long>> body,
+                                             @AuthenticationPrincipal User user) {
+        communityService.batchNotifyInactive(id, body.get("userIds"), user);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/members/batch-kick")
+    public ResponseEntity<Void> batchKick(@PathVariable Long id,
+                                           @RequestBody Map<String, List<Long>> body,
+                                           @AuthenticationPrincipal User user) {
+        communityService.batchKickMembers(id, body.get("userIds"), user);
         return ResponseEntity.ok().build();
     }
 
@@ -235,6 +294,61 @@ public class CommunityController {
                                               @AuthenticationPrincipal User user) {
         communityService.respondToInvite(token, false, user);
         return ResponseEntity.ok().build();
+    }
+
+    // ── Community Programmes ──────────────────────────────────────────────────
+
+    @GetMapping("/{id}/programs")
+    public List<ProgramDto> getCommunityPrograms(@PathVariable Long id) {
+        return programService.getCommunityPrograms(id);
+    }
+
+    @PostMapping("/{id}/programs")
+    public ResponseEntity<ProgramDto> createCommunityProgram(@PathVariable Long id,
+                                                              @RequestBody CreateProgramRequest req,
+                                                              @AuthenticationPrincipal User user) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(programService.createCommunityProgram(id, req, user));
+    }
+
+    @DeleteMapping("/{id}/programs/{pid}")
+    public ResponseEntity<Void> deleteCommunityProgram(@PathVariable Long id,
+                                                        @PathVariable Long pid,
+                                                        @AuthenticationPrincipal User user) {
+        programService.deleteCommunityProgram(id, pid, user);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/programs/{pid}/sessions")
+    public List<ProgramSessionDto> getProgramSessions(@PathVariable Long id, @PathVariable Long pid) {
+        return programService.getProgramSessions(pid);
+    }
+
+    @PostMapping("/{id}/programs/{pid}/sessions")
+    public ProgramSessionDto addProgramSession(@PathVariable Long id,
+                                                @PathVariable Long pid,
+                                                @RequestBody ProgramSessionDto dto,
+                                                @AuthenticationPrincipal User user) {
+        return programService.addSession(pid, dto, user);
+    }
+
+    @PostMapping("/{id}/programs/{pid}/enroll")
+    public ProgramProgressDto enrollInProgram(@PathVariable Long id,
+                                               @PathVariable Long pid,
+                                               @AuthenticationPrincipal User user) {
+        return programService.startProgram(pid, user.getEmail());
+    }
+
+    @GetMapping("/{id}/programs/{pid}/enrollees")
+    public List<EnrolleeProgressDto> getProgramEnrollees(@PathVariable Long id, @PathVariable Long pid) {
+        return programService.getProgramEnrollees(pid);
+    }
+
+    @PostMapping("/{id}/programs/{pid}/complete-session")
+    public ProgramProgressDto completeSession(@PathVariable Long id,
+                                               @PathVariable Long pid,
+                                               @AuthenticationPrincipal User user) {
+        return programService.completeSession(pid, user.getEmail());
     }
 
     // ── Weekly Digest ──────────────────────────────────────────────────────────

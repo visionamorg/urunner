@@ -3,6 +3,7 @@ import { RouterOutlet, RouterLink, RouterLinkActive, Router, RouterModule, Navig
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService } from '../../../core/services/user.service';
+import { NotificationService } from '../../../core/services/notification.service';
 import { AuthResponse } from '../../../core/models/user.model';
 import { ThemeService } from '../../../core/services/theme.service';
 import { AvatarComponent } from '../../components/avatar/avatar.component';
@@ -30,6 +31,7 @@ export class LayoutComponent implements OnInit {
     { path: '/events', icon: 'event', label: 'Events' },
     { path: '/programs', icon: 'fitness_center', label: 'Programs' },
     { path: '/rankings', icon: 'leaderboard', label: 'Rankings' },
+    { path: '/notifications', icon: 'notifications', label: 'Notifications' },
     { path: '/profile', icon: 'person', label: 'Profile' },
     { path: '/chat', icon: 'chat', label: 'Chat' },
     { path: '/export-studio', icon: 'photo_camera', label: 'Export Studio' }
@@ -43,11 +45,14 @@ export class LayoutComponent implements OnInit {
     { path: '/profile', icon: 'person', label: 'Profile' }
   ];
 
+  unreadCount = 0;
+
   constructor(
     private authService: AuthService,
     private userService: UserService,
     private router: Router,
-    public themeService: ThemeService
+    public themeService: ThemeService,
+    public notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -65,10 +70,13 @@ export class LayoutComponent implements OnInit {
           next: (profile) => { this.profileImageUrl = profile.profileImageUrl ?? null; },
           error: () => {}
         });
+        this.notificationService.refreshUnreadCount();
       } else {
         this.profileImageUrl = null;
       }
     });
+
+    this.notificationService.unreadCount.subscribe(c => this.unreadCount = c);
   }
 
   logout(): void {

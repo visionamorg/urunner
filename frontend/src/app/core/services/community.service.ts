@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Community, CommunityMember, CreateCommunityRequest, InviteDto, DriveFolderDto } from '../models/community.model';
+import { Community, CommunityMember, CommunityTag, CreateCommunityRequest, InviteDto, DriveFolderDto } from '../models/community.model';
 import { Post, PageResponse } from '../models/post.model';
 import { RunEvent, CreateEventRequest, UpdateEventRequest } from '../models/event.model';
 import { RoomDto, CreateRoomRequest, RoomMemberDto } from '../models/room.model';
+import { Program, ProgramSession, ProgramProgress, EnrolleeProgress, CreateProgramRequest } from '../models/program.model';
 
 @Injectable({ providedIn: 'root' })
 export class CommunityService {
@@ -78,6 +79,36 @@ export class CommunityService {
 
   pinPost(communityId: number, postId: number): Observable<void> {
     return this.http.post<void>(`/api/communities/${communityId}/posts/${postId}/pin`, {});
+  }
+
+  // ── Tags ──────────────────────────────────────────────────────────────────
+
+  getTags(communityId: number): Observable<CommunityTag[]> {
+    return this.http.get<CommunityTag[]>(`/api/communities/${communityId}/tags`);
+  }
+
+  createTag(communityId: number, name: string, color: string): Observable<CommunityTag> {
+    return this.http.post<CommunityTag>(`/api/communities/${communityId}/tags`, { name, color });
+  }
+
+  deleteTag(communityId: number, tagId: number): Observable<void> {
+    return this.http.delete<void>(`/api/communities/${communityId}/tags/${tagId}`);
+  }
+
+  assignTag(communityId: number, userId: number, tagId: number): Observable<void> {
+    return this.http.post<void>(`/api/communities/${communityId}/members/${userId}/tags/${tagId}`, {});
+  }
+
+  removeTagFromMember(communityId: number, userId: number, tagId: number): Observable<void> {
+    return this.http.delete<void>(`/api/communities/${communityId}/members/${userId}/tags/${tagId}`);
+  }
+
+  batchNotifyInactive(communityId: number, userIds: number[]): Observable<void> {
+    return this.http.post<void>(`/api/communities/${communityId}/members/batch-notify`, { userIds });
+  }
+
+  batchKickMembers(communityId: number, userIds: number[]): Observable<void> {
+    return this.http.post<void>(`/api/communities/${communityId}/members/batch-kick`, { userIds });
   }
 
   // ── Invites ───────────────────────────────────────────────────────────────
@@ -163,5 +194,39 @@ export class CommunityService {
 
   removeRoomMember(communityId: number, roomId: number, userId: number): Observable<void> {
     return this.http.delete<void>(`/api/communities/${communityId}/rooms/${roomId}/members/${userId}`);
+  }
+
+  // ── Community Programmes ──────────────────────────────────────────────────
+
+  getCommunityPrograms(communityId: number): Observable<Program[]> {
+    return this.http.get<Program[]>(`/api/communities/${communityId}/programs`);
+  }
+
+  createCommunityProgram(communityId: number, data: CreateProgramRequest): Observable<Program> {
+    return this.http.post<Program>(`/api/communities/${communityId}/programs`, data);
+  }
+
+  deleteCommunityProgram(communityId: number, programId: number): Observable<void> {
+    return this.http.delete<void>(`/api/communities/${communityId}/programs/${programId}`);
+  }
+
+  getProgramSessions(communityId: number, programId: number): Observable<ProgramSession[]> {
+    return this.http.get<ProgramSession[]>(`/api/communities/${communityId}/programs/${programId}/sessions`);
+  }
+
+  addProgramSession(communityId: number, programId: number, session: Partial<ProgramSession>): Observable<ProgramSession> {
+    return this.http.post<ProgramSession>(`/api/communities/${communityId}/programs/${programId}/sessions`, session);
+  }
+
+  enrollInProgram(communityId: number, programId: number): Observable<ProgramProgress> {
+    return this.http.post<ProgramProgress>(`/api/communities/${communityId}/programs/${programId}/enroll`, {});
+  }
+
+  getProgramEnrollees(communityId: number, programId: number): Observable<EnrolleeProgress[]> {
+    return this.http.get<EnrolleeProgress[]>(`/api/communities/${communityId}/programs/${programId}/enrollees`);
+  }
+
+  completeProgramSession(communityId: number, programId: number): Observable<ProgramProgress> {
+    return this.http.post<ProgramProgress>(`/api/communities/${communityId}/programs/${programId}/complete-session`, {});
   }
 }

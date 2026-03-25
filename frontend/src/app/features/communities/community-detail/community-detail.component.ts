@@ -8,7 +8,7 @@ import { ChatService } from '../../../core/services/chat.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { EventService } from '../../../core/services/event.service';
 import { CommunityGoalService, CommunityGoal, CreateGoalRequest } from '../../../core/services/community-goal.service';
-import { Community, CommunityMember, InviteDto, DriveFolderDto } from '../../../core/models/community.model';
+import { Community, CommunityMember, CommunityTag, InviteDto, DriveFolderDto } from '../../../core/models/community.model';
 import { Post, Comment } from '../../../core/models/post.model';
 import { RunEvent, CreateEventRequest, UpdateEventRequest } from '../../../core/models/event.model';
 import { Message } from '../../../core/models/message.model';
@@ -29,7 +29,7 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
   posts: Post[] = [];
   members: CommunityMember[] = [];
   invites: InviteDto[] = [];
-  activeTab: 'feed' | 'members' | 'invites' | 'settings' | 'events' | 'calendar' | 'chat' | 'rooms' | 'leaderboard' = 'feed';
+  activeTab: 'feed' | 'members' | 'invites' | 'settings' | 'events' | 'calendar' | 'chat' | 'rooms' | 'leaderboard' | 'programmes' = 'feed';
 
   // ── Events Tab ─────────────────────────────────────────────────────────────
   communityEvents: RunEvent[] = [];
@@ -59,6 +59,22 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
   galleryUploading = false;
   galleryDriveFolderInput = '';
   showGalleryLinkForm = false;
+
+  // ── Programmes Tab ────────────────────────────────────────────────────────
+  programmes: any[] = [];
+  programmesLoading = false;
+  programmesLoaded = false;
+  selectedProgramme: any = null;
+  programmeSessions: any[] = [];
+  programmeEnrollees: any[] = [];
+  programmeSessionsLoading = false;
+  showProgrammeForm = false;
+  programmeForm = { name: '', description: '', level: 'BEGINNER', durationWeeks: 4, targetDistanceKm: 0 };
+  savingProgramme = false;
+  sessionForm = { weekNumber: 1, dayNumber: 1, title: '', description: '', distanceKm: 0, durationMinutes: 0 };
+  addingSession = false;
+  enrollingProgramme = false;
+  completingSession = false;
 
   // ── Chat Tab ───────────────────────────────────────────────────────────────
   chatMessages: Message[] = [];
@@ -123,6 +139,15 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
   // Role change state
   changingRole: { [userId: number]: boolean } = {};
   membersLoading = true;
+
+  // Tags & Activity
+  communityTags: any[] = [];
+  newTagName = '';
+  newTagColor = '#3b82f6';
+  membersView: 'list' | 'activity' = 'list';
+  selectedMembers: Set<number> = new Set();
+  assigningTag: { [key: string]: boolean } = {};
+  batchActioning = false;
 
   // Leaderboard
   leaderboard: any[] = [];
@@ -208,18 +233,23 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  switchTab(tab: 'feed' | 'members' | 'invites' | 'settings' | 'events' | 'calendar' | 'chat' | 'rooms' | 'leaderboard'): void {
+  switchTab(tab: typeof this.activeTab): void {
     this.activeTab = tab;
     if (tab === 'feed' && !this.eventsLoaded) this.loadEvents();
     if (tab === 'events' && !this.eventsLoaded) this.loadEvents();
     if (tab === 'chat' && !this.chatLoaded) this.loadChat();
     if (tab === 'leaderboard') this.loadLeaderboard();
+    if (tab === 'programmes' && !this.programmesLoaded) this.loadProgrammes();
   }
 
   loadMembers(): void {
     this.communityService.getMembers(this.communityId).subscribe({
       next: (members) => { this.members = members; this.membersLoading = false; },
       error: () => { this.membersLoading = false; this.toast.error('Failed to load members'); }
+    });
+    this.communityService.getTags(this.communityId).subscribe({
+      next: (tags) => { this.communityTags = tags; },
+      error: () => {}
     });
   }
 
@@ -664,6 +694,129 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     return Math.min(100, (entry.totalDistanceKm / this.weeklyGoalKm) * 100);
   }
 
+  // ── Programmes Tab Methods ─────────────────────────────────────────────────
+
+  loadProgrammes(): void {
+    this.programmesLoading = true;
+    this.communityService.getCommunityPrograms(this.communityId).subscribe({
+      next: (p) => { this.programmes = p; this.programmesLoading = false; this.programmesLoaded = true; },
+      error: () => { this.programmesLoading = false; this.toast.error('Failed to load programmes'); }
+    });
+  }
+
+  openProgrammeDetail(prog: any): void {
+    this.selectedProgramme = prog;
+    this.programmeSessionsLoading = true;
+    this.communityService.getProgramSessions(this.communityId, prog.id).subscribe({
+      next: (s) => { this.programmeSessions = s; this.programmeSessionsLoading = false; },
+      error: () => { this.programmeSessionsLoading = false; }
+    });
+    this.communityService.getProgramEnrollees(this.communityId, prog.id).subscribe({
+      next: (e) => { this.programmeEnrollees = e; },
+      error: () => {}
+    });
+  }
+
+  closeProgrammeDetail(): void {
+    this.selectedProgramme = null;
+    this.programmeSessions = [];
+    this.programmeEnrollees = [];
+  }
+
+  createProgramme(): void {
+    if (!this.programmeForm.name.trim()) return;
+    this.savingProgramme = true;
+    this.communityService.createCommunityProgram(this.communityId, this.programmeForm as any).subscribe({
+      next: (p) => {
+        this.programmes.unshift(p);
+        this.savingProgramme = false;
+        this.showProgrammeForm = false;
+        this.programmeForm = { name: '', description: '', level: 'BEGINNER', durationWeeks: 4, targetDistanceKm: 0 };
+        this.toast.success('Programme created');
+      },
+      error: () => { this.savingProgramme = false; this.toast.error('Failed to create programme'); }
+    });
+  }
+
+  deleteProgramme(prog: any): void {
+    this.communityService.deleteCommunityProgram(this.communityId, prog.id).subscribe({
+      next: () => {
+        this.programmes = this.programmes.filter(p => p.id !== prog.id);
+        this.toast.success('Programme deleted');
+      },
+      error: () => this.toast.error('Failed to delete programme')
+    });
+  }
+
+  addSessionToProgramme(): void {
+    if (!this.selectedProgramme || !this.sessionForm.title.trim()) return;
+    this.addingSession = true;
+    this.communityService.addProgramSession(this.communityId, this.selectedProgramme.id, this.sessionForm).subscribe({
+      next: (s) => {
+        this.programmeSessions.push(s);
+        this.addingSession = false;
+        this.sessionForm = { weekNumber: 1, dayNumber: 1, title: '', description: '', distanceKm: 0, durationMinutes: 0 };
+        this.selectedProgramme.sessionsCount = (this.selectedProgramme.sessionsCount || 0) + 1;
+        this.toast.success('Workout added');
+      },
+      error: () => { this.addingSession = false; this.toast.error('Failed to add workout'); }
+    });
+  }
+
+  enrollInProgramme(prog: any): void {
+    this.enrollingProgramme = true;
+    this.communityService.enrollInProgram(this.communityId, prog.id).subscribe({
+      next: () => {
+        this.enrollingProgramme = false;
+        this.toast.success('Enrolled in ' + prog.name);
+        this.communityService.getProgramEnrollees(this.communityId, prog.id).subscribe({
+          next: (e) => { this.programmeEnrollees = e; }
+        });
+      },
+      error: (err) => { this.enrollingProgramme = false; this.toast.error(err.error?.message || 'Failed to enroll'); }
+    });
+  }
+
+  completeSessionInProgramme(prog: any): void {
+    this.completingSession = true;
+    this.communityService.completeProgramSession(this.communityId, prog.id).subscribe({
+      next: () => {
+        this.completingSession = false;
+        this.toast.success('Session completed!');
+        this.communityService.getProgramEnrollees(this.communityId, prog.id).subscribe({
+          next: (e) => { this.programmeEnrollees = e; }
+        });
+      },
+      error: (err) => { this.completingSession = false; this.toast.error(err.error?.message || 'Failed to complete session'); }
+    });
+  }
+
+  getLevelColor(level: string): string {
+    switch (level) {
+      case 'BEGINNER': return 'bg-green-500/20 text-green-400';
+      case 'INTERMEDIATE': return 'bg-yellow-500/20 text-yellow-400';
+      case 'ADVANCED': return 'bg-red-500/20 text-red-400';
+      default: return 'bg-muted text-muted-foreground';
+    }
+  }
+
+  getSessionsByWeek(): { week: number; sessions: any[] }[] {
+    const map = new Map<number, any[]>();
+    for (const s of this.programmeSessions) {
+      const list = map.get(s.weekNumber) || [];
+      list.push(s);
+      map.set(s.weekNumber, list);
+    }
+    return Array.from(map.entries())
+      .sort((a, b) => a[0] - b[0])
+      .map(([week, sessions]) => ({ week, sessions: sessions.sort((a: any, b: any) => a.dayNumber - b.dayNumber) }));
+  }
+
+  enrolleeProgressPercent(e: any): number {
+    if (!e.totalSessions) return 0;
+    return Math.round((e.completedSessions / e.totalSessions) * 100);
+  }
+
   // ── Events Tab Methods ──────────────────────────────────────────────────────
 
   loadEvents(): void {
@@ -789,6 +942,123 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     if (role === 'ADMIN') return 'Admin';
     if (role === 'MODERATOR') return 'Crew';
     return null;
+  }
+
+  getMemberTags(username: string): CommunityTag[] {
+    const member = this.members.find(m => m.username === username);
+    return member?.tags || [];
+  }
+
+  // ── Tag Management ────────────────────────────────────────────────────────
+
+  createCommunityTag(): void {
+    if (!this.newTagName.trim()) return;
+    this.communityService.createTag(this.communityId, this.newTagName.trim(), this.newTagColor).subscribe({
+      next: (tag) => {
+        this.communityTags.push(tag);
+        this.newTagName = '';
+        this.newTagColor = '#3b82f6';
+        this.toast.success('Tag created');
+      },
+      error: () => this.toast.error('Failed to create tag')
+    });
+  }
+
+  deleteCommunityTag(tagId: number): void {
+    this.communityService.deleteTag(this.communityId, tagId).subscribe({
+      next: () => {
+        this.communityTags = this.communityTags.filter(t => t.id !== tagId);
+        this.members.forEach(m => { if (m.tags) m.tags = m.tags.filter((t: any) => t.id !== tagId); });
+        this.toast.success('Tag deleted');
+      },
+      error: () => this.toast.error('Failed to delete tag')
+    });
+  }
+
+  assignTagToMember(userId: number, tagId: number): void {
+    const key = `${userId}-${tagId}`;
+    this.assigningTag[key] = true;
+    this.communityService.assignTag(this.communityId, userId, tagId).subscribe({
+      next: () => {
+        const member = this.members.find(m => m.userId === userId);
+        const tag = this.communityTags.find(t => t.id === tagId);
+        if (member && tag) {
+          if (!member.tags) member.tags = [];
+          if (!member.tags.find((t: any) => t.id === tagId)) member.tags.push(tag);
+        }
+        this.assigningTag[key] = false;
+      },
+      error: () => { this.assigningTag[key] = false; this.toast.error('Failed to assign tag'); }
+    });
+  }
+
+  removeTagFromMember(userId: number, tagId: number): void {
+    this.communityService.removeTagFromMember(this.communityId, userId, tagId).subscribe({
+      next: () => {
+        const member = this.members.find(m => m.userId === userId);
+        if (member && member.tags) member.tags = member.tags.filter((t: any) => t.id !== tagId);
+      },
+      error: () => this.toast.error('Failed to remove tag')
+    });
+  }
+
+  toggleMemberSelect(userId: number): void {
+    if (this.selectedMembers.has(userId)) {
+      this.selectedMembers.delete(userId);
+    } else {
+      this.selectedMembers.add(userId);
+    }
+  }
+
+  selectInactiveMembers(days: number): void {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - days);
+    this.selectedMembers.clear();
+    this.members.forEach(m => {
+      if (!m.lastRunDate || new Date(m.lastRunDate) < cutoff) {
+        this.selectedMembers.add(m.userId);
+      }
+    });
+  }
+
+  batchNotify(): void {
+    const ids = Array.from(this.selectedMembers);
+    if (!ids.length) return;
+    this.batchActioning = true;
+    this.communityService.batchNotifyInactive(this.communityId, ids).subscribe({
+      next: () => {
+        this.batchActioning = false;
+        this.selectedMembers.clear();
+        this.toast.success(`Re-engagement notification sent to ${ids.length} members`);
+      },
+      error: () => { this.batchActioning = false; this.toast.error('Failed to send notifications'); }
+    });
+  }
+
+  batchKick(): void {
+    const ids = Array.from(this.selectedMembers);
+    if (!ids.length || !confirm(`Remove ${ids.length} selected members?`)) return;
+    this.batchActioning = true;
+    this.communityService.batchKickMembers(this.communityId, ids).subscribe({
+      next: () => {
+        this.members = this.members.filter(m => !this.selectedMembers.has(m.userId));
+        if (this.community) this.community.memberCount -= ids.length;
+        this.batchActioning = false;
+        this.selectedMembers.clear();
+        this.toast.success(`${ids.length} members removed`);
+      },
+      error: () => { this.batchActioning = false; this.toast.error('Failed to remove members'); }
+    });
+  }
+
+  memberHasTag(member: CommunityMember, tagId: number): boolean {
+    return member.tags?.some((t: any) => t.id === tagId) || false;
+  }
+
+  daysSinceLastRun(member: CommunityMember): number | null {
+    if (!member.lastRunDate) return null;
+    const diff = new Date().getTime() - new Date(member.lastRunDate).getTime();
+    return Math.floor(diff / (1000 * 60 * 60 * 24));
   }
 
   // ── Event Photo helpers ─────────────────────────────────────────────────────

@@ -11,4 +11,5 @@ public interface UserProgramProgressRepository extends JpaRepository<UserProgram
     List<UserProgramProgress> findByUserId(Long userId);
     List<UserProgramProgress> findByUserIdAndStatus(Long userId, String status);
     boolean existsByUserIdAndProgramIdAndStatus(Long userId, Long programId, String status);
+    List<UserProgramProgress> findByProgramId(Long programId);
 }

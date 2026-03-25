@@ -11,6 +11,8 @@ import org.mapstruct.Mapping;
 public interface ProgramMapper {
 
     @Mapping(target = "sessionsCount", ignore = true)
+    @Mapping(source = "community.id", target = "communityId")
+    @Mapping(source = "createdBy.displayUsername", target = "createdByUsername")
     ProgramDto toDto(Program program);
 
     ProgramSessionDto toSessionDto(ProgramSession session);

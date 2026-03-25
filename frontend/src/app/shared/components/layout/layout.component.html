@@ -20,7 +20,14 @@
           [routerLinkActiveOptions]="{exact: false}"
           class="sidebar-nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-all duration-200 group no-underline"
           [title]="item.label">
-          <span class="material-icons text-xl group-[.active]:text-primary flex-shrink-0">{{ item.icon }}</span>
+          <span class="relative flex-shrink-0">
+            <span class="material-icons text-xl group-[.active]:text-primary">{{ item.icon }}</span>
+            @if (item.path === '/notifications' && unreadCount > 0) {
+              <span class="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+                {{ unreadCount > 99 ? '99+' : unreadCount }}
+              </span>
+            }
+          </span>
           <span class="sidebar-nav-label text-sm font-medium">{{ item.label }}</span>
         </a>
       }
@@ -63,6 +70,14 @@
     </button>
     <span class="text-lg font-black text-primary tracking-wider">UR</span>
     <div class="flex items-center gap-2">
+      <a routerLink="/notifications" class="relative p-2 rounded-lg text-muted-foreground hover:text-foreground transition-all no-underline">
+        <span class="material-icons text-xl">notifications</span>
+        @if (unreadCount > 0) {
+          <span class="absolute top-0.5 right-0.5 min-w-[16px] h-[16px] bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5">
+            {{ unreadCount > 99 ? '99+' : unreadCount }}
+          </span>
+        }
+      </a>
       <button (click)="themeService.toggle()" class="p-2 rounded-lg text-muted-foreground hover:text-foreground transition-all">
         <span class="material-icons text-xl">{{ themeService.isDark() ? 'light_mode' : 'dark_mode' }}</span>
       </button>
@@ -90,7 +105,14 @@
               routerLinkActive="bg-primary/15 text-primary border border-primary/30"
               (click)="toggleSidebar()"
               class="flex items-center gap-3 px-4 py-3 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary transition-all duration-200 no-underline">
-              <span class="material-icons text-xl">{{ item.icon }}</span>
+              <span class="relative">
+                <span class="material-icons text-xl">{{ item.icon }}</span>
+                @if (item.path === '/notifications' && unreadCount > 0) {
+                  <span class="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+                    {{ unreadCount > 99 ? '99+' : unreadCount }}
+                  </span>
+                }
+              </span>
               <span class="text-sm font-medium">{{ item.label }}</span>
             </a>
           }

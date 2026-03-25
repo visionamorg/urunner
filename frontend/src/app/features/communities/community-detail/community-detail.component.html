@@ -1,1542 +1,1742 @@
 <!-- Loading State -->
 @if (loading) {
-  <div class="flex justify-center items-center py-32">
-    <div class="animate-spin rounded-full h-12 w-12 border-2 border-primary border-t-transparent"></div>
-  </div>
+<div class="flex justify-center items-center py-32">
+  <div class="animate-spin rounded-full h-12 w-12 border-2 border-primary border-t-transparent"></div>
+</div>
 } @else if (community) {
-  <div class="max-w-4xl mx-auto space-y-0 animate-fade-in">
+<div class="max-w-4xl mx-auto space-y-0 animate-fade-in">
 
-    <!-- Header / Cover Section -->
-    <div class="relative rounded-2xl overflow-hidden mb-6">
-      @if (community.coverUrl) {
-        <div class="h-48 sm:h-64 w-full bg-cover bg-center" [style.backgroundImage]="'url(' + community.coverUrl + ')'">
-          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
-        </div>
-      } @else {
-        <div class="h-48 sm:h-64 w-full bg-gradient-to-br from-primary/30 via-primary/20 to-primary/10">
-          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
-        </div>
-      }
+  <!-- Header / Cover Section -->
+  <div class="relative rounded-2xl overflow-hidden mb-6">
+    @if (community.coverUrl) {
+    <div class="h-48 sm:h-64 w-full bg-cover bg-center" [style.backgroundImage]="'url(' + community.coverUrl + ')'">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+    </div>
+    } @else {
+    <div class="h-48 sm:h-64 w-full bg-gradient-to-br from-primary/30 via-primary/20 to-primary/10">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+    </div>
+    }
 
-      <div class="absolute bottom-0 left-0 right-0 p-6">
-        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div>
-            <h1 class="text-3xl font-black text-white mb-1">{{ community.name }}</h1>
-            <p class="text-white text-sm max-w-2xl line-clamp-2">{{ community.description }}</p>
-            <div class="flex items-center gap-4 mt-2">
-              <div class="flex items-center gap-1 text-muted-foreground text-sm">
-                <span class="material-icons text-sm">group</span>
-                <span>{{ community.memberCount }} members</span>
-              </div>
-              @if (community.joined) {
-                <span class="bg-primary/20 border border-primary/40 text-primary text-xs font-semibold px-2.5 py-1 rounded-full">
-                  Joined
-                </span>
-              }
-              @if (community.isAdmin && community.pendingInviteCount && community.pendingInviteCount > 0) {
-                <button
-                  (click)="activeTab = 'invites'"
-                  class="bg-blue-500/20 border border-blue-500/40 text-blue-400 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1">
-                  <span class="material-icons text-xs">mail</span>
-                  {{ community.pendingInviteCount }} pending
-                </button>
-              }
+    <div class="absolute bottom-0 left-0 right-0 p-6">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <h1 class="text-3xl font-black text-white mb-1">{{ community.name }}</h1>
+          <p class="text-white text-sm max-w-2xl line-clamp-2">{{ community.description }}</p>
+          <div class="flex items-center gap-4 mt-2">
+            <div class="flex items-center gap-1 text-muted-foreground text-sm">
+              <span class="material-icons text-sm">group</span>
+              <span>{{ community.memberCount }} members</span>
             </div>
-          </div>
-          <div class="flex items-center gap-2 flex-shrink-0">
-            @if (community.isAdmin) {
-              <button
-                (click)="openDrivePicker()"
-                class="bg-blue-600 hover:bg-blue-500 text-foreground text-sm font-semibold px-4 py-2 rounded-xl transition-colors inline-flex items-center gap-2">
-                <span class="material-icons text-base">cloud_sync</span>
-                Sync Drive
-              </button>
+            @if (community.joined) {
+            <span
+              class="bg-primary/20 border border-primary/40 text-primary text-xs font-semibold px-2.5 py-1 rounded-full">
+              Joined
+            </span>
             }
-            <button
-              (click)="joinOrLeave()"
-              [class]="community.joined
+            @if (community.isAdmin && community.pendingInviteCount && community.pendingInviteCount > 0) {
+            <button (click)="activeTab = 'invites'"
+              class="bg-blue-500/20 border border-blue-500/40 text-blue-400 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1">
+              <span class="material-icons text-xs">mail</span>
+              {{ community.pendingInviteCount }} pending
+            </button>
+            }
+          </div>
+        </div>
+        <div class="flex items-center gap-2 flex-shrink-0">
+          @if (community.isAdmin) {
+          <button (click)="openDrivePicker()"
+            class="bg-blue-600 hover:bg-blue-500 text-foreground text-sm font-semibold px-4 py-2 rounded-xl transition-colors inline-flex items-center gap-2">
+            <span class="material-icons text-base">cloud_sync</span>
+            Sync Drive
+          </button>
+          }
+          <button (click)="joinOrLeave()"
+            [class]="community.joined
                 ? 'bg-secondary hover:bg-muted text-foreground text-sm font-semibold px-4 py-2 rounded-xl transition-colors inline-flex items-center gap-2'
                 : 'bg-primary  text-foreground text-sm font-semibold px-4 py-2 rounded-xl transition-all inline-flex items-center gap-2'">
-              <span class="material-icons text-base">{{ community.joined ? 'logout' : 'person_add' }}</span>
-              {{ community.joined ? 'Leave' : 'Join Community' }}
-            </button>
-          </div>
+            <span class="material-icons text-base">{{ community.joined ? 'logout' : 'person_add' }}</span>
+            {{ community.joined ? 'Leave' : 'Join Community' }}
+          </button>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Community Goal Banner -->
-    @if (communityGoal) {
-      <div class="card mb-4 p-4 border-primary/20" [ngClass]="{'border-green-500/30': communityGoal.completed}">
-        <div class="flex items-start justify-between gap-3 mb-3">
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="material-icons text-primary text-lg">emoji_events</span>
-              <span class="font-bold text-foreground text-sm">{{ communityGoal.title }}</span>
-              @if (communityGoal.completed) {
-                <span class="text-xs bg-green-500/20 text-green-400 border border-green-500/30 px-2 py-0.5 rounded-full font-semibold">🎉 Completed!</span>
-              } @else if (communityGoal.active) {
-                <span class="text-xs bg-primary/20 text-primary border border-primary/30 px-2 py-0.5 rounded-full font-semibold">Active</span>
-              }
-            </div>
-            <p class="text-muted-foreground text-xs mt-0.5">{{ communityGoal.startDate }} → {{ communityGoal.endDate }}</p>
-          </div>
-          <div class="text-right flex-shrink-0">
-            <p class="text-foreground font-black text-lg">{{ communityGoal.progressKm }} <span class="text-muted-foreground font-normal text-sm">/ {{ communityGoal.targetKm }} km</span></p>
-          </div>
-        </div>
-        <div class="w-full bg-secondary rounded-full h-3 overflow-hidden">
-          <div class="h-3 rounded-full transition-all duration-700"
-            [style.width]="communityGoal.progressPercent + '%'"
-            [class]="communityGoal.completed ? 'bg-green-500' : 'bg-primary'">
-          </div>
-        </div>
-        <p class="text-muted-foreground text-xs mt-1.5 text-right">{{ communityGoal.progressPercent }}% reached</p>
-      </div>
-    }
-
-    @if (community && community.isAdmin && !communityGoal) {
-      <div class="mb-4">
-        @if (!showGoalForm) {
-          <button (click)="showGoalForm = true" class="w-full py-2.5 rounded-xl border border-dashed border-border text-muted-foreground text-sm hover:border-primary hover:text-primary transition-all flex items-center justify-center gap-2">
-            <span class="material-icons text-base">flag</span>
-            Set a Community Distance Goal
-          </button>
-        } @else {
-          <div class="card p-4 space-y-3">
-            <h3 class="font-bold text-foreground text-sm">New Community Goal</h3>
-            <input [(ngModel)]="goalForm.title" class="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm" placeholder="e.g. Run to the Moon 🌙">
-            <div class="flex gap-2">
-              <input type="number" [(ngModel)]="goalForm.targetKm" class="flex-1 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm" placeholder="Target km (e.g. 500)">
-              <input type="date" [(ngModel)]="goalForm.endDate" class="flex-1 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm">
-            </div>
-            <div class="flex gap-2">
-              <button (click)="showGoalForm = false" class="flex-1 py-2 rounded-xl bg-secondary border border-border text-muted-foreground text-sm hover:text-foreground">Cancel</button>
-              <button (click)="saveGoal()" [disabled]="savingGoal" class="flex-1 py-2 rounded-xl bg-primary text-white text-sm font-semibold">
-                {{ savingGoal ? 'Saving...' : 'Set Goal' }}
-              </button>
-            </div>
-          </div>
-        }
-      </div>
-    }
-
-    @if (community && community.isAdmin && communityGoal) {
-      <div class="mb-4 flex justify-end">
-        @if (!showGoalForm) {
-          <button (click)="showGoalForm = true" class="text-xs text-muted-foreground hover:text-primary flex items-center gap-1">
-            <span class="material-icons text-xs">edit</span> Update Goal
-          </button>
-        } @else {
-          <div class="card p-4 space-y-3 w-full">
-            <h3 class="font-bold text-foreground text-sm">Update Community Goal</h3>
-            <input [(ngModel)]="goalForm.title" class="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm" placeholder="Goal title">
-            <div class="flex gap-2">
-              <input type="number" [(ngModel)]="goalForm.targetKm" class="flex-1 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm" placeholder="Target km">
-              <input type="date" [(ngModel)]="goalForm.endDate" class="flex-1 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm">
-            </div>
-            <div class="flex gap-2">
-              <button (click)="showGoalForm = false" class="flex-1 py-2 rounded-xl bg-secondary border border-border text-muted-foreground text-sm">Cancel</button>
-              <button (click)="saveGoal()" [disabled]="savingGoal" class="flex-1 py-2 rounded-xl bg-primary text-white text-sm font-semibold">
-                {{ savingGoal ? 'Saving...' : 'Update' }}
-              </button>
-            </div>
-          </div>
-        }
-      </div>
-    }
-
-    <!-- Tab Bar -->
-    <div class="flex items-center gap-1 mb-6 bg-secondary border border-border rounded-2xl p-1 overflow-x-auto">
-      <button
-        (click)="switchTab('feed')"
-        [class]="activeTab === 'feed'
-          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
-          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
-        <span class="material-icons text-base">dynamic_feed</span>
-        Feed
-      </button>
-      <button
-        (click)="switchTab('events')"
-        [class]="activeTab === 'events'
-          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
-          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
-        <span class="material-icons text-base">event</span>
-        Events
-      </button>
-      <button
-        (click)="switchTab('calendar')"
-        [class]="activeTab === 'calendar'
-          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
-          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
-        <span class="material-icons text-base">calendar_month</span>
-        Calendar
-      </button>
-      <button
-        (click)="switchTab('leaderboard')"
-        [class]="activeTab === 'leaderboard'
-          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
-          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
-        <span class="material-icons text-base">leaderboard</span>
-        Ranks
-      </button>
-      @if (community.joined) {
-        <button
-          (click)="switchTab('chat')"
-          [class]="activeTab === 'chat'
-            ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
-            : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
-          <span class="material-icons text-base">chat</span>
-          Chat
-        </button>
-        <button
-          (click)="switchTab('rooms')"
-          [class]="activeTab === 'rooms'
-            ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
-            : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
-          <span class="material-icons text-base">meeting_room</span>
-          Rooms
-        </button>
-      }
-      <button
-        (click)="switchTab('members')"
-        [class]="activeTab === 'members'
-          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
-          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
-        <span class="material-icons text-base">group</span>
-        Members
-      </button>
-      @if (community.isAdmin) {
-        <button
-          (click)="switchTab('invites'); loadInvites()"
-          [class]="activeTab === 'invites'
-            ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
-            : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
-          <span class="material-icons text-base">mail</span>
-          Invites
-          @if (community.pendingInviteCount && community.pendingInviteCount > 0) {
-            <span class="bg-primary text-foreground text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
-              {{ community.pendingInviteCount }}
-            </span>
+  <!-- Community Goal Banner -->
+  @if (communityGoal) {
+  <div class="card mb-4 p-4 border-primary/20" [ngClass]="{'border-green-500/30': communityGoal.completed}">
+    <div class="flex items-start justify-between gap-3 mb-3">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="material-icons text-primary text-lg">emoji_events</span>
+          <span class="font-bold text-foreground text-sm">{{ communityGoal.title }}</span>
+          @if (communityGoal.completed) {
+          <span
+            class="text-xs bg-green-500/20 text-green-400 border border-green-500/30 px-2 py-0.5 rounded-full font-semibold">🎉
+            Completed!</span>
+          } @else if (communityGoal.active) {
+          <span
+            class="text-xs bg-primary/20 text-primary border border-primary/30 px-2 py-0.5 rounded-full font-semibold">Active</span>
           }
+        </div>
+        <p class="text-muted-foreground text-xs mt-0.5">{{ communityGoal.startDate }} → {{ communityGoal.endDate }}</p>
+      </div>
+      <div class="text-right flex-shrink-0">
+        <p class="text-foreground font-black text-lg">{{ communityGoal.progressKm }} <span
+            class="text-muted-foreground font-normal text-sm">/ {{ communityGoal.targetKm }} km</span></p>
+      </div>
+    </div>
+    <div class="w-full bg-secondary rounded-full h-3 overflow-hidden">
+      <div class="h-3 rounded-full transition-all duration-700" [style.width]="communityGoal.progressPercent + '%'"
+        [class]="communityGoal.completed ? 'bg-green-500' : 'bg-primary'">
+      </div>
+    </div>
+    <p class="text-muted-foreground text-xs mt-1.5 text-right">{{ communityGoal.progressPercent }}% reached</p>
+  </div>
+  }
+
+  @if (community && community.isAdmin && !communityGoal) {
+  <div class="mb-4">
+    @if (!showGoalForm) {
+    <button (click)="showGoalForm = true"
+      class="w-full py-2.5 rounded-xl border border-dashed border-border text-muted-foreground text-sm hover:border-primary hover:text-primary transition-all flex items-center justify-center gap-2">
+      <span class="material-icons text-base">flag</span>
+      Set a Community Distance Goal
+    </button>
+    } @else {
+    <div class="card p-4 space-y-3">
+      <h3 class="font-bold text-foreground text-sm">New Community Goal</h3>
+      <input [(ngModel)]="goalForm.title"
+        class="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm"
+        placeholder="e.g. Run to the Moon 🌙">
+      <div class="flex gap-2">
+        <input type="number" [(ngModel)]="goalForm.targetKm"
+          class="flex-1 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm"
+          placeholder="Target km (e.g. 500)">
+        <input type="date" [(ngModel)]="goalForm.endDate"
+          class="flex-1 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm">
+      </div>
+      <div class="flex gap-2">
+        <button (click)="showGoalForm = false"
+          class="flex-1 py-2 rounded-xl bg-secondary border border-border text-muted-foreground text-sm hover:text-foreground">Cancel</button>
+        <button (click)="saveGoal()" [disabled]="savingGoal"
+          class="flex-1 py-2 rounded-xl bg-primary text-white text-sm font-semibold">
+          {{ savingGoal ? 'Saving...' : 'Set Goal' }}
         </button>
-        <button
-          (click)="switchTab('settings')"
-          [class]="activeTab === 'settings'
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  @if (community && community.isAdmin && communityGoal) {
+  <div class="mb-4 flex justify-end">
+    @if (!showGoalForm) {
+    <button (click)="showGoalForm = true"
+      class="text-xs text-muted-foreground hover:text-primary flex items-center gap-1">
+      <span class="material-icons text-xs">edit</span> Update Goal
+    </button>
+    } @else {
+    <div class="card p-4 space-y-3 w-full">
+      <h3 class="font-bold text-foreground text-sm">Update Community Goal</h3>
+      <input [(ngModel)]="goalForm.title"
+        class="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm"
+        placeholder="Goal title">
+      <div class="flex gap-2">
+        <input type="number" [(ngModel)]="goalForm.targetKm"
+          class="flex-1 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm"
+          placeholder="Target km">
+        <input type="date" [(ngModel)]="goalForm.endDate"
+          class="flex-1 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm">
+      </div>
+      <div class="flex gap-2">
+        <button (click)="showGoalForm = false"
+          class="flex-1 py-2 rounded-xl bg-secondary border border-border text-muted-foreground text-sm">Cancel</button>
+        <button (click)="saveGoal()" [disabled]="savingGoal"
+          class="flex-1 py-2 rounded-xl bg-primary text-white text-sm font-semibold">
+          {{ savingGoal ? 'Saving...' : 'Update' }}
+        </button>
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- Tab Bar -->
+  <div class="flex items-center gap-1 mb-6 my-4 bg-secondary border border-border rounded-2xl p-1 overflow-x-auto">
+    <button (click)="switchTab('feed')"
+      [class]="activeTab === 'feed'
+          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
+          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
+      <span class="material-icons text-base">dynamic_feed</span>
+      Feed
+    </button>
+    <button (click)="switchTab('events')"
+      [class]="activeTab === 'events'
+          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
+          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
+      <span class="material-icons text-base">event</span>
+      Events
+    </button>
+    <button (click)="switchTab('calendar')"
+      [class]="activeTab === 'calendar'
+          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
+          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
+      <span class="material-icons text-base">calendar_month</span>
+      Calendar
+    </button>
+    <button (click)="switchTab('leaderboard')"
+      [class]="activeTab === 'leaderboard'
+          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
+          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
+      <span class="material-icons text-base">leaderboard</span>
+      Ranks
+    </button>
+    <button (click)="switchTab('programmes')"
+      [class]="activeTab === 'programmes'
+          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
+          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
+      <span class="material-icons text-base">fitness_center</span>
+      Plans
+    </button>
+    @if (community.joined) {
+    <button (click)="switchTab('chat')"
+      [class]="activeTab === 'chat'
             ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
             : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
-          <span class="material-icons text-base">settings</span>
-          Settings
+      <span class="material-icons text-base">chat</span>
+      Chat
+    </button>
+    <button (click)="switchTab('rooms')"
+      [class]="activeTab === 'rooms'
+            ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
+            : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
+      <span class="material-icons text-base">meeting_room</span>
+      Rooms
+    </button>
+    }
+    <button (click)="switchTab('members')"
+      [class]="activeTab === 'members'
+          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
+          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
+      <span class="material-icons text-base">group</span>
+      Members
+    </button>
+    @if (community.isAdmin) {
+    <button (click)="switchTab('invites'); loadInvites()"
+      [class]="activeTab === 'invites'
+            ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
+            : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
+      <span class="material-icons text-base">mail</span>
+      Invites
+      @if (community.pendingInviteCount && community.pendingInviteCount > 0) {
+      <span class="bg-primary text-foreground text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+        {{ community.pendingInviteCount }}
+      </span>
+      }
+    </button>
+    <button (click)="switchTab('settings')"
+      [class]="activeTab === 'settings'
+            ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
+            : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
+      <span class="material-icons text-base">settings</span>
+      Settings
+    </button>
+    }
+  </div>
+
+  <!-- ==================== FEED TAB ==================== -->
+  @if (activeTab === 'feed') {
+  <div class="space-y-4">
+
+    <!-- Create Post Box -->
+    @if (community.joined) {
+    <div class="card">
+      <textarea [(ngModel)]="postContent" placeholder="Share something with the community..." rows="3"
+        class="input-field resize-none mb-3"></textarea>
+      <div class="flex justify-end">
+        <button (click)="createPost()" [disabled]="!postContent.trim()"
+          class="btn-primary !py-2 !px-5 disabled:opacity-40">
+          Post
         </button>
+      </div>
+    </div>
+    }
+
+    <!-- Upcoming Events Strip (feed tab) -->
+    @if (communityEvents.length > 0) {
+    <div class="space-y-2">
+      @for (event of communityEvents.slice(0, 3); track event.id) {
+      @if (!event.isCancelled) {
+      <div (click)="openEventDetail(event)"
+        class="cursor-pointer rounded-xl overflow-hidden bg-primary/20 border border-primary/30 hover:border-primary/60 transition-all p-4">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-primary flex flex-col items-center justify-center flex-shrink-0">
+            <span class="text-foreground text-xs font-bold leading-none">{{ event.eventDate | date:'MMM' }}</span>
+            <span class="text-foreground text-lg font-black leading-none">{{ event.eventDate | date:'d' }}</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-foreground font-bold text-sm truncate">{{ event.name }}</p>
+            <p class="text-primary text-xs mt-0.5 truncate">
+              <span class="material-icons text-xs align-middle">location_on</span> {{ event.location }}
+              @if (event.distanceKm) { · {{ event.distanceKm }} km }
+            </p>
+          </div>
+          <span class="material-icons text-primary flex-shrink-0">chevron_right</span>
+        </div>
+      </div>
+      }
       }
     </div>
+    }
 
-    <!-- ==================== FEED TAB ==================== -->
-    @if (activeTab === 'feed') {
-      <div class="space-y-4">
-
-        <!-- Create Post Box -->
-        @if (community.joined) {
-          <div class="card">
-            <textarea
-              [(ngModel)]="postContent"
-              placeholder="Share something with the community..."
-              rows="3"
-              class="input-field resize-none mb-3"></textarea>
-            <div class="flex justify-end">
-              <button
-                (click)="createPost()"
-                [disabled]="!postContent.trim()"
-                class="btn-primary !py-2 !px-5 disabled:opacity-40">
-                Post
-              </button>
-            </div>
-          </div>
-        }
-
-        <!-- Upcoming Events Strip (feed tab) -->
-        @if (communityEvents.length > 0) {
-          <div class="space-y-2">
-            @for (event of communityEvents.slice(0, 3); track event.id) {
-              @if (!event.isCancelled) {
-                <div (click)="openEventDetail(event)"
-                  class="cursor-pointer rounded-xl overflow-hidden bg-primary/20 border border-primary/30 hover:border-primary/60 transition-all p-4">
-                  <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-primary flex flex-col items-center justify-center flex-shrink-0">
-                      <span class="text-foreground text-xs font-bold leading-none">{{ event.eventDate | date:'MMM' }}</span>
-                      <span class="text-foreground text-lg font-black leading-none">{{ event.eventDate | date:'d' }}</span>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                      <p class="text-foreground font-bold text-sm truncate">{{ event.name }}</p>
-                      <p class="text-primary text-xs mt-0.5 truncate">
-                        <span class="material-icons text-xs align-middle">location_on</span> {{ event.location }}
-                        @if (event.distanceKm) { · {{ event.distanceKm }} km }
-                      </p>
-                    </div>
-                    <span class="material-icons text-primary flex-shrink-0">chevron_right</span>
-                  </div>
-                </div>
-              }
+    <!-- Feed Loading (initial) -->
+    @if (feedLoading && posts.length === 0) {
+    <div class="flex justify-center py-12">
+      <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
+    </div>
+    } @else if (!feedLoading && posts.length === 0) {
+    <div class="card flex flex-col items-center justify-center py-16 gap-4 text-center">
+      <div class="w-16 h-16 rounded-2xl bg-secondary border border-border flex items-center justify-center">
+        <span class="material-icons text-muted-foreground text-3xl">article</span>
+      </div>
+      <div>
+        <p class="text-foreground font-semibold">No posts yet</p>
+        <p class="text-muted-foreground mt-1 text-sm">Be the first to post in this community!</p>
+      </div>
+    </div>
+    } @else {
+    @for (post of posts; track post.id) {
+    <div class="card space-y-4" [class]="post.pinned ? 'border-primary/40 bg-primary/5' : ''">
+      <!-- Post Header -->
+      <div class="flex items-start gap-3">
+        <div
+          class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm flex-shrink-0 overflow-hidden">
+          <app-avatar [imageUrl]="post.authorProfileImageUrl" [username]="post.authorUsername"></app-avatar>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <p class="text-foreground font-semibold text-sm">{{ post.authorUsername }}</p>
+            @if (getMemberRole(post.authorUsername); as role) {
+            <span class="text-xs font-semibold px-1.5 py-0.5 rounded-full border"
+              [class]="role === 'Admin' ? 'bg-primary/20 text-primary border-primary/30' : 'bg-blue-500/20 text-blue-400 border-blue-500/30'">
+              {{ role }}
+            </span>
+            }
+            @if (post.pinned) {
+            <span class="flex items-center gap-1 text-primary text-xs">
+              <span class="material-icons text-xs">push_pin</span>
+              Pinned
+            </span>
             }
           </div>
+          <p class="text-muted-foreground text-xs">{{ timeAgo(post.createdAt) }}</p>
+        </div>
+        <!-- Admin Post Controls -->
+        @if (community.isAdmin) {
+        <div class="flex items-center gap-1 flex-shrink-0">
+          <button (click)="pinPost(post)" class="p-1.5 rounded-lg transition-colors"
+            [class]="post.pinned ? 'text-primary bg-primary/10 hover:bg-primary/20' : 'text-muted-foreground hover:text-primary hover:bg-primary/10'"
+            title="{{ post.pinned ? 'Unpin post' : 'Pin post' }}">
+            <span class="material-icons text-sm">push_pin</span>
+          </button>
+          <button (click)="deletePost(post.id)"
+            class="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+            title="Delete post">
+            <span class="material-icons text-sm">delete</span>
+          </button>
+        </div>
         }
+      </div>
 
-        <!-- Feed Loading (initial) -->
-        @if (feedLoading && posts.length === 0) {
-          <div class="flex justify-center py-12">
-            <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
+      <!-- Post Content -->
+      @if (post.content) {
+      <p class="text-foreground text-sm leading-relaxed">{{ post.content }}</p>
+      }
+
+      <!-- Photo Grid -->
+      @if (post.postType === 'PHOTO_ALBUM' && post.photoUrls && post.photoUrls.length > 0) {
+      <div class="rounded-xl overflow-hidden">
+        @if (post.photoUrls.length === 1) {
+        <img (click)="openLightbox(post.photoUrls, 0)" [src]="post.photoUrls[0]" alt="Post photo"
+          class="w-full max-h-96 object-cover rounded-xl cursor-pointer hover:opacity-90 transition-opacity" />
+        } @else if (post.photoUrls.length === 2) {
+        <div class="grid grid-cols-2 gap-1">
+          @for (url of post.photoUrls; track url; let i = $index) {
+          <img (click)="openLightbox(post.photoUrls, i)" [src]="url" alt="Post photo"
+            class="w-full h-48 object-cover cursor-pointer hover:opacity-90 transition-opacity rounded-xl" />
+          }
+        </div>
+        } @else if (post.photoUrls.length === 3) {
+        <div class="grid grid-cols-2 gap-1">
+          <img (click)="openLightbox(post.photoUrls, 0)" [src]="post.photoUrls[0]" alt="Post photo"
+            class="w-full h-64 object-cover cursor-pointer hover:opacity-90 transition-opacity rounded-xl row-span-2" />
+          <div class="flex flex-col gap-1">
+            <img (click)="openLightbox(post.photoUrls, 1)" [src]="post.photoUrls[1]" alt="Post photo"
+              class="w-full h-[calc(128px-2px)] object-cover cursor-pointer hover:opacity-90 transition-opacity rounded-xl" />
+            <img (click)="openLightbox(post.photoUrls, 2)" [src]="post.photoUrls[2]" alt="Post photo"
+              class="w-full h-[calc(128px-2px)] object-cover cursor-pointer hover:opacity-90 transition-opacity rounded-xl" />
           </div>
-        } @else if (!feedLoading && posts.length === 0) {
-          <div class="card flex flex-col items-center justify-center py-16 gap-4 text-center">
-            <div class="w-16 h-16 rounded-2xl bg-secondary border border-border flex items-center justify-center">
-              <span class="material-icons text-muted-foreground text-3xl">article</span>
-            </div>
-            <div>
-              <p class="text-foreground font-semibold">No posts yet</p>
-              <p class="text-muted-foreground mt-1 text-sm">Be the first to post in this community!</p>
-            </div>
-          </div>
+        </div>
         } @else {
-          @for (post of posts; track post.id) {
-            <div class="card space-y-4" [class]="post.pinned ? 'border-primary/40 bg-primary/5' : ''">
-              <!-- Post Header -->
-              <div class="flex items-start gap-3">
-                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm flex-shrink-0 overflow-hidden">
-                  <app-avatar [imageUrl]="post.authorProfileImageUrl" [username]="post.authorUsername"></app-avatar>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <p class="text-foreground font-semibold text-sm">{{ post.authorUsername }}</p>
-                    @if (getMemberRole(post.authorUsername); as role) {
-                      <span class="text-xs font-semibold px-1.5 py-0.5 rounded-full border"
-                        [class]="role === 'Admin' ? 'bg-primary/20 text-primary border-primary/30' : 'bg-blue-500/20 text-blue-400 border-blue-500/30'">
-                        {{ role }}
-                      </span>
-                    }
-                    @if (post.pinned) {
-                      <span class="flex items-center gap-1 text-primary text-xs">
-                        <span class="material-icons text-xs">push_pin</span>
-                        Pinned
-                      </span>
-                    }
-                  </div>
-                  <p class="text-muted-foreground text-xs">{{ timeAgo(post.createdAt) }}</p>
-                </div>
-                <!-- Admin Post Controls -->
-                @if (community.isAdmin) {
-                  <div class="flex items-center gap-1 flex-shrink-0">
-                    <button
-                      (click)="pinPost(post)"
-                      class="p-1.5 rounded-lg transition-colors"
-                      [class]="post.pinned ? 'text-primary bg-primary/10 hover:bg-primary/20' : 'text-muted-foreground hover:text-primary hover:bg-primary/10'"
-                      title="{{ post.pinned ? 'Unpin post' : 'Pin post' }}">
-                      <span class="material-icons text-sm">push_pin</span>
-                    </button>
-                    <button
-                      (click)="deletePost(post.id)"
-                      class="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                      title="Delete post">
-                      <span class="material-icons text-sm">delete</span>
-                    </button>
-                  </div>
-                }
-              </div>
+        <div class="grid grid-cols-2 gap-1">
+          @for (url of post.photoUrls.slice(0, 4); track url; let i = $index) {
+          <div class="relative">
+            <img (click)="openLightbox(post.photoUrls, i)" [src]="url" alt="Post photo"
+              class="w-full h-40 object-cover cursor-pointer hover:opacity-90 transition-opacity rounded-xl" />
+            @if (i === 3 && post.photoUrls.length > 4) {
+            <div (click)="openLightbox(post.photoUrls, 3)"
+              class="absolute inset-0 bg-black/60 hover:bg-black/50 flex items-center justify-center rounded-xl cursor-pointer transition-colors">
+              <span class="text-white text-2xl font-black">+{{ post.photoUrls.length - 4 }}</span>
+            </div>
+            }
+          </div>
+          }
+        </div>
+        }
+      </div>
+      }
 
-              <!-- Post Content -->
-              @if (post.content) {
-                <p class="text-foreground text-sm leading-relaxed">{{ post.content }}</p>
-              }
-
-              <!-- Photo Grid -->
-              @if (post.postType === 'PHOTO_ALBUM' && post.photoUrls && post.photoUrls.length > 0) {
-                <div class="rounded-xl overflow-hidden">
-                  @if (post.photoUrls.length === 1) {
-                    <img (click)="openLightbox(post.photoUrls, 0)"
-                      [src]="post.photoUrls[0]" alt="Post photo"
-                      class="w-full max-h-96 object-cover rounded-xl cursor-pointer hover:opacity-90 transition-opacity" />
-                  } @else if (post.photoUrls.length === 2) {
-                    <div class="grid grid-cols-2 gap-1">
-                      @for (url of post.photoUrls; track url; let i = $index) {
-                        <img (click)="openLightbox(post.photoUrls, i)"
-                          [src]="url" alt="Post photo"
-                          class="w-full h-48 object-cover cursor-pointer hover:opacity-90 transition-opacity rounded-xl" />
-                      }
-                    </div>
-                  } @else if (post.photoUrls.length === 3) {
-                    <div class="grid grid-cols-2 gap-1">
-                      <img (click)="openLightbox(post.photoUrls, 0)"
-                        [src]="post.photoUrls[0]" alt="Post photo"
-                        class="w-full h-64 object-cover cursor-pointer hover:opacity-90 transition-opacity rounded-xl row-span-2" />
-                      <div class="flex flex-col gap-1">
-                        <img (click)="openLightbox(post.photoUrls, 1)"
-                          [src]="post.photoUrls[1]" alt="Post photo"
-                          class="w-full h-[calc(128px-2px)] object-cover cursor-pointer hover:opacity-90 transition-opacity rounded-xl" />
-                        <img (click)="openLightbox(post.photoUrls, 2)"
-                          [src]="post.photoUrls[2]" alt="Post photo"
-                          class="w-full h-[calc(128px-2px)] object-cover cursor-pointer hover:opacity-90 transition-opacity rounded-xl" />
-                      </div>
-                    </div>
-                  } @else {
-                    <div class="grid grid-cols-2 gap-1">
-                      @for (url of post.photoUrls.slice(0, 4); track url; let i = $index) {
-                        <div class="relative">
-                          <img (click)="openLightbox(post.photoUrls, i)"
-                            [src]="url" alt="Post photo"
-                            class="w-full h-40 object-cover cursor-pointer hover:opacity-90 transition-opacity rounded-xl" />
-                          @if (i === 3 && post.photoUrls.length > 4) {
-                            <div (click)="openLightbox(post.photoUrls, 3)"
-                              class="absolute inset-0 bg-black/60 hover:bg-black/50 flex items-center justify-center rounded-xl cursor-pointer transition-colors">
-                              <span class="text-white text-2xl font-black">+{{ post.photoUrls.length - 4 }}</span>
-                            </div>
-                          }
-                        </div>
-                      }
-                    </div>
-                  }
-                </div>
-              }
-
-              <!-- Reaction counts display -->
-              @if (post.reactions && reactionEntries(post.reactions).length > 0) {
-                <div class="flex flex-wrap gap-1.5 pt-1">
-                  @for (r of reactionEntries(post.reactions); track r.emoji) {
-                    <button (click)="sendReaction(post, r.emoji)"
-                      class="flex items-center gap-1 text-xs px-2 py-1 rounded-full border transition-all"
-                      [class]="post.myReaction === r.emoji
+      <!-- Reaction counts display -->
+      @if (post.reactions && reactionEntries(post.reactions).length > 0) {
+      <div class="flex flex-wrap gap-1.5 pt-1">
+        @for (r of reactionEntries(post.reactions); track r.emoji) {
+        <button (click)="sendReaction(post, r.emoji)"
+          class="flex items-center gap-1 text-xs px-2 py-1 rounded-full border transition-all" [class]="post.myReaction === r.emoji
                         ? 'bg-primary/20 border-primary/40 text-foreground'
                         : 'bg-secondary border-border text-muted-foreground hover:border-slate-500'">
-                      <span>{{ r.emoji }}</span>
-                      <span>{{ r.count }}</span>
-                    </button>
-                  }
-                </div>
-              }
-
-              <!-- Action Bar -->
-              <div class="flex items-center gap-2 pt-2 border-t border-border" (click)="closeAllPickers()">
-                <!-- Reaction button -->
-                <div class="relative">
-                  <button (click)="toggleReactionPicker(post.id, $event)"
-                    class="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-xl transition-all"
-                    [class]="post.myReaction ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-primary hover:bg-primary/10'">
-                    <span class="text-base leading-none">{{ post.myReaction || '🤍' }}</span>
-                    <span class="text-xs">React</span>
-                  </button>
-
-                  <!-- Emoji picker popup -->
-                  @if (showReactionPicker[post.id]) {
-                    <div class="absolute bottom-full left-0 mb-2 bg-card border border-border rounded-2xl px-3 py-2 flex gap-1 shadow-xl z-10 animate-fade-in">
-                      @for (emoji of EMOJIS; track emoji) {
-                        <button (click)="sendReaction(post, emoji); $event.stopPropagation()"
-                          class="text-2xl hover:scale-125 transition-transform w-9 h-9 flex items-center justify-center rounded-xl"
-                          [class]="post.myReaction === emoji ? 'bg-primary/20 scale-110' : 'hover:bg-secondary'">
-                          {{ emoji }}
-                        </button>
-                      }
-                    </div>
-                  }
-                </div>
-
-                <button (click)="toggleComments(post.id)"
-                  class="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-blue-400 hover:bg-blue-500/10 px-3 py-1.5 rounded-xl transition-all">
-                  <span class="material-icons text-base">chat_bubble_outline</span>
-                  <span>{{ post.commentsCount }}</span>
-                </button>
-              </div>
-
-              <!-- Comments Section -->
-              @if (showComments[post.id]) {
-                <div class="space-y-3 pt-2 border-t border-border">
-                  @if (post.comments && post.comments.length > 0) {
-                    @for (comment of post.comments; track comment.id) {
-                      <div class="flex items-start gap-2.5">
-                        <div class="w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center text-foreground font-bold text-xs flex-shrink-0 overflow-hidden">
-                          <app-avatar [imageUrl]="null" [username]="comment.authorUsername"></app-avatar>
-                        </div>
-                        <div class="flex-1 bg-secondary rounded-xl px-3 py-2">
-                          <div class="flex items-center gap-2 mb-0.5">
-                            <span class="text-foreground text-xs font-semibold">{{ comment.authorUsername }}</span>
-                            <span class="text-muted-foreground text-xs">{{ timeAgo(comment.createdAt) }}</span>
-                          </div>
-                          <p class="text-foreground text-sm">{{ comment.content }}</p>
-                        </div>
-                      </div>
-                    }
-                  } @else {
-                    <p class="text-muted-foreground text-xs text-center py-2">No comments yet. Be the first!</p>
-                  }
-                  <div class="flex items-center gap-2 mt-3">
-                    <input
-                      type="text"
-                      [(ngModel)]="commentInput[post.id]"
-                      placeholder="Write a comment..."
-                      (keyup.enter)="addComment(post.id)"
-                      class="input-field !py-2 !text-sm flex-1"
-                    />
-                    <button
-                      (click)="addComment(post.id)"
-                      [disabled]="!(commentInput[post.id] || '').trim()"
-                      class="btn-primary !py-2 !px-4 !text-sm disabled:opacity-40">
-                      Reply
-                    </button>
-                  </div>
-                </div>
-              }
-            </div>
-          }
-
-          <!-- Load More -->
-          @if (feedHasMore) {
-            <div class="flex justify-center pt-4">
-              <button (click)="loadMorePosts()" [disabled]="feedLoading"
-                class="btn-secondary inline-flex items-center gap-2">
-                @if (feedLoading) {
-                  <div class="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
-                  Loading...
-                } @else {
-                  <span class="material-icons text-lg">expand_more</span>
-                  Load More Posts
-                }
-              </button>
-            </div>
-          }
+          <span>{{ r.emoji }}</span>
+          <span>{{ r.count }}</span>
+        </button>
         }
       </div>
-    }
+      }
 
-    <!-- ==================== EVENTS TAB ==================== -->
-    @if (activeTab === 'events') {
-      <div class="space-y-4">
+      <!-- Action Bar -->
+      <div class="flex items-center gap-2 pt-2 border-t border-border" (click)="closeAllPickers()">
+        <!-- Reaction button -->
+        <div class="relative">
+          <button (click)="toggleReactionPicker(post.id, $event)"
+            class="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-xl transition-all"
+            [class]="post.myReaction ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-primary hover:bg-primary/10'">
+            <span class="text-base leading-none">{{ post.myReaction || '🤍' }}</span>
+            <span class="text-xs">React</span>
+          </button>
 
-        <!-- Admin: Add Event -->
-        @if (community.isAdmin) {
-          <div class="flex justify-end">
-            <button (click)="openCreateEvent()"
-              class="btn-primary !py-2 !px-4 inline-flex items-center gap-2">
-              <span class="material-icons text-base">add</span>
-              New Event
+          <!-- Emoji picker popup -->
+          @if (showReactionPicker[post.id]) {
+          <div
+            class="absolute bottom-full left-0 mb-2 bg-card border border-border rounded-2xl px-3 py-2 flex gap-1 shadow-xl z-10 animate-fade-in">
+            @for (emoji of EMOJIS; track emoji) {
+            <button (click)="sendReaction(post, emoji); $event.stopPropagation()"
+              class="text-2xl hover:scale-125 transition-transform w-9 h-9 flex items-center justify-center rounded-xl"
+              [class]="post.myReaction === emoji ? 'bg-primary/20 scale-110' : 'hover:bg-secondary'">
+              {{ emoji }}
             </button>
-          </div>
-        }
-
-        <!-- Event Form -->
-        @if (showEventForm && community.isAdmin) {
-          <div class="card space-y-4">
-            <h3 class="text-foreground font-bold">{{ editingEvent ? 'Edit Event' : 'Create Event' }}</h3>
-
-            @if (eventError) {
-              <div class="bg-destructive/10 border border-destructive/30 text-destructive text-sm px-4 py-3 rounded-xl">{{ eventError }}</div>
-            }
-
-            <input type="text" [(ngModel)]="eventForm.name" placeholder="Event name *" class="input-field" />
-            <textarea [(ngModel)]="eventForm.description" rows="2" placeholder="Description" class="input-field resize-none"></textarea>
-            <input type="datetime-local" [(ngModel)]="eventForm.eventDate" class="input-field" />
-            <input type="text" [(ngModel)]="eventForm.location" placeholder="Location *" class="input-field" />
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="label">Distance (km)</label>
-                <input type="number" [(ngModel)]="eventForm.distanceKm" min="0" step="0.1" class="input-field" />
-              </div>
-              <div>
-                <label class="label">Price</label>
-                <input type="number" [(ngModel)]="eventForm.price" min="0" step="0.01" class="input-field" />
-              </div>
-            </div>
-            <div>
-              <label class="label">Max Participants</label>
-              <input type="number" [(ngModel)]="eventForm.maxParticipants" min="1" placeholder="Unlimited" class="input-field" />
-            </div>
-
-            <!-- Photos Section -->
-            <div>
-              <label class="label">Photos <span class="text-muted-foreground font-normal">(optional)</span></label>
-              <div class="flex gap-2">
-                <input type="url" [(ngModel)]="eventPhotoInput" placeholder="https://example.com/photo.jpg" class="input-field flex-1 !text-sm" />
-                <button type="button" (click)="addEventPhoto()"
-                  class="btn-secondary !py-2 !px-3 !text-sm whitespace-nowrap">Add Photo</button>
-              </div>
-              @if (eventForm.photoUrls && eventForm.photoUrls.length > 0) {
-                <div class="flex gap-2 flex-wrap mt-2">
-                  @for (url of eventForm.photoUrls; track url; let i = $index) {
-                    <div class="relative group">
-                      <img [src]="url" alt="Event photo" class="w-16 h-16 object-cover rounded-lg border border-border" />
-                      <button (click)="removeEventPhoto(i)"
-                        class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-foreground text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <span class="material-icons text-xs">close</span>
-                      </button>
-                    </div>
-                  }
-                </div>
-              }
-            </div>
-
-            <div class="flex gap-3 pt-2">
-              <button (click)="saveEvent()" [disabled]="savingEvent"
-                class="btn-primary disabled:opacity-40 inline-flex items-center gap-2">
-                @if (savingEvent) {
-                  <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                }
-                {{ editingEvent ? 'Save Changes' : 'Create Event' }}
-              </button>
-              <button (click)="showEventForm = false"
-                class="py-2.5 px-5 text-sm text-muted-foreground hover:text-foreground bg-secondary border border-border rounded-xl transition-colors">
-                Cancel
-              </button>
-            </div>
-          </div>
-        }
-
-        <!-- Events List -->
-        @if (eventsLoading) {
-          <div class="flex justify-center py-16">
-            <div class="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent"></div>
-          </div>
-        } @else if (communityEvents.length === 0) {
-          <div class="card flex flex-col items-center justify-center py-16 gap-4 text-center">
-            <span class="material-icons text-muted-foreground text-4xl">event_busy</span>
-            <div>
-              <p class="text-foreground font-semibold">No events yet</p>
-              <p class="text-muted-foreground mt-1 text-sm">
-                @if (community.isAdmin) { Create the first event for this community! }
-                @else { Events will appear here when the admin creates them. }
-              </p>
-            </div>
-          </div>
-        } @else {
-          <div class="space-y-4">
-            @for (event of communityEvents; track event.id) {
-              <div (click)="openEventDetail(event)" class="card cursor-pointer hover:border-primary/30 transition-all" [class]="event.isCancelled ? 'opacity-60' : ''">
-                <div class="flex items-start gap-4">
-                  <div class="w-14 h-14 rounded-2xl flex flex-col items-center justify-center flex-shrink-0 text-center"
-                    [class]="event.isCancelled ? 'bg-destructive/20' : 'bg-primary/20'">
-                    <span class="text-xs font-bold" [class]="event.isCancelled ? 'text-destructive' : 'text-primary'">
-                      {{ (event.eventDate | date:'MMM') }}
-                    </span>
-                    <span class="text-lg font-black text-foreground leading-tight">
-                      {{ (event.eventDate | date:'d') }}
-                    </span>
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-2 flex-wrap">
-                      <h3 class="text-foreground font-bold text-base">{{ event.name }}</h3>
-                      @if (event.isCancelled) {
-                        <span class="text-xs bg-destructive/20 text-destructive px-2 py-0.5 rounded-full border border-destructive/30">Cancelled</span>
-                      }
-                    </div>
-                    <p class="text-muted-foreground text-sm mt-0.5">
-                      {{ formatEventDate(event.eventDate) }}
-                    </p>
-                    <p class="text-muted-foreground text-sm">
-                      <span class="material-icons text-xs align-middle mr-1">location_on</span>{{ event.location }}
-                    </p>
-                    @if (event.description) {
-                      <p class="text-foreground text-sm mt-2 line-clamp-2">{{ event.description }}</p>
-                    }
-                    <div class="flex items-center gap-4 mt-3 flex-wrap">
-                      @if (event.distanceKm) {
-                        <span class="text-xs text-muted-foreground flex items-center gap-1">
-                          <span class="material-icons text-xs">directions_run</span>
-                          {{ event.distanceKm }} km
-                        </span>
-                      }
-                      @if (event.price > 0) {
-                        <span class="text-xs text-muted-foreground flex items-center gap-1">
-                          <span class="material-icons text-xs">payments</span>
-                          {{ event.price | currency }}
-                        </span>
-                      } @else {
-                        <span class="text-xs text-green-400">Free</span>
-                      }
-                      <span class="text-xs text-muted-foreground flex items-center gap-1">
-                        <span class="material-icons text-xs">group</span>
-                        {{ event.participantCount }} registered
-                        @if (event.maxParticipants) { / {{ event.maxParticipants }} }
-                      </span>
-                    </div>
-                  </div>
-                  @if (community.isAdmin && !event.isCancelled) {
-                    <div class="flex items-center gap-1 flex-shrink-0">
-                      <button (click)="openEditEvent(event); $event.stopPropagation()"
-                        class="p-1.5 rounded-lg text-muted-foreground hover:text-blue-400 hover:bg-blue-500/10 transition-colors"
-                        title="Edit event">
-                        <span class="material-icons text-sm">edit</span>
-                      </button>
-                      <button (click)="cancelEvent(event); $event.stopPropagation()"
-                        class="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                        title="Cancel event">
-                        <span class="material-icons text-sm">event_busy</span>
-                      </button>
-                    </div>
-                  }
-                </div>
-              </div>
             }
           </div>
-        }
-      </div>
-    }
-
-    <!-- ==================== CALENDAR TAB ==================== -->
-    @if (activeTab === 'calendar') {
-      <app-community-calendar
-        [communityId]="communityId"
-        [isAdmin]="!!community.isAdmin"
-        (eventCreated)="communityEvents.unshift($event); eventsLoaded = true">
-      </app-community-calendar>
-    }
-
-    <!-- ==================== LEADERBOARD TAB ==================== -->
-    @if (activeTab === 'leaderboard') {
-      <div class="space-y-6">
-
-        <!-- Metric Toggle + Digest Button -->
-        <div class="flex items-center justify-between flex-wrap gap-3">
-          <div class="flex items-center gap-1 bg-secondary border border-border rounded-xl p-1">
-            @for (m of ['distance', 'time', 'elevation']; track m) {
-              <button (click)="changeLeaderboardMetric($any(m))"
-                class="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all capitalize"
-                [class]="leaderboardMetric === m ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:text-foreground'">
-                {{ m }}
-              </button>
-            }
-          </div>
-          @if (community.isAdmin) {
-            <button (click)="generateDigest()" [disabled]="generatingDigest"
-              class="btn-secondary !py-2 !px-4 !text-sm inline-flex items-center gap-2">
-              @if (generatingDigest) {
-                <div class="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
-              } @else {
-                <span class="material-icons text-sm">auto_awesome</span>
-              }
-              Post Weekly Digest
-            </button>
           }
         </div>
 
-        <!-- Top 10 Leaderboard -->
-        <div class="card">
-          <div class="flex items-center gap-2 mb-4">
-            <span class="material-icons text-primary text-lg">emoji_events</span>
-            <h3 class="text-foreground font-bold">Top 10 — {{ leaderboardMetric | titlecase }}</h3>
-          </div>
+        <button (click)="toggleComments(post.id)"
+          class="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-blue-400 hover:bg-blue-500/10 px-3 py-1.5 rounded-xl transition-all">
+          <span class="material-icons text-base">chat_bubble_outline</span>
+          <span>{{ post.commentsCount }}</span>
+        </button>
+      </div>
 
-          @if (leaderboardLoading) {
-            <div class="space-y-3">
-              @for (i of [1,2,3,4,5]; track i) {
-                <div class="flex items-center gap-3 animate-pulse">
-                  <div class="w-8 h-8 rounded-full bg-secondary"></div>
-                  <div class="flex-1 h-4 bg-secondary rounded"></div>
-                  <div class="w-16 h-4 bg-secondary rounded"></div>
-                </div>
+      <!-- Comments Section -->
+      @if (showComments[post.id]) {
+      <div class="space-y-3 pt-2 border-t border-border">
+        @if (post.comments && post.comments.length > 0) {
+        @for (comment of post.comments; track comment.id) {
+        <div class="flex items-start gap-2.5">
+          <div
+            class="w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center text-foreground font-bold text-xs flex-shrink-0 overflow-hidden">
+            <app-avatar [imageUrl]="null" [username]="comment.authorUsername"></app-avatar>
+          </div>
+          <div class="flex-1 bg-secondary rounded-xl px-3 py-2">
+            <div class="flex items-center gap-2 mb-0.5">
+              <span class="text-foreground text-xs font-semibold">{{ comment.authorUsername }}</span>
+              <span class="text-muted-foreground text-xs">{{ timeAgo(comment.createdAt) }}</span>
+            </div>
+            <p class="text-foreground text-sm">{{ comment.content }}</p>
+          </div>
+        </div>
+        }
+        } @else {
+        <p class="text-muted-foreground text-xs text-center py-2">No comments yet. Be the first!</p>
+        }
+        <div class="flex items-center gap-2 mt-3">
+          <input type="text" [(ngModel)]="commentInput[post.id]" placeholder="Write a comment..."
+            (keyup.enter)="addComment(post.id)" class="input-field !py-2 !text-sm flex-1" />
+          <button (click)="addComment(post.id)" [disabled]="!(commentInput[post.id] || '').trim()"
+            class="btn-primary !py-2 !px-4 !text-sm disabled:opacity-40">
+            Reply
+          </button>
+        </div>
+      </div>
+      }
+    </div>
+    }
+
+    <!-- Load More -->
+    @if (feedHasMore) {
+    <div class="flex justify-center pt-4">
+      <button (click)="loadMorePosts()" [disabled]="feedLoading" class="btn-secondary inline-flex items-center gap-2">
+        @if (feedLoading) {
+        <div class="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
+        Loading...
+        } @else {
+        <span class="material-icons text-lg">expand_more</span>
+        Load More Posts
+        }
+      </button>
+    </div>
+    }
+    }
+  </div>
+  }
+
+  <!-- ==================== EVENTS TAB ==================== -->
+  @if (activeTab === 'events') {
+  <div class="space-y-4">
+
+    <!-- Admin: Add Event -->
+    @if (community.isAdmin) {
+    <div class="flex justify-end">
+      <button (click)="openCreateEvent()" class="btn-primary !py-2 !px-4 inline-flex items-center gap-2">
+        <span class="material-icons text-base">add</span>
+        New Event
+      </button>
+    </div>
+    }
+
+    <!-- Event Form -->
+    @if (showEventForm && community.isAdmin) {
+    <div class="card space-y-4">
+      <h3 class="text-foreground font-bold">{{ editingEvent ? 'Edit Event' : 'Create Event' }}</h3>
+
+      @if (eventError) {
+      <div class="bg-destructive/10 border border-destructive/30 text-destructive text-sm px-4 py-3 rounded-xl">{{
+        eventError }}</div>
+      }
+
+      <input type="text" [(ngModel)]="eventForm.name" placeholder="Event name *" class="input-field" />
+      <textarea [(ngModel)]="eventForm.description" rows="2" placeholder="Description"
+        class="input-field resize-none"></textarea>
+      <input type="datetime-local" [(ngModel)]="eventForm.eventDate" class="input-field" />
+      <input type="text" [(ngModel)]="eventForm.location" placeholder="Location *" class="input-field" />
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="label">Distance (km)</label>
+          <input type="number" [(ngModel)]="eventForm.distanceKm" min="0" step="0.1" class="input-field" />
+        </div>
+        <div>
+          <label class="label">Price</label>
+          <input type="number" [(ngModel)]="eventForm.price" min="0" step="0.01" class="input-field" />
+        </div>
+      </div>
+      <div>
+        <label class="label">Max Participants</label>
+        <input type="number" [(ngModel)]="eventForm.maxParticipants" min="1" placeholder="Unlimited"
+          class="input-field" />
+      </div>
+
+      <!-- Photos Section -->
+      <div>
+        <label class="label">Photos <span class="text-muted-foreground font-normal">(optional)</span></label>
+        <div class="flex gap-2">
+          <input type="url" [(ngModel)]="eventPhotoInput" placeholder="https://example.com/photo.jpg"
+            class="input-field flex-1 !text-sm" />
+          <button type="button" (click)="addEventPhoto()"
+            class="btn-secondary !py-2 !px-3 !text-sm whitespace-nowrap">Add Photo</button>
+        </div>
+        @if (eventForm.photoUrls && eventForm.photoUrls.length > 0) {
+        <div class="flex gap-2 flex-wrap mt-2">
+          @for (url of eventForm.photoUrls; track url; let i = $index) {
+          <div class="relative group">
+            <img [src]="url" alt="Event photo" class="w-16 h-16 object-cover rounded-lg border border-border" />
+            <button (click)="removeEventPhoto(i)"
+              class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-foreground text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <span class="material-icons text-xs">close</span>
+            </button>
+          </div>
+          }
+        </div>
+        }
+      </div>
+
+      <div class="flex gap-3 pt-2">
+        <button (click)="saveEvent()" [disabled]="savingEvent"
+          class="btn-primary disabled:opacity-40 inline-flex items-center gap-2">
+          @if (savingEvent) {
+          <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+          }
+          {{ editingEvent ? 'Save Changes' : 'Create Event' }}
+        </button>
+        <button (click)="showEventForm = false"
+          class="py-2.5 px-5 text-sm text-muted-foreground hover:text-foreground bg-secondary border border-border rounded-xl transition-colors">
+          Cancel
+        </button>
+      </div>
+    </div>
+    }
+
+    <!-- Events List -->
+    @if (eventsLoading) {
+    <div class="flex justify-center py-16">
+      <div class="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent"></div>
+    </div>
+    } @else if (communityEvents.length === 0) {
+    <div class="card flex flex-col items-center justify-center py-16 gap-4 text-center">
+      <span class="material-icons text-muted-foreground text-4xl">event_busy</span>
+      <div>
+        <p class="text-foreground font-semibold">No events yet</p>
+        <p class="text-muted-foreground mt-1 text-sm">
+          @if (community.isAdmin) { Create the first event for this community! }
+          @else { Events will appear here when the admin creates them. }
+        </p>
+      </div>
+    </div>
+    } @else {
+    <div class="space-y-4">
+      @for (event of communityEvents; track event.id) {
+      <div (click)="openEventDetail(event)" class="card cursor-pointer hover:border-primary/30 transition-all"
+        [class]="event.isCancelled ? 'opacity-60' : ''">
+        <div class="flex items-start gap-4">
+          <div class="w-14 h-14 rounded-2xl flex flex-col items-center justify-center flex-shrink-0 text-center"
+            [class]="event.isCancelled ? 'bg-destructive/20' : 'bg-primary/20'">
+            <span class="text-xs font-bold" [class]="event.isCancelled ? 'text-destructive' : 'text-primary'">
+              {{ (event.eventDate | date:'MMM') }}
+            </span>
+            <span class="text-lg font-black text-foreground leading-tight">
+              {{ (event.eventDate | date:'d') }}
+            </span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 class="text-foreground font-bold text-base">{{ event.name }}</h3>
+              @if (event.isCancelled) {
+              <span
+                class="text-xs bg-destructive/20 text-destructive px-2 py-0.5 rounded-full border border-destructive/30">Cancelled</span>
               }
             </div>
-          } @else if (leaderboard.length === 0) {
-            <div class="flex flex-col items-center py-12 gap-3 text-center">
-              <span class="material-icons text-muted-foreground text-4xl">leaderboard</span>
-              <p class="text-muted-foreground text-sm">No activity data yet</p>
+            <p class="text-muted-foreground text-sm mt-0.5">
+              {{ formatEventDate(event.eventDate) }}
+            </p>
+            <p class="text-muted-foreground text-sm">
+              <span class="material-icons text-xs align-middle mr-1">location_on</span>{{ event.location }}
+            </p>
+            @if (event.description) {
+            <p class="text-foreground text-sm mt-2 line-clamp-2">{{ event.description }}</p>
+            }
+            <div class="flex items-center gap-4 mt-3 flex-wrap">
+              @if (event.distanceKm) {
+              <span class="text-xs text-muted-foreground flex items-center gap-1">
+                <span class="material-icons text-xs">directions_run</span>
+                {{ event.distanceKm }} km
+              </span>
+              }
+              @if (event.price > 0) {
+              <span class="text-xs text-muted-foreground flex items-center gap-1">
+                <span class="material-icons text-xs">payments</span>
+                {{ event.price | currency }}
+              </span>
+              } @else {
+              <span class="text-xs text-green-400">Free</span>
+              }
+              <span class="text-xs text-muted-foreground flex items-center gap-1">
+                <span class="material-icons text-xs">group</span>
+                {{ event.participantCount }} registered
+                @if (event.maxParticipants) { / {{ event.maxParticipants }} }
+              </span>
             </div>
-          } @else {
-            <div class="space-y-2">
-              @for (entry of leaderboard; track entry.userId) {
-                <div class="flex items-center gap-3 p-3 rounded-xl transition-colors"
-                  [class]="entry.rank <= 3 ? 'bg-primary/5 border border-primary/10' : 'hover:bg-secondary'">
-                  <!-- Rank -->
-                  <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-black"
-                    [class]="entry.rank === 1 ? 'bg-yellow-500/20 text-yellow-400' :
+          </div>
+          @if (community.isAdmin && !event.isCancelled) {
+          <div class="flex items-center gap-1 flex-shrink-0">
+            <button (click)="openEditEvent(event); $event.stopPropagation()"
+              class="p-1.5 rounded-lg text-muted-foreground hover:text-blue-400 hover:bg-blue-500/10 transition-colors"
+              title="Edit event">
+              <span class="material-icons text-sm">edit</span>
+            </button>
+            <button (click)="cancelEvent(event); $event.stopPropagation()"
+              class="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+              title="Cancel event">
+              <span class="material-icons text-sm">event_busy</span>
+            </button>
+          </div>
+          }
+        </div>
+      </div>
+      }
+    </div>
+    }
+  </div>
+  }
+
+  <!-- ==================== CALENDAR TAB ==================== -->
+  @if (activeTab === 'calendar') {
+  <app-community-calendar [communityId]="communityId" [isAdmin]="!!community.isAdmin"
+    (eventCreated)="communityEvents.unshift($event); eventsLoaded = true">
+  </app-community-calendar>
+  }
+
+  <!-- ==================== LEADERBOARD TAB ==================== -->
+  @if (activeTab === 'leaderboard') {
+  <div class="space-y-6">
+
+    <!-- Metric Toggle + Digest Button -->
+    <div class="flex items-center justify-between flex-wrap gap-3">
+      <div class="flex items-center gap-1 bg-secondary border border-border rounded-xl p-1">
+        @for (m of ['distance', 'time', 'elevation']; track m) {
+        <button (click)="changeLeaderboardMetric($any(m))"
+          class="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all capitalize"
+          [class]="leaderboardMetric === m ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:text-foreground'">
+          {{ m }}
+        </button>
+        }
+      </div>
+      @if (community.isAdmin) {
+      <button (click)="generateDigest()" [disabled]="generatingDigest"
+        class="btn-secondary !py-2 !px-4 !text-sm inline-flex items-center gap-2">
+        @if (generatingDigest) {
+        <div class="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
+        } @else {
+        <span class="material-icons text-sm">auto_awesome</span>
+        }
+        Post Weekly Digest
+      </button>
+      }
+    </div>
+
+    <!-- Top 10 Leaderboard -->
+    <div class="card">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="material-icons text-primary text-lg">emoji_events</span>
+        <h3 class="text-foreground font-bold">Top 10 — {{ leaderboardMetric | titlecase }}</h3>
+      </div>
+
+      @if (leaderboardLoading) {
+      <div class="space-y-3">
+        @for (i of [1,2,3,4,5]; track i) {
+        <div class="flex items-center gap-3 animate-pulse">
+          <div class="w-8 h-8 rounded-full bg-secondary"></div>
+          <div class="flex-1 h-4 bg-secondary rounded"></div>
+          <div class="w-16 h-4 bg-secondary rounded"></div>
+        </div>
+        }
+      </div>
+      } @else if (leaderboard.length === 0) {
+      <div class="flex flex-col items-center py-12 gap-3 text-center">
+        <span class="material-icons text-muted-foreground text-4xl">leaderboard</span>
+        <p class="text-muted-foreground text-sm">No activity data yet</p>
+      </div>
+      } @else {
+      <div class="space-y-2">
+        @for (entry of leaderboard; track entry.userId) {
+        <div class="flex items-center gap-3 p-3 rounded-xl transition-colors"
+          [class]="entry.rank <= 3 ? 'bg-primary/5 border border-primary/10' : 'hover:bg-secondary'">
+          <!-- Rank -->
+          <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-black" [class]="entry.rank === 1 ? 'bg-yellow-500/20 text-yellow-400' :
                              entry.rank === 2 ? 'bg-gray-300/20 text-gray-300' :
                              entry.rank === 3 ? 'bg-orange-600/20 text-orange-400' :
                              'bg-secondary text-muted-foreground'">
-                    {{ entry.rank }}
-                  </div>
-                  <!-- Avatar -->
-                  @if (entry.profileImageUrl) {
-                    <img [src]="entry.profileImageUrl" class="w-9 h-9 rounded-full object-cover border border-border" />
-                  } @else {
-                    <div class="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-bold">
-                      {{ entry.username?.substring(0, 2)?.toUpperCase() }}
-                    </div>
-                  }
-                  <!-- Name -->
-                  <div class="flex-1 min-w-0">
-                    <p class="text-foreground font-semibold text-sm truncate">{{ entry.username }}</p>
-                    <p class="text-muted-foreground text-xs">{{ entry.totalRuns }} runs</p>
-                  </div>
-                  <!-- Value -->
-                  <div class="text-right">
-                    <p class="text-foreground font-black text-sm">{{ getMetricValue(entry) }}</p>
-                  </div>
-                </div>
-              }
-            </div>
-          }
-        </div>
-
-        <!-- Weekly Challenge -->
-        @if (weeklyChallenge.length > 0) {
-          <div class="card">
-            <div class="flex items-center gap-2 mb-4">
-              <span class="material-icons text-primary text-lg">local_fire_department</span>
-              <h3 class="text-foreground font-bold">Weekly Challenge</h3>
-              <span class="text-muted-foreground text-xs ml-auto">Goal: {{ weeklyGoalKm }} km</span>
-            </div>
-
-            <div class="space-y-3">
-              @for (entry of weeklyChallenge; track entry.userId) {
-                <div class="space-y-1">
-                  <div class="flex items-center justify-between text-sm">
-                    <span class="text-foreground font-medium">{{ entry.username }}</span>
-                    <span class="text-muted-foreground text-xs">{{ entry.totalDistanceKm?.toFixed(1) }} / {{ weeklyGoalKm }} km</span>
-                  </div>
-                  <div class="h-2.5 bg-secondary rounded-full overflow-hidden">
-                    <div class="h-full rounded-full transition-all duration-500"
-                      [style.width.%]="getWeeklyChallengeProgress(entry)"
-                      [class]="getWeeklyChallengeProgress(entry) >= 100 ? 'bg-green-500' : 'bg-primary'">
-                    </div>
-                  </div>
-                </div>
-              }
-            </div>
+            {{ entry.rank }}
           </div>
-        }
-
-      </div>
-    }
-
-    <!-- ==================== CHAT TAB ==================== -->
-    @if (activeTab === 'chat' && community.joined) {
-      <div class="card flex flex-col h-[calc(100vh-280px)] sm:h-[600px]">
-        <!-- Offline Banner -->
-        @if (chatOffline) {
-          <div class="flex items-center justify-between gap-2 px-4 py-2 bg-red-500/10 border-b border-red-500/20 text-red-400 text-sm">
-            <div class="flex items-center gap-2">
-              <span class="material-icons text-sm">cloud_off</span>
-              Chat is offline
-            </div>
-            <button (click)="retryChatConnection()" class="text-xs px-3 py-1 rounded-lg bg-red-500/20 hover:bg-red-500/30 transition-colors">
-              Reconnect
-            </button>
-          </div>
-        }
-        <!-- Messages -->
-        <div class="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
-          @if (chatLoading) {
-            <div class="flex justify-center py-8">
-              <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
-            </div>
-          } @else if (chatMessages.length === 0) {
-            <div class="flex flex-col items-center justify-center h-full gap-3 text-center">
-              <span class="material-icons text-muted-foreground text-4xl">chat_bubble_outline</span>
-              <p class="text-muted-foreground">No messages yet. Start the conversation!</p>
-            </div>
+          <!-- Avatar -->
+          @if (entry.profileImageUrl) {
+          <img [src]="entry.profileImageUrl" class="w-9 h-9 rounded-full object-cover border border-border" />
           } @else {
-            @for (msg of chatMessages; track msg.id) {
-              <div class="flex items-end gap-2" [class]="isOwnMessage(msg) ? 'flex-row-reverse' : ''">
-                @if (!isOwnMessage(msg)) {
-                  <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                    {{ msg.senderUsername.substring(0, 2).toUpperCase() }}
-                  </div>
-                }
-                <div class="max-w-[70%] space-y-1">
-                  @if (!isOwnMessage(msg)) {
-                    <p class="text-muted-foreground text-xs px-1">{{ msg.senderUsername }}</p>
-                  }
-                  <div class="rounded-2xl text-sm overflow-hidden"
-                    [class]="isOwnMessage(msg)
-                      ? 'bg-primary text-foreground rounded-br-sm'
-                      : 'bg-secondary border border-border text-foreground rounded-bl-sm'">
-                    @if (msg.content) {
-                      <div class="px-3 py-2">{{ msg.content }}</div>
-                    }
-                    @if (msg.mediaType === 'image' || msg.mediaType === 'gif') {
-                      <img [src]="msg.mediaUrl" alt="Media" class="max-w-full rounded-xl" style="max-height: 250px; object-fit: contain;" />
-                    } @else if (msg.mediaType === 'video') {
-                      <video [src]="msg.mediaUrl" controls class="max-w-full rounded-xl" style="max-height: 250px;"></video>
-                    } @else if (msg.mediaType === 'audio') {
-                      <div class="px-3 py-2"><audio [src]="msg.mediaUrl" controls class="w-full"></audio></div>
-                    }
-                  </div>
-                  <p class="text-muted-foreground text-xs px-1" [class]="isOwnMessage(msg) ? 'text-right' : ''">
-                    {{ timeAgo(msg.sentAt) }}
-                  </p>
-                </div>
-              </div>
-            }
+          <div
+            class="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-bold">
+            {{ entry.username?.substring(0, 2)?.toUpperCase() }}
+          </div>
           }
-        </div>
-        <!-- Input -->
-        <div class="p-4 border-t border-border space-y-2">
-          @if (showChatMediaInput) {
-            <div class="flex gap-2 items-center">
-              <input type="url" [(ngModel)]="chatMediaUrl" placeholder="https://example.com/image.jpg" class="input-field flex-1 !text-sm !py-2" />
-              <select [(ngModel)]="chatMediaType"
-                class="bg-secondary border border-border text-foreground text-sm rounded-xl px-2 py-2 focus:outline-none focus:border-primary">
-                <option value="image">Image</option>
-                <option value="gif">GIF</option>
-                <option value="video">Video</option>
-                <option value="audio">Audio</option>
-              </select>
-            </div>
-          }
-          <div class="flex items-center gap-2">
-            <button (click)="showChatMediaInput = !showChatMediaInput"
-              class="w-11 h-11 rounded-xl flex items-center justify-center transition-colors flex-shrink-0"
-              [class]="showChatMediaInput ? 'bg-primary/20 text-primary' : 'bg-secondary border border-border text-muted-foreground hover:text-foreground'">
-              <span class="material-icons text-xl">attach_file</span>
-            </button>
-            <input
-              type="text"
-              [(ngModel)]="chatInput"
-              (keydown)="onChatKeyDown($event)"
-              placeholder="Message the community..."
-              class="input-field flex-1"
-            />
-            <button (click)="sendChatMessage()"
-              [disabled]="(!chatInput.trim() && !chatMediaUrl.trim()) || sendingChat"
-              class="w-11 h-11 rounded-xl bg-primary flex items-center justify-center disabled:opacity-40  transition-all flex-shrink-0">
-              <span class="material-icons text-white">send</span>
-            </button>
+          <!-- Name -->
+          <div class="flex-1 min-w-0">
+            <p class="text-foreground font-semibold text-sm truncate">{{ entry.username }}</p>
+            <p class="text-muted-foreground text-xs">{{ entry.totalRuns }} runs</p>
+          </div>
+          <!-- Value -->
+          <div class="text-right">
+            <p class="text-foreground font-black text-sm">{{ getMetricValue(entry) }}</p>
           </div>
         </div>
-      </div>
-    }
-
-    <!-- ==================== ROOMS TAB ==================== -->
-    @if (activeTab === 'rooms' && community.joined) {
-      <app-community-rooms
-        [communityId]="communityId"
-        [isAdmin]="!!community.isAdmin"
-        [members]="members">
-      </app-community-rooms>
-    }
-
-    <!-- ==================== MEMBERS TAB ==================== -->
-    @if (activeTab === 'members') {
-      <div>
-        @if (membersLoading) {
-          <div class="space-y-3">
-            @for (i of [1,2,3,4,5]; track i) {
-              <div class="card flex items-center gap-3 animate-pulse">
-                <div class="w-10 h-10 rounded-full bg-secondary"></div>
-                <div class="flex-1 space-y-2">
-                  <div class="h-4 bg-secondary rounded w-1/3"></div>
-                  <div class="h-3 bg-secondary rounded w-1/5"></div>
-                </div>
-              </div>
-            }
-          </div>
-        } @else if (members.length === 0) {
-          <div class="card flex flex-col items-center justify-center py-16 gap-4 text-center">
-            <span class="material-icons text-muted-foreground text-4xl">group</span>
-            <p class="text-muted-foreground">No members found</p>
-          </div>
-        } @else {
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            @for (member of members; track member.userId) {
-              <div class="card flex items-center gap-4">
-                <!-- Avatar -->
-                <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-bold text-base flex-shrink-0 overflow-hidden">
-                  <app-avatar [imageUrl]="member.profileImageUrl" [username]="member.username"></app-avatar>
-                </div>
-                <!-- Info -->
-                <div class="flex-1 min-w-0">
-                  <p class="text-foreground font-semibold text-sm truncate">{{ member.firstName }} {{ member.lastName }}</p>
-                  <p class="text-muted-foreground text-xs">&#64;{{ member.username }}</p>
-                </div>
-                <!-- Role badge / selector -->
-                @if (community.isAdmin) {
-                  <div class="flex items-center gap-2 flex-shrink-0">
-                    <select
-                      [value]="member.role"
-                      (change)="changeRole(member.userId, $any($event.target).value)"
-                      [disabled]="changingRole[member.userId]"
-                      class="bg-secondary border border-border text-foreground text-xs rounded-lg px-2 py-1 focus:outline-none focus:border-primary">
-                      <option value="MEMBER">MEMBER</option>
-                      <option value="MODERATOR">MODERATOR</option>
-                      <option value="ADMIN">ADMIN</option>
-                    </select>
-                    <button
-                      (click)="kickMember(member.userId, member.username)"
-                      class="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                      title="Kick member">
-                      <span class="material-icons text-sm">person_remove</span>
-                    </button>
-                  </div>
-                } @else {
-                  <span
-                    class="text-xs font-semibold px-2.5 py-1 rounded-full border"
-                    [class]="getRoleBadgeClass(member.role)">
-                    {{ member.role }}
-                  </span>
-                }
-              </div>
-            }
-          </div>
         }
       </div>
-    }
+      }
+    </div>
 
-    <!-- ==================== INVITES TAB (admin only) ==================== -->
-    @if (activeTab === 'invites' && community.isAdmin) {
-      <div class="space-y-6">
-
-        <!-- Invite Form -->
-        <div class="card">
-          <div class="flex items-center gap-3 mb-5">
-            <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-              <span class="material-icons text-foreground text-xl">person_add</span>
-            </div>
-            <h2 class="text-foreground font-bold text-lg">Invite a Member</h2>
-          </div>
-
-          <div class="flex gap-3">
-            <input
-              type="text"
-              [(ngModel)]="inviteUsername"
-              placeholder="Enter username..."
-              (keyup.enter)="sendInvite()"
-              class="input-field flex-1"
-            />
-            <button
-              (click)="sendInvite()"
-              [disabled]="inviteLoading || !inviteUsername.trim()"
-              class="btn-primary disabled:opacity-40 inline-flex items-center gap-2 whitespace-nowrap">
-              @if (inviteLoading) {
-                <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-              } @else {
-                <span class="material-icons text-base">send</span>
-              }
-              Send Invite
-            </button>
-          </div>
-
-          @if (inviteError) {
-            <div class="mt-3 bg-destructive/10 border border-destructive/30 text-destructive text-sm px-4 py-3 rounded-xl">
-              {{ inviteError }}
-            </div>
-          }
-          @if (inviteSuccess) {
-            <div class="mt-3 bg-green-500/10 border border-green-500/30 text-green-400 text-sm px-4 py-3 rounded-xl flex items-center gap-2">
-              <span class="material-icons text-base">check_circle</span>
-              {{ inviteSuccess }}
-            </div>
-          }
-        </div>
-
-        <!-- Pending Invites List -->
-        <div class="card">
-          <h3 class="text-foreground font-bold mb-4 flex items-center gap-2">
-            <span class="material-icons text-primary">schedule</span>
-            Pending Invites
-            @if (invites.length > 0) {
-              <span class="bg-primary/20 text-primary text-xs font-bold px-2 py-0.5 rounded-full">{{ invites.length }}</span>
-            }
-          </h3>
-
-          @if (invites.length === 0) {
-            <div class="flex flex-col items-center justify-center py-10 gap-3 text-center">
-              <span class="material-icons text-muted-foreground text-4xl">mail_outline</span>
-              <p class="text-muted-foreground text-sm">No pending invites</p>
-            </div>
-          } @else {
-            <div class="space-y-3">
-              @for (invite of invites; track invite.id) {
-                <div class="flex items-center gap-4 p-4 bg-secondary rounded-xl border border-border">
-                  <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-foreground font-bold text-sm flex-shrink-0">
-                    {{ invite.invitedUsername.substring(0, 2).toUpperCase() }}
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <p class="text-foreground font-semibold text-sm">&#64;{{ invite.invitedUsername }}</p>
-                    <p class="text-muted-foreground text-xs">Invited by &#64;{{ invite.invitedByUsername }} · {{ timeAgo(invite.createdAt) }}</p>
-                  </div>
-                  <div class="flex items-center gap-2 flex-shrink-0">
-                    <span class="bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 text-xs font-semibold px-2.5 py-1 rounded-full">
-                      Pending
-                    </span>
-                    <button
-                      (click)="cancelInvite(invite.id)"
-                      class="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                      title="Cancel invite">
-                      <span class="material-icons text-sm">close</span>
-                    </button>
-                  </div>
-                </div>
-              }
-            </div>
-          }
-        </div>
+    <!-- Weekly Challenge -->
+    @if (weeklyChallenge.length > 0) {
+    <div class="card">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="material-icons text-primary text-lg">local_fire_department</span>
+        <h3 class="text-foreground font-bold">Weekly Challenge</h3>
+        <span class="text-muted-foreground text-xs ml-auto">Goal: {{ weeklyGoalKm }} km</span>
       </div>
-    }
 
-    <!-- ==================== SETTINGS TAB (admin only) ==================== -->
-    @if (activeTab === 'settings' && community.isAdmin) {
-      <div class="space-y-6">
-
-        <!-- Community Settings Card -->
-        <div class="card">
-          <div class="flex items-center gap-3 mb-6">
-            <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-              <span class="material-icons text-foreground text-xl">settings</span>
-            </div>
-            <h2 class="text-foreground font-bold text-lg">Community Settings</h2>
+      <div class="space-y-3">
+        @for (entry of weeklyChallenge; track entry.userId) {
+        <div class="space-y-1">
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-foreground font-medium">{{ entry.username }}</span>
+            <span class="text-muted-foreground text-xs">{{ entry.totalDistanceKm?.toFixed(1) }} / {{ weeklyGoalKm }}
+              km</span>
           </div>
-
-          <div class="space-y-4">
-            <div>
-              <label class="label">Community Name</label>
-              <input type="text" [(ngModel)]="settingsName" placeholder="Community name" class="input-field" />
-            </div>
-            <div>
-              <label class="label">Description</label>
-              <textarea [(ngModel)]="settingsDescription" rows="3" placeholder="What's this community about?" class="input-field resize-none"></textarea>
-            </div>
-            <div>
-              <label class="label">Google Drive Folder ID</label>
-              <input type="text" [(ngModel)]="settingsDriveFolderId" placeholder="e.g. 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs" class="input-field" />
-              <p class="text-muted-foreground text-xs mt-1">
-                Paste your public Google Drive folder ID to enable photo syncing.
-                Open your folder in Google Drive and copy the ID from the URL.
-              </p>
-            </div>
-            <div>
-              <label class="label">Cover Image URL <span class="text-muted-foreground font-normal">(optional)</span></label>
-              <input type="url" [(ngModel)]="settingsCoverUrl" placeholder="https://example.com/cover.jpg" class="input-field" />
-            </div>
-            <div>
-              <label class="label">Community Icon URL <span class="text-muted-foreground font-normal">(optional)</span></label>
-              <input type="url" [(ngModel)]="settingsImageUrl" placeholder="https://example.com/icon.png" class="input-field" />
-            </div>
-
-            @if (settingsSuccess) {
-              <div class="bg-green-500/10 border border-green-500/30 text-green-400 text-sm px-4 py-3 rounded-xl">
-                Settings saved successfully!
-              </div>
-            }
-
-            <div class="flex items-center gap-3 pt-2">
-              <button
-                (click)="updateCommunity()"
-                [disabled]="settingsSaving || !settingsName.trim()"
-                class="btn-primary disabled:opacity-40 inline-flex items-center gap-2">
-                @if (settingsSaving) {
-                  <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                }
-                Save Changes
-              </button>
+          <div class="h-2.5 bg-secondary rounded-full overflow-hidden">
+            <div class="h-full rounded-full transition-all duration-500"
+              [style.width.%]="getWeeklyChallengeProgress(entry)"
+              [class]="getWeeklyChallengeProgress(entry) >= 100 ? 'bg-green-500' : 'bg-primary'">
             </div>
           </div>
         </div>
-
-        <!-- Drive Sync Card -->
-        <div class="card">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-10 h-10 rounded-xl bg-blue-600/20 flex items-center justify-center">
-              <span class="material-icons text-blue-400 text-xl">cloud_sync</span>
-            </div>
-            <div>
-              <h2 class="text-foreground font-bold">Sync Drive Photos</h2>
-              <p class="text-muted-foreground text-sm">Fetches all images from the Drive folder and creates a photo post</p>
-            </div>
-          </div>
-          <p class="text-muted-foreground text-sm mb-4">
-            When you click "Sync Drive Photos", we'll fetch all images from your configured Google Drive folder
-            and automatically create a Photo Album post in this community's feed.
-          </p>
-          <button
-            (click)="openDrivePicker()"
-            [disabled]="!community.driveFolderId"
-            class="bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-foreground font-semibold px-5 py-2.5 rounded-xl transition-colors inline-flex items-center gap-2">
-            <span class="material-icons text-base">cloud_sync</span>
-            Browse & Sync Drive Folders
-          </button>
-          @if (!community.driveFolderId) {
-            <p class="text-muted-foreground text-xs mt-2">Set a Google Drive Folder ID in Community Settings to enable syncing.</p>
-          }
-        </div>
-
+        }
       </div>
+    </div>
     }
 
   </div>
+  }
 
-  <!-- ==================== LIGHTBOX ==================== -->
-  @if (lightboxOpen) {
-    <div class="fixed inset-0 z-50 bg-black/95 flex flex-col"
-         (touchstart)="onTouchStart($event)"
-         (touchend)="onTouchEnd($event)">
+  <!-- ==================== PROGRAMMES TAB ==================== -->
+  @if (activeTab === 'programmes') {
+  <div class="space-y-6">
 
-      <!-- Top bar: close left, counter right -->
-      <div class="flex items-center justify-between px-4 py-3 absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/70 to-transparent">
-        <button (click)="closeLightbox()" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
-          <span class="material-icons text-white">close</span>
+    <!-- Admin: Create Programme -->
+    @if (community.isAdmin) {
+      @if (!showProgrammeForm) {
+        <button (click)="showProgrammeForm = true"
+          class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
+          + New Programme
         </button>
-        <span class="text-white/70 text-sm font-medium">{{ lightboxIndex + 1 }} / {{ lightboxPhotos.length }}</span>
-      </div>
-
-      <!-- Main Image -->
-      <div class="flex-1 flex items-center justify-center p-4 pt-16 pb-4 relative">
-        <img [src]="lightboxPhotos[lightboxIndex]"
-             alt="Photo"
-             class="max-w-full max-h-full object-contain select-none transition-opacity duration-150"
-             [class]="lightboxTransitioning ? 'opacity-0' : 'opacity-100'"
-             draggable="false" />
-
-        <!-- Navigation arrows -->
-        @if (lightboxPhotos.length > 1) {
-          <button (click)="prevPhoto()"
-            class="absolute left-2 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center transition-colors">
-            <span class="material-icons text-white text-3xl">chevron_left</span>
-          </button>
-          <button (click)="nextPhoto()"
-            class="absolute right-2 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center transition-colors">
-            <span class="material-icons text-white text-3xl">chevron_right</span>
-          </button>
-        }
-      </div>
-
-      <!-- Bottom Thumbnail Strip -->
-      @if (lightboxPhotos.length > 1) {
-        <div class="bg-gradient-to-t from-black/80 to-transparent px-4 pb-4 pt-2">
-          <div class="flex gap-2 overflow-x-auto py-2">
-            @for (p of lightboxPhotos; track p; let i = $index) {
-              <button (click)="goToPhoto(i)"
-                class="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden transition-all"
-                [class]="i === lightboxIndex ? 'ring-2 ring-primary ring-offset-1 ring-offset-black opacity-100' : 'opacity-50 hover:opacity-75'">
-                <img [src]="p" alt="Thumb" class="w-full h-full object-cover" />
-              </button>
-            }
+      } @else {
+        <div class="card p-5 space-y-4">
+          <h3 class="text-lg font-bold text-foreground">Create Programme</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <input [(ngModel)]="programmeForm.name" placeholder="Programme name"
+              class="input-field col-span-full">
+            <textarea [(ngModel)]="programmeForm.description" placeholder="Description" rows="2"
+              class="input-field col-span-full"></textarea>
+            <select [(ngModel)]="programmeForm.level" class="input-field">
+              <option value="BEGINNER">Beginner</option>
+              <option value="INTERMEDIATE">Intermediate</option>
+              <option value="ADVANCED">Advanced</option>
+            </select>
+            <input type="number" [(ngModel)]="programmeForm.durationWeeks" placeholder="Duration (weeks)" min="1"
+              class="input-field">
+            <input type="number" [(ngModel)]="programmeForm.targetDistanceKm" placeholder="Target distance (km)" min="0"
+              class="input-field">
+          </div>
+          <div class="flex gap-2">
+            <button (click)="createProgramme()" [disabled]="savingProgramme || !programmeForm.name.trim()"
+              class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors">
+              {{ savingProgramme ? 'Creating...' : 'Create' }}
+            </button>
+            <button (click)="showProgrammeForm = false"
+              class="px-4 py-2 text-muted-foreground border border-border rounded-lg text-sm hover:text-foreground transition-colors">
+              Cancel
+            </button>
           </div>
         </div>
       }
-    </div>
-  }
+    }
 
-  <!-- ==================== EVENT DETAIL MODAL ==================== -->
-  @if (selectedEvent) {
-    <!-- Backdrop -->
-    <div class="fixed inset-0 bg-black/70 z-40" (click)="closeEventDetail()"></div>
-
-    <!-- Slide-in panel -->
-    <div class="fixed inset-y-0 right-0 z-50 w-full max-w-lg flex flex-col bg-card border-l border-border shadow-2xl overflow-hidden animate-slide-up">
-
-      <!-- Header Banner -->
-      <div class="relative h-36 bg-gradient-to-br from-primary/40 to-primary/20 flex-shrink-0">
-        <div class="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent"></div>
-        <div class="absolute top-4 right-4">
-          <button (click)="closeEventDetail()" class="w-9 h-9 rounded-full bg-black/30 hover:bg-black/50 flex items-center justify-center transition-colors">
-            <span class="material-icons text-white">close</span>
-          </button>
-        </div>
-        <div class="absolute bottom-4 left-5 right-5">
-          <h2 class="text-white font-black text-xl leading-tight">{{ selectedEvent.name }}</h2>
-        </div>
-      </div>
-
-      <!-- Scrollable Content -->
-      <div class="flex-1 overflow-y-auto">
-
-        <!-- Event Info -->
-        <div class="p-5 space-y-4">
-
-          <!-- Date, Location -->
-          <div class="flex flex-col gap-2 text-sm">
-            <div class="flex items-center gap-2 text-foreground">
-              <span class="material-icons text-primary text-base">schedule</span>
-              {{ formatEventDate(selectedEvent.eventDate) }}
-            </div>
-            <div class="flex items-center gap-2 text-foreground">
-              <span class="material-icons text-primary text-base">location_on</span>
-              {{ selectedEvent.location }}
-            </div>
+    <!-- Programme Detail Modal -->
+    @if (selectedProgramme) {
+      <div class="card p-5 space-y-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-xl font-bold text-foreground">{{ selectedProgramme.name }}</h3>
+            <p class="text-sm text-muted-foreground mt-1">{{ selectedProgramme.description }}</p>
           </div>
-
-          <!-- Stats Row -->
-          <div class="grid grid-cols-3 gap-3">
-            @if (selectedEvent.distanceKm) {
-              <div class="bg-secondary rounded-xl p-3 text-center border border-border">
-                <span class="material-icons text-primary text-lg">directions_run</span>
-                <p class="text-foreground font-bold text-sm mt-1">{{ selectedEvent.distanceKm }} km</p>
-                <p class="text-muted-foreground text-xs">Distance</p>
-              </div>
-            }
-            <div class="bg-secondary rounded-xl p-3 text-center border border-border">
-              <span class="material-icons text-green-400 text-lg">payments</span>
-              <p class="text-foreground font-bold text-sm mt-1">{{ selectedEvent.price > 0 ? (selectedEvent.price | currency) : 'Free' }}</p>
-              <p class="text-muted-foreground text-xs">Entry</p>
-            </div>
-            <div class="bg-secondary rounded-xl p-3 text-center border border-border">
-              <span class="material-icons text-blue-400 text-lg">group</span>
-              <p class="text-foreground font-bold text-sm mt-1">
-                {{ selectedEvent.participantCount }}
-                @if (selectedEvent.maxParticipants) { / {{ selectedEvent.maxParticipants }} }
-              </p>
-              <p class="text-muted-foreground text-xs">Registered</p>
-            </div>
-          </div>
-
-          <!-- Description -->
-          @if (selectedEvent.description) {
-            <p class="text-foreground text-sm leading-relaxed">{{ selectedEvent.description }}</p>
-          }
-
-          <!-- Register button -->
-          @if (!selectedEvent.isCancelled) {
-            <button (click)="registerForEvent(selectedEvent)"
-              [disabled]="!!eventRegistered[selectedEvent.id]"
-              class="w-full btn-primary disabled:opacity-60">
-              {{ eventRegistered[selectedEvent.id] ? 'Registered ✓' : 'Register for Event' }}
-            </button>
-          }
-        </div>
-
-        <!-- Participants -->
-        @if (eventParticipants.length > 0) {
-          <div class="px-5 pb-4">
-            <h3 class="text-foreground font-bold mb-3 flex items-center gap-2">
-              <span class="material-icons text-primary text-base">people</span>
-              Participants ({{ eventParticipants.length }})
-            </h3>
-            <div class="flex flex-wrap gap-2">
-              @for (p of eventParticipants; track p.userId) {
-                <div class="flex items-center gap-1.5 bg-secondary border border-border rounded-full px-3 py-1.5">
-                  <div class="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
-                    {{ (p.username || '?').substring(0, 1).toUpperCase() }}
-                  </div>
-                  <span class="text-foreground text-xs">{{ p.username }}</span>
-                </div>
-              }
-            </div>
-          </div>
-        }
-
-        <!-- Event Gallery -->
-        <div class="px-5 pb-4">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-foreground font-bold flex items-center gap-2">
-              <span class="material-icons text-primary text-base">photo_library</span>
-              Gallery
-              @if (galleryPhotos.length > 0) {
-                <span class="text-muted-foreground text-xs font-normal">({{ galleryPhotos.length }})</span>
-              }
-            </h3>
-            <div class="flex items-center gap-2">
-              @if (community.isAdmin && selectedEvent.driveFolderId) {
-                <button (click)="syncEventGallery()" [disabled]="gallerySyncing"
-                  class="text-xs px-2 py-1 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors inline-flex items-center gap-1">
-                  @if (gallerySyncing) {
-                    <div class="animate-spin rounded-full h-3 w-3 border border-primary border-t-transparent"></div>
-                  } @else {
-                    <span class="material-icons text-xs">sync</span>
-                  }
-                  Sync Drive
-                </button>
-              }
-              @if (community.isAdmin && !selectedEvent.driveFolderId) {
-                <button (click)="showGalleryLinkForm = !showGalleryLinkForm"
-                  class="text-xs px-2 py-1 rounded-lg bg-secondary border border-border text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
-                  <span class="material-icons text-xs">link</span>
-                  Link Drive
-                </button>
-              }
-            </div>
-          </div>
-
-          <!-- Link Drive Form -->
-          @if (showGalleryLinkForm && community.isAdmin) {
-            <div class="flex gap-2 mb-3">
-              <input type="text" [(ngModel)]="galleryDriveFolderInput" placeholder="Google Drive Folder ID"
-                class="input-field flex-1 !text-sm !py-2" />
-              <button (click)="linkDriveToEvent()" class="btn-primary !py-2 !px-3 !text-sm">Link</button>
-            </div>
-          }
-
-          <!-- Upload Photo -->
-          <div class="flex gap-2 mb-3">
-            <input type="url" [(ngModel)]="galleryUploadUrl" placeholder="Add photo URL..."
-              class="input-field flex-1 !text-sm !py-2" />
-            <button (click)="uploadGalleryPhoto()" [disabled]="galleryUploading || !galleryUploadUrl.trim()"
-              class="btn-secondary !py-2 !px-3 !text-sm disabled:opacity-40 inline-flex items-center gap-1">
-              @if (galleryUploading) {
-                <div class="animate-spin rounded-full h-3 w-3 border border-primary border-t-transparent"></div>
-              } @else {
-                <span class="material-icons text-sm">add_photo_alternate</span>
-              }
-              Add
-            </button>
-          </div>
-
-          <!-- Gallery Grid (Masonry-style) -->
-          @if (galleryLoading) {
-            <div class="grid grid-cols-3 gap-2">
-              @for (i of [1,2,3,4,5,6]; track i) {
-                <div class="aspect-square bg-secondary rounded-xl animate-pulse"></div>
-              }
-            </div>
-          } @else if (galleryPhotos.length > 0) {
-            <div class="columns-2 sm:columns-3 gap-2 space-y-2">
-              @for (photo of galleryPhotos; track photo.id; let i = $index) {
-                <div class="break-inside-avoid group relative cursor-pointer" (click)="openLightbox(galleryPhotoUrls, i)">
-                  <img [src]="photo.thumbnailUrl || photo.photoUrl" alt="Gallery photo"
-                    class="w-full rounded-xl hover:opacity-90 transition-opacity" />
-                  @if (photo.taggedUsername) {
-                    <div class="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full backdrop-blur-sm">
-                      <span class="material-icons text-xs align-middle mr-0.5">person</span>{{ photo.taggedUsername }}
-                    </div>
-                  }
-                  @if (photo.uploadedByUsername) {
-                    <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full backdrop-blur-sm transition-opacity">
-                      by {{ photo.uploadedByUsername }}
-                    </div>
-                  }
-                </div>
-              }
-            </div>
-          } @else if (selectedEvent.photoUrls && selectedEvent.photoUrls.length > 0) {
-            <!-- Fallback: legacy photoUrls from event -->
-            <div class="columns-2 sm:columns-3 gap-2 space-y-2">
-              @for (url of selectedEvent.photoUrls; track url; let i = $index) {
-                <div class="break-inside-avoid">
-                  <img (click)="openLightbox(selectedEvent.photoUrls!, i)"
-                    [src]="url" alt="Event photo"
-                    class="w-full rounded-xl cursor-pointer hover:opacity-90 transition-opacity" />
-                </div>
-              }
-            </div>
-          } @else {
-            <div class="text-center py-6">
-              <span class="material-icons text-muted-foreground text-3xl">add_a_photo</span>
-              <p class="text-muted-foreground text-sm mt-2">No photos yet. Be the first to share!</p>
-            </div>
-          }
-        </div>
-
-        <!-- Event Discussion -->
-        <div class="px-5 pb-5">
-          <h3 class="text-foreground font-bold mb-3 flex items-center gap-2">
-            <span class="material-icons text-primary text-base">chat_bubble</span>
-            Discussion
-          </h3>
-
-          @if (loadingEventDetail) {
-            <div class="flex justify-center py-6">
-              <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
-            </div>
-          } @else if (eventMessages.length === 0) {
-            <p class="text-muted-foreground text-sm text-center py-6">No messages yet. Be the first!</p>
-          } @else {
-            <div class="space-y-3 mb-4 max-h-60 overflow-y-auto">
-              @for (msg of eventMessages; track msg.id) {
-                <div class="flex items-start gap-2">
-                  <div class="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                    {{ msg.senderUsername.substring(0, 1).toUpperCase() }}
-                  </div>
-                  <div class="flex-1 bg-secondary border border-border rounded-xl px-3 py-2">
-                    <div class="flex items-center gap-2 mb-0.5">
-                      <span class="text-foreground text-xs font-semibold">{{ msg.senderUsername }}</span>
-                      <span class="text-muted-foreground text-xs">{{ timeAgo(msg.sentAt) }}</span>
-                    </div>
-                    <p class="text-foreground text-sm">{{ msg.content }}</p>
-                  </div>
-                </div>
-              }
-            </div>
-          }
-
-          <!-- Chat Input -->
-          <div class="flex items-center gap-2 border-t border-border pt-3">
-            <input type="text" [(ngModel)]="eventChatInput"
-              (keydown)="onEventChatKeyDown($event)"
-              placeholder="Write a message..."
-              class="input-field flex-1 !py-2 !text-sm" />
-            <button (click)="sendEventMessage()"
-              [disabled]="!eventChatInput.trim() || sendingEventChat"
-              class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center disabled:opacity-40 flex-shrink-0">
-              <span class="material-icons text-white text-sm">send</span>
-            </button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  }
-
-  <!-- ==================== DRIVE FOLDER PICKER MODAL ==================== -->
-  @if (showDrivePicker) {
-    <!-- Backdrop -->
-    <div class="fixed inset-0 bg-black/70 z-40" (click)="closeDrivePicker()"></div>
-
-    <!-- Modal -->
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div class="bg-card border border-border rounded-2xl w-full max-w-lg shadow-2xl animate-fade-in">
-
-        <!-- Header -->
-        <div class="flex items-center justify-between p-6 border-b border-border">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-blue-600/20 flex items-center justify-center">
-              <span class="material-icons text-blue-400">folder</span>
-            </div>
-            <div>
-              <h2 class="text-foreground font-bold text-lg">Select Event Folder</h2>
-              <p class="text-muted-foreground text-xs">Pick a folder to sync its photos as a community post</p>
-            </div>
-          </div>
-          <button (click)="closeDrivePicker()" class="text-muted-foreground hover:text-foreground transition-colors">
+          <button (click)="closeProgrammeDetail()" class="p-2 text-muted-foreground hover:text-foreground">
             <span class="material-icons">close</span>
           </button>
         </div>
 
-        <!-- Body -->
-        <div class="p-6">
+        <div class="flex gap-2 flex-wrap">
+          <span [class]="'text-xs px-2.5 py-1 rounded-full font-medium ' + getLevelColor(selectedProgramme.level)">
+            {{ selectedProgramme.level }}
+          </span>
+          <span class="text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground font-medium">
+            {{ selectedProgramme.durationWeeks }} weeks
+          </span>
+          @if (selectedProgramme.targetDistanceKm) {
+            <span class="text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground font-medium">
+              {{ selectedProgramme.targetDistanceKm }} km target
+            </span>
+          }
+        </div>
 
-          @if (driveError) {
-            <div class="bg-destructive/10 border border-destructive/30 text-destructive text-sm px-4 py-3 rounded-xl mb-4">
-              {{ driveError }}
+        <!-- Actions -->
+        <div class="flex gap-2">
+          @if (community.joined) {
+            <button (click)="enrollInProgramme(selectedProgramme)" [disabled]="enrollingProgramme"
+              class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors">
+              {{ enrollingProgramme ? 'Enrolling...' : 'Enroll' }}
+            </button>
+            <button (click)="completeSessionInProgramme(selectedProgramme)" [disabled]="completingSession"
+              class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 transition-colors">
+              {{ completingSession ? 'Completing...' : 'Complete Session' }}
+            </button>
+          }
+        </div>
+
+        <!-- Workouts by Week -->
+        @if (programmeSessionsLoading) {
+          <div class="space-y-3">
+            @for (_ of [1,2]; track _) {
+              <div class="bg-muted/30 rounded-lg p-4 animate-pulse"><div class="h-4 bg-muted rounded w-1/3"></div></div>
+            }
+          </div>
+        } @else {
+          @for (weekGroup of getSessionsByWeek(); track weekGroup.week) {
+            <div>
+              <h4 class="text-sm font-bold text-foreground mb-2">Week {{ weekGroup.week }}</h4>
+              <div class="space-y-2">
+                @for (session of weekGroup.sessions; track session.id) {
+                  <div class="bg-card border border-border rounded-lg p-3 flex items-center justify-between">
+                    <div class="min-w-0">
+                      <p class="text-sm font-medium text-foreground">Day {{ session.dayNumber }}: {{ session.title }}</p>
+                      @if (session.description) {
+                        <p class="text-xs text-muted-foreground mt-0.5">{{ session.description }}</p>
+                      }
+                    </div>
+                    <div class="flex gap-3 text-xs text-muted-foreground flex-shrink-0">
+                      @if (session.distanceKm) { <span>{{ session.distanceKm }} km</span> }
+                      @if (session.durationMinutes) { <span>{{ session.durationMinutes }} min</span> }
+                    </div>
+                  </div>
+                }
+              </div>
             </div>
           }
+          @if (programmeSessions.length === 0) {
+            <p class="text-sm text-muted-foreground">No workouts added yet.</p>
+          }
+        }
 
-          @if (loadingFolders) {
-            <div class="flex flex-col items-center justify-center py-12 gap-3">
-              <div class="animate-spin rounded-full h-10 w-10 border-2 border-blue-500 border-t-transparent"></div>
-              <p class="text-muted-foreground text-sm">Loading folders from Google Drive...</p>
+        <!-- Admin: Add Workout -->
+        @if (community.isAdmin) {
+          <div class="border-t border-border pt-4 space-y-3">
+            <h4 class="text-sm font-bold text-foreground">Add Workout</h4>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <input type="number" [(ngModel)]="sessionForm.weekNumber" placeholder="Week" min="1" class="input-field">
+              <input type="number" [(ngModel)]="sessionForm.dayNumber" placeholder="Day" min="1" class="input-field">
+              <input [(ngModel)]="sessionForm.title" placeholder="Workout title" class="input-field col-span-2">
+              <input [(ngModel)]="sessionForm.description" placeholder="Description (optional)" class="input-field col-span-2">
+              <input type="number" [(ngModel)]="sessionForm.distanceKm" placeholder="Distance km" min="0" step="0.1" class="input-field">
+              <input type="number" [(ngModel)]="sessionForm.durationMinutes" placeholder="Duration min" min="0" class="input-field">
             </div>
-          } @else if (driveFolders.length === 0 && !driveError) {
-            <div class="flex flex-col items-center justify-center py-12 gap-3 text-center">
-              <span class="material-icons text-muted-foreground text-5xl">folder_off</span>
-              <p class="text-muted-foreground">No event folders found.</p>
-              <p class="text-muted-foreground text-sm">Make sure your Drive folder contains subfolders named after events.</p>
+            <button (click)="addSessionToProgramme()" [disabled]="addingSession || !sessionForm.title.trim()"
+              class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors">
+              {{ addingSession ? 'Adding...' : 'Add Workout' }}
+            </button>
+          </div>
+        }
+
+        <!-- Enrollee Progress -->
+        @if (programmeEnrollees.length > 0) {
+          <div class="border-t border-border pt-4">
+            <h4 class="text-sm font-bold text-foreground mb-3">Enrolled Members</h4>
+            <div class="space-y-2">
+              @for (e of programmeEnrollees; track e.username) {
+                <div class="flex items-center gap-3">
+                  <span class="text-sm text-foreground font-medium w-32 truncate">{{ e.username }}</span>
+                  <div class="flex-1 bg-muted/30 rounded-full h-2.5 overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-300"
+                      [class]="e.status === 'COMPLETED' ? 'bg-green-500' : 'bg-primary'"
+                      [style.width.%]="enrolleeProgressPercent(e)"></div>
+                  </div>
+                  <span class="text-xs text-muted-foreground w-16 text-right">
+                    {{ e.completedSessions }}/{{ e.totalSessions }}
+                  </span>
+                  @if (e.status === 'COMPLETED') {
+                    <span class="text-xs text-green-400 font-medium">Done</span>
+                  }
+                </div>
+              }
             </div>
-          } @else {
-            <div class="space-y-3 max-h-80 overflow-y-auto pr-1">
-              @for (folder of driveFolders; track folder.id) {
-                <button
-                  (click)="syncFolder(folder)"
-                  [disabled]="syncingFolderId !== null"
-                  class="w-full flex items-center gap-4 p-4 bg-secondary border border-border hover:border-blue-500/50 rounded-xl transition-all disabled:opacity-50 text-left group">
-                  <div class="w-12 h-12 rounded-xl bg-blue-600/15 flex items-center justify-center flex-shrink-0">
-                    @if (syncingFolderId === folder.id) {
-                      <div class="animate-spin rounded-full h-5 w-5 border-2 border-blue-400 border-t-transparent"></div>
-                    } @else {
-                      <span class="material-icons text-blue-400 text-2xl">photo_library</span>
-                    }
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <p class="text-foreground font-semibold text-sm truncate">{{ folder.name }}</p>
-                    <p class="text-muted-foreground text-xs mt-0.5">
-                      @if (folder.imageCount > 0) {
-                        {{ folder.imageCount }} photo{{ folder.imageCount !== 1 ? 's' : '' }}
-                      } @else {
-                        No photos found
-                      }
-                    </p>
-                  </div>
-                  <span class="material-icons text-muted-foreground group-hover:text-blue-400 transition-colors flex-shrink-0">chevron_right</span>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Programmes List -->
+    @if (!selectedProgramme) {
+      @if (programmesLoading) {
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          @for (_ of [1,2,3]; track _) {
+            <div class="card p-5 animate-pulse">
+              <div class="h-5 bg-muted rounded w-2/3 mb-3"></div>
+              <div class="h-3 bg-muted rounded w-full mb-2"></div>
+              <div class="h-3 bg-muted rounded w-1/2"></div>
+            </div>
+          }
+        </div>
+      } @else if (programmes.length === 0) {
+        <div class="card p-8 text-center">
+          <span class="material-icons text-4xl text-muted-foreground mb-2">fitness_center</span>
+          <p class="text-muted-foreground">No training programmes yet</p>
+        </div>
+      } @else {
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          @for (prog of programmes; track prog.id) {
+            <div class="card p-5 hover:border-primary/30 transition-colors cursor-pointer" (click)="openProgrammeDetail(prog)">
+              <div class="flex items-start justify-between mb-2">
+                <h3 class="text-base font-bold text-foreground">{{ prog.name }}</h3>
+                <span [class]="'text-xs px-2 py-0.5 rounded-full font-medium ' + getLevelColor(prog.level)">
+                  {{ prog.level }}
+                </span>
+              </div>
+              <p class="text-sm text-muted-foreground line-clamp-2 mb-3">{{ prog.description }}</p>
+              <div class="flex gap-4 text-xs text-muted-foreground">
+                <span>{{ prog.durationWeeks }} weeks</span>
+                <span>{{ prog.sessionsCount || 0 }} workouts</span>
+                @if (prog.targetDistanceKm) { <span>{{ prog.targetDistanceKm }} km</span> }
+              </div>
+              @if (prog.createdByUsername) {
+                <p class="text-xs text-muted-foreground mt-2">by {{ prog.createdByUsername }}</p>
+              }
+              @if (community.isAdmin) {
+                <button (click)="deleteProgramme(prog); $event.stopPropagation()"
+                  class="mt-3 text-xs text-red-400 hover:text-red-300 transition-colors">
+                  Delete
                 </button>
               }
             </div>
           }
         </div>
+      }
+    }
+  </div>
+  }
 
+  <!-- ==================== CHAT TAB ==================== -->
+  @if (activeTab === 'chat' && community.joined) {
+  <div class="card flex flex-col h-[calc(100vh-280px)] sm:h-[600px]">
+    <!-- Offline Banner -->
+    @if (chatOffline) {
+    <div
+      class="flex items-center justify-between gap-2 px-4 py-2 bg-red-500/10 border-b border-red-500/20 text-red-400 text-sm">
+      <div class="flex items-center gap-2">
+        <span class="material-icons text-sm">cloud_off</span>
+        Chat is offline
+      </div>
+      <button (click)="retryChatConnection()"
+        class="text-xs px-3 py-1 rounded-lg bg-red-500/20 hover:bg-red-500/30 transition-colors">
+        Reconnect
+      </button>
+    </div>
+    }
+    <!-- Messages -->
+    <div class="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
+      @if (chatLoading) {
+      <div class="flex justify-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
+      </div>
+      } @else if (chatMessages.length === 0) {
+      <div class="flex flex-col items-center justify-center h-full gap-3 text-center">
+        <span class="material-icons text-muted-foreground text-4xl">chat_bubble_outline</span>
+        <p class="text-muted-foreground">No messages yet. Start the conversation!</p>
+      </div>
+      } @else {
+      @for (msg of chatMessages; track msg.id) {
+      <div class="flex items-end gap-2" [class]="isOwnMessage(msg) ? 'flex-row-reverse' : ''">
+        @if (!isOwnMessage(msg)) {
+        <div
+          class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+          {{ msg.senderUsername.substring(0, 2).toUpperCase() }}
+        </div>
+        }
+        <div class="max-w-[70%] space-y-1">
+          @if (!isOwnMessage(msg)) {
+          <p class="text-muted-foreground text-xs px-1">{{ msg.senderUsername }}</p>
+          }
+          <div class="rounded-2xl text-sm overflow-hidden" [class]="isOwnMessage(msg)
+                      ? 'bg-primary text-foreground rounded-br-sm'
+                      : 'bg-secondary border border-border text-foreground rounded-bl-sm'">
+            @if (msg.content) {
+            <div class="px-3 py-2">{{ msg.content }}</div>
+            }
+            @if (msg.mediaType === 'image' || msg.mediaType === 'gif') {
+            <img [src]="msg.mediaUrl" alt="Media" class="max-w-full rounded-xl"
+              style="max-height: 250px; object-fit: contain;" />
+            } @else if (msg.mediaType === 'video') {
+            <video [src]="msg.mediaUrl" controls class="max-w-full rounded-xl" style="max-height: 250px;"></video>
+            } @else if (msg.mediaType === 'audio') {
+            <div class="px-3 py-2"><audio [src]="msg.mediaUrl" controls class="w-full"></audio></div>
+            }
+          </div>
+          <p class="text-muted-foreground text-xs px-1" [class]="isOwnMessage(msg) ? 'text-right' : ''">
+            {{ timeAgo(msg.sentAt) }}
+          </p>
+        </div>
+      </div>
+      }
+      }
+    </div>
+    <!-- Input -->
+    <div class="p-4 border-t border-border space-y-2">
+      @if (showChatMediaInput) {
+      <div class="flex gap-2 items-center">
+        <input type="url" [(ngModel)]="chatMediaUrl" placeholder="https://example.com/image.jpg"
+          class="input-field flex-1 !text-sm !py-2" />
+        <select [(ngModel)]="chatMediaType"
+          class="bg-secondary border border-border text-foreground text-sm rounded-xl px-2 py-2 focus:outline-none focus:border-primary">
+          <option value="image">Image</option>
+          <option value="gif">GIF</option>
+          <option value="video">Video</option>
+          <option value="audio">Audio</option>
+        </select>
+      </div>
+      }
+      <div class="flex items-center gap-2">
+        <button (click)="showChatMediaInput = !showChatMediaInput"
+          class="w-11 h-11 rounded-xl flex items-center justify-center transition-colors flex-shrink-0"
+          [class]="showChatMediaInput ? 'bg-primary/20 text-primary' : 'bg-secondary border border-border text-muted-foreground hover:text-foreground'">
+          <span class="material-icons text-xl">attach_file</span>
+        </button>
+        <input type="text" [(ngModel)]="chatInput" (keydown)="onChatKeyDown($event)"
+          placeholder="Message the community..." class="input-field flex-1" />
+        <button (click)="sendChatMessage()" [disabled]="(!chatInput.trim() && !chatMediaUrl.trim()) || sendingChat"
+          class="w-11 h-11 rounded-xl bg-primary flex items-center justify-center disabled:opacity-40  transition-all flex-shrink-0">
+          <span class="material-icons text-white">send</span>
+        </button>
       </div>
     </div>
+  </div>
   }
+
+  <!-- ==================== ROOMS TAB ==================== -->
+  @if (activeTab === 'rooms' && community.joined) {
+  <app-community-rooms [communityId]="communityId" [isAdmin]="!!community.isAdmin" [members]="members">
+  </app-community-rooms>
+  }
+
+  <!-- ==================== MEMBERS TAB ==================== -->
+  @if (activeTab === 'members') {
+  <div>
+    @if (membersLoading) {
+    <div class="space-y-3">
+      @for (i of [1,2,3,4,5]; track i) {
+      <div class="card flex items-center gap-3 animate-pulse">
+        <div class="w-10 h-10 rounded-full bg-secondary"></div>
+        <div class="flex-1 space-y-2">
+          <div class="h-4 bg-secondary rounded w-1/3"></div>
+          <div class="h-3 bg-secondary rounded w-1/5"></div>
+        </div>
+      </div>
+      }
+    </div>
+    } @else if (members.length === 0) {
+    <div class="card flex flex-col items-center justify-center py-16 gap-4 text-center">
+      <span class="material-icons text-muted-foreground text-4xl">group</span>
+      <p class="text-muted-foreground">No members found</p>
+    </div>
+    } @else {
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      @for (member of members; track member.userId) {
+      <div class="card flex items-center gap-4">
+        <!-- Avatar -->
+        <div
+          class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-bold text-base flex-shrink-0 overflow-hidden">
+          <app-avatar [imageUrl]="member.profileImageUrl" [username]="member.username"></app-avatar>
+        </div>
+        <!-- Info -->
+        <div class="flex-1 min-w-0">
+          <p class="text-foreground font-semibold text-sm truncate">{{ member.firstName }} {{ member.lastName }}</p>
+          <p class="text-muted-foreground text-xs">&#64;{{ member.username }}</p>
+        </div>
+        <!-- Role badge / selector -->
+        @if (community.isAdmin) {
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <select [value]="member.role" (change)="changeRole(member.userId, $any($event.target).value)"
+            [disabled]="changingRole[member.userId]"
+            class="bg-secondary border border-border text-foreground text-xs rounded-lg px-2 py-1 focus:outline-none focus:border-primary">
+            <option value="MEMBER">MEMBER</option>
+            <option value="MODERATOR">MODERATOR</option>
+            <option value="ADMIN">ADMIN</option>
+          </select>
+          <button (click)="kickMember(member.userId, member.username)"
+            class="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+            title="Kick member">
+            <span class="material-icons text-sm">person_remove</span>
+          </button>
+        </div>
+        } @else {
+        <span class="text-xs font-semibold px-2.5 py-1 rounded-full border" [class]="getRoleBadgeClass(member.role)">
+          {{ member.role }}
+        </span>
+        }
+      </div>
+      }
+    </div>
+    }
+  </div>
+  }
+
+  <!-- ==================== INVITES TAB (admin only) ==================== -->
+  @if (activeTab === 'invites' && community.isAdmin) {
+  <div class="space-y-6">
+
+    <!-- Invite Form -->
+    <div class="card">
+      <div class="flex items-center gap-3 mb-5">
+        <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
+          <span class="material-icons text-foreground text-xl">person_add</span>
+        </div>
+        <h2 class="text-foreground font-bold text-lg">Invite a Member</h2>
+      </div>
+
+      <div class="flex gap-3">
+        <input type="text" [(ngModel)]="inviteUsername" placeholder="Enter username..." (keyup.enter)="sendInvite()"
+          class="input-field flex-1" />
+        <button (click)="sendInvite()" [disabled]="inviteLoading || !inviteUsername.trim()"
+          class="btn-primary disabled:opacity-40 inline-flex items-center gap-2 whitespace-nowrap">
+          @if (inviteLoading) {
+          <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+          } @else {
+          <span class="material-icons text-base">send</span>
+          }
+          Send Invite
+        </button>
+      </div>
+
+      @if (inviteError) {
+      <div class="mt-3 bg-destructive/10 border border-destructive/30 text-destructive text-sm px-4 py-3 rounded-xl">
+        {{ inviteError }}
+      </div>
+      }
+      @if (inviteSuccess) {
+      <div
+        class="mt-3 bg-green-500/10 border border-green-500/30 text-green-400 text-sm px-4 py-3 rounded-xl flex items-center gap-2">
+        <span class="material-icons text-base">check_circle</span>
+        {{ inviteSuccess }}
+      </div>
+      }
+    </div>
+
+    <!-- Pending Invites List -->
+    <div class="card">
+      <h3 class="text-foreground font-bold mb-4 flex items-center gap-2">
+        <span class="material-icons text-primary">schedule</span>
+        Pending Invites
+        @if (invites.length > 0) {
+        <span class="bg-primary/20 text-primary text-xs font-bold px-2 py-0.5 rounded-full">{{ invites.length }}</span>
+        }
+      </h3>
+
+      @if (invites.length === 0) {
+      <div class="flex flex-col items-center justify-center py-10 gap-3 text-center">
+        <span class="material-icons text-muted-foreground text-4xl">mail_outline</span>
+        <p class="text-muted-foreground text-sm">No pending invites</p>
+      </div>
+      } @else {
+      <div class="space-y-3">
+        @for (invite of invites; track invite.id) {
+        <div class="flex items-center gap-4 p-4 bg-secondary rounded-xl border border-border">
+          <div
+            class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-foreground font-bold text-sm flex-shrink-0">
+            {{ invite.invitedUsername.substring(0, 2).toUpperCase() }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-foreground font-semibold text-sm">&#64;{{ invite.invitedUsername }}</p>
+            <p class="text-muted-foreground text-xs">Invited by &#64;{{ invite.invitedByUsername }} · {{
+              timeAgo(invite.createdAt) }}</p>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span
+              class="bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 text-xs font-semibold px-2.5 py-1 rounded-full">
+              Pending
+            </span>
+            <button (click)="cancelInvite(invite.id)"
+              class="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+              title="Cancel invite">
+              <span class="material-icons text-sm">close</span>
+            </button>
+          </div>
+        </div>
+        }
+      </div>
+      }
+    </div>
+  </div>
+  }
+
+  <!-- ==================== SETTINGS TAB (admin only) ==================== -->
+  @if (activeTab === 'settings' && community.isAdmin) {
+  <div class="space-y-6">
+
+    <!-- Community Settings Card -->
+    <div class="card">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
+          <span class="material-icons text-foreground text-xl">settings</span>
+        </div>
+        <h2 class="text-foreground font-bold text-lg">Community Settings</h2>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="label">Community Name</label>
+          <input type="text" [(ngModel)]="settingsName" placeholder="Community name" class="input-field" />
+        </div>
+        <div>
+          <label class="label">Description</label>
+          <textarea [(ngModel)]="settingsDescription" rows="3" placeholder="What's this community about?"
+            class="input-field resize-none"></textarea>
+        </div>
+        <div>
+          <label class="label">Google Drive Folder ID</label>
+          <input type="text" [(ngModel)]="settingsDriveFolderId" placeholder="e.g. 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs"
+            class="input-field" />
+          <p class="text-muted-foreground text-xs mt-1">
+            Paste your public Google Drive folder ID to enable photo syncing.
+            Open your folder in Google Drive and copy the ID from the URL.
+          </p>
+        </div>
+        <div>
+          <label class="label">Cover Image URL <span class="text-muted-foreground font-normal">(optional)</span></label>
+          <input type="url" [(ngModel)]="settingsCoverUrl" placeholder="https://example.com/cover.jpg"
+            class="input-field" />
+        </div>
+        <div>
+          <label class="label">Community Icon URL <span
+              class="text-muted-foreground font-normal">(optional)</span></label>
+          <input type="url" [(ngModel)]="settingsImageUrl" placeholder="https://example.com/icon.png"
+            class="input-field" />
+        </div>
+
+        @if (settingsSuccess) {
+        <div class="bg-green-500/10 border border-green-500/30 text-green-400 text-sm px-4 py-3 rounded-xl">
+          Settings saved successfully!
+        </div>
+        }
+
+        <div class="flex items-center gap-3 pt-2">
+          <button (click)="updateCommunity()" [disabled]="settingsSaving || !settingsName.trim()"
+            class="btn-primary disabled:opacity-40 inline-flex items-center gap-2">
+            @if (settingsSaving) {
+            <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+            }
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drive Sync Card -->
+    <div class="card">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-blue-600/20 flex items-center justify-center">
+          <span class="material-icons text-blue-400 text-xl">cloud_sync</span>
+        </div>
+        <div>
+          <h2 class="text-foreground font-bold">Sync Drive Photos</h2>
+          <p class="text-muted-foreground text-sm">Fetches all images from the Drive folder and creates a photo post</p>
+        </div>
+      </div>
+      <p class="text-muted-foreground text-sm mb-4">
+        When you click "Sync Drive Photos", we'll fetch all images from your configured Google Drive folder
+        and automatically create a Photo Album post in this community's feed.
+      </p>
+      <button (click)="openDrivePicker()" [disabled]="!community.driveFolderId"
+        class="bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-foreground font-semibold px-5 py-2.5 rounded-xl transition-colors inline-flex items-center gap-2">
+        <span class="material-icons text-base">cloud_sync</span>
+        Browse & Sync Drive Folders
+      </button>
+      @if (!community.driveFolderId) {
+      <p class="text-muted-foreground text-xs mt-2">Set a Google Drive Folder ID in Community Settings to enable
+        syncing.</p>
+      }
+    </div>
+
+  </div>
+  }
+
+</div>
+
+<!-- ==================== LIGHTBOX ==================== -->
+@if (lightboxOpen) {
+<div class="fixed inset-0 z-50 bg-black/95 flex flex-col" (touchstart)="onTouchStart($event)"
+  (touchend)="onTouchEnd($event)">
+
+  <!-- Top bar: close left, counter right -->
+  <div
+    class="flex items-center justify-between px-4 py-3 absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/70 to-transparent">
+    <button (click)="closeLightbox()"
+      class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
+      <span class="material-icons text-white">close</span>
+    </button>
+    <span class="text-white/70 text-sm font-medium">{{ lightboxIndex + 1 }} / {{ lightboxPhotos.length }}</span>
+  </div>
+
+  <!-- Main Image -->
+  <div class="flex-1 flex items-center justify-center p-4 pt-16 pb-4 relative">
+    <img [src]="lightboxPhotos[lightboxIndex]" alt="Photo"
+      class="max-w-full max-h-full object-contain select-none transition-opacity duration-150"
+      [class]="lightboxTransitioning ? 'opacity-0' : 'opacity-100'" draggable="false" />
+
+    <!-- Navigation arrows -->
+    @if (lightboxPhotos.length > 1) {
+    <button (click)="prevPhoto()"
+      class="absolute left-2 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center transition-colors">
+      <span class="material-icons text-white text-3xl">chevron_left</span>
+    </button>
+    <button (click)="nextPhoto()"
+      class="absolute right-2 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center transition-colors">
+      <span class="material-icons text-white text-3xl">chevron_right</span>
+    </button>
+    }
+  </div>
+
+  <!-- Bottom Thumbnail Strip -->
+  @if (lightboxPhotos.length > 1) {
+  <div class="bg-gradient-to-t from-black/80 to-transparent px-4 pb-4 pt-2">
+    <div class="flex gap-2 overflow-x-auto py-2">
+      @for (p of lightboxPhotos; track p; let i = $index) {
+      <button (click)="goToPhoto(i)" class="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden transition-all"
+        [class]="i === lightboxIndex ? 'ring-2 ring-primary ring-offset-1 ring-offset-black opacity-100' : 'opacity-50 hover:opacity-75'">
+        <img [src]="p" alt="Thumb" class="w-full h-full object-cover" />
+      </button>
+      }
+    </div>
+  </div>
+  }
+</div>
+}
+
+<!-- ==================== EVENT DETAIL MODAL ==================== -->
+@if (selectedEvent) {
+<!-- Backdrop -->
+<div class="fixed inset-0 bg-black/70 z-40" (click)="closeEventDetail()"></div>
+
+<!-- Slide-in panel -->
+<div
+  class="fixed inset-y-0 right-0 z-50 w-full max-w-lg flex flex-col bg-card border-l border-border shadow-2xl overflow-hidden animate-slide-up">
+
+  <!-- Header Banner -->
+  <div class="relative h-36 bg-gradient-to-br from-primary/40 to-primary/20 flex-shrink-0">
+    <div class="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent"></div>
+    <div class="absolute top-4 right-4">
+      <button (click)="closeEventDetail()"
+        class="w-9 h-9 rounded-full bg-black/30 hover:bg-black/50 flex items-center justify-center transition-colors">
+        <span class="material-icons text-white">close</span>
+      </button>
+    </div>
+    <div class="absolute bottom-4 left-5 right-5">
+      <h2 class="text-white font-black text-xl leading-tight">{{ selectedEvent.name }}</h2>
+    </div>
+  </div>
+
+  <!-- Scrollable Content -->
+  <div class="flex-1 overflow-y-auto">
+
+    <!-- Event Info -->
+    <div class="p-5 space-y-4">
+
+      <!-- Date, Location -->
+      <div class="flex flex-col gap-2 text-sm">
+        <div class="flex items-center gap-2 text-foreground">
+          <span class="material-icons text-primary text-base">schedule</span>
+          {{ formatEventDate(selectedEvent.eventDate) }}
+        </div>
+        <div class="flex items-center gap-2 text-foreground">
+          <span class="material-icons text-primary text-base">location_on</span>
+          {{ selectedEvent.location }}
+        </div>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="grid grid-cols-3 gap-3">
+        @if (selectedEvent.distanceKm) {
+        <div class="bg-secondary rounded-xl p-3 text-center border border-border">
+          <span class="material-icons text-primary text-lg">directions_run</span>
+          <p class="text-foreground font-bold text-sm mt-1">{{ selectedEvent.distanceKm }} km</p>
+          <p class="text-muted-foreground text-xs">Distance</p>
+        </div>
+        }
+        <div class="bg-secondary rounded-xl p-3 text-center border border-border">
+          <span class="material-icons text-green-400 text-lg">payments</span>
+          <p class="text-foreground font-bold text-sm mt-1">{{ selectedEvent.price > 0 ? (selectedEvent.price |
+            currency) : 'Free' }}</p>
+          <p class="text-muted-foreground text-xs">Entry</p>
+        </div>
+        <div class="bg-secondary rounded-xl p-3 text-center border border-border">
+          <span class="material-icons text-blue-400 text-lg">group</span>
+          <p class="text-foreground font-bold text-sm mt-1">
+            {{ selectedEvent.participantCount }}
+            @if (selectedEvent.maxParticipants) { / {{ selectedEvent.maxParticipants }} }
+          </p>
+          <p class="text-muted-foreground text-xs">Registered</p>
+        </div>
+      </div>
+
+      <!-- Description -->
+      @if (selectedEvent.description) {
+      <p class="text-foreground text-sm leading-relaxed">{{ selectedEvent.description }}</p>
+      }
+
+      <!-- Register button -->
+      @if (!selectedEvent.isCancelled) {
+      <button (click)="registerForEvent(selectedEvent)" [disabled]="!!eventRegistered[selectedEvent.id]"
+        class="w-full btn-primary disabled:opacity-60">
+        {{ eventRegistered[selectedEvent.id] ? 'Registered ✓' : 'Register for Event' }}
+      </button>
+      }
+    </div>
+
+    <!-- Participants -->
+    @if (eventParticipants.length > 0) {
+    <div class="px-5 pb-4">
+      <h3 class="text-foreground font-bold mb-3 flex items-center gap-2">
+        <span class="material-icons text-primary text-base">people</span>
+        Participants ({{ eventParticipants.length }})
+      </h3>
+      <div class="flex flex-wrap gap-2">
+        @for (p of eventParticipants; track p.userId) {
+        <div class="flex items-center gap-1.5 bg-secondary border border-border rounded-full px-3 py-1.5">
+          <div class="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
+            {{ (p.username || '?').substring(0, 1).toUpperCase() }}
+          </div>
+          <span class="text-foreground text-xs">{{ p.username }}</span>
+        </div>
+        }
+      </div>
+    </div>
+    }
+
+    <!-- Event Gallery -->
+    <div class="px-5 pb-4">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-foreground font-bold flex items-center gap-2">
+          <span class="material-icons text-primary text-base">photo_library</span>
+          Gallery
+          @if (galleryPhotos.length > 0) {
+          <span class="text-muted-foreground text-xs font-normal">({{ galleryPhotos.length }})</span>
+          }
+        </h3>
+        <div class="flex items-center gap-2">
+          @if (community.isAdmin && selectedEvent.driveFolderId) {
+          <button (click)="syncEventGallery()" [disabled]="gallerySyncing"
+            class="text-xs px-2 py-1 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors inline-flex items-center gap-1">
+            @if (gallerySyncing) {
+            <div class="animate-spin rounded-full h-3 w-3 border border-primary border-t-transparent"></div>
+            } @else {
+            <span class="material-icons text-xs">sync</span>
+            }
+            Sync Drive
+          </button>
+          }
+          @if (community.isAdmin && !selectedEvent.driveFolderId) {
+          <button (click)="showGalleryLinkForm = !showGalleryLinkForm"
+            class="text-xs px-2 py-1 rounded-lg bg-secondary border border-border text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+            <span class="material-icons text-xs">link</span>
+            Link Drive
+          </button>
+          }
+        </div>
+      </div>
+
+      <!-- Link Drive Form -->
+      @if (showGalleryLinkForm && community.isAdmin) {
+      <div class="flex gap-2 mb-3">
+        <input type="text" [(ngModel)]="galleryDriveFolderInput" placeholder="Google Drive Folder ID"
+          class="input-field flex-1 !text-sm !py-2" />
+        <button (click)="linkDriveToEvent()" class="btn-primary !py-2 !px-3 !text-sm">Link</button>
+      </div>
+      }
+
+      <!-- Upload Photo -->
+      <div class="flex gap-2 mb-3">
+        <input type="url" [(ngModel)]="galleryUploadUrl" placeholder="Add photo URL..."
+          class="input-field flex-1 !text-sm !py-2" />
+        <button (click)="uploadGalleryPhoto()" [disabled]="galleryUploading || !galleryUploadUrl.trim()"
+          class="btn-secondary !py-2 !px-3 !text-sm disabled:opacity-40 inline-flex items-center gap-1">
+          @if (galleryUploading) {
+          <div class="animate-spin rounded-full h-3 w-3 border border-primary border-t-transparent"></div>
+          } @else {
+          <span class="material-icons text-sm">add_photo_alternate</span>
+          }
+          Add
+        </button>
+      </div>
+
+      <!-- Gallery Grid (Masonry-style) -->
+      @if (galleryLoading) {
+      <div class="grid grid-cols-3 gap-2">
+        @for (i of [1,2,3,4,5,6]; track i) {
+        <div class="aspect-square bg-secondary rounded-xl animate-pulse"></div>
+        }
+      </div>
+      } @else if (galleryPhotos.length > 0) {
+      <div class="columns-2 sm:columns-3 gap-2 space-y-2">
+        @for (photo of galleryPhotos; track photo.id; let i = $index) {
+        <div class="break-inside-avoid group relative cursor-pointer" (click)="openLightbox(galleryPhotoUrls, i)">
+          <img [src]="photo.thumbnailUrl || photo.photoUrl" alt="Gallery photo"
+            class="w-full rounded-xl hover:opacity-90 transition-opacity" />
+          @if (photo.taggedUsername) {
+          <div
+            class="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full backdrop-blur-sm">
+            <span class="material-icons text-xs align-middle mr-0.5">person</span>{{ photo.taggedUsername }}
+          </div>
+          }
+          @if (photo.uploadedByUsername) {
+          <div
+            class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full backdrop-blur-sm transition-opacity">
+            by {{ photo.uploadedByUsername }}
+          </div>
+          }
+        </div>
+        }
+      </div>
+      } @else if (selectedEvent.photoUrls && selectedEvent.photoUrls.length > 0) {
+      <!-- Fallback: legacy photoUrls from event -->
+      <div class="columns-2 sm:columns-3 gap-2 space-y-2">
+        @for (url of selectedEvent.photoUrls; track url; let i = $index) {
+        <div class="break-inside-avoid">
+          <img (click)="openLightbox(selectedEvent.photoUrls!, i)" [src]="url" alt="Event photo"
+            class="w-full rounded-xl cursor-pointer hover:opacity-90 transition-opacity" />
+        </div>
+        }
+      </div>
+      } @else {
+      <div class="text-center py-6">
+        <span class="material-icons text-muted-foreground text-3xl">add_a_photo</span>
+        <p class="text-muted-foreground text-sm mt-2">No photos yet. Be the first to share!</p>
+      </div>
+      }
+    </div>
+
+    <!-- Event Discussion -->
+    <div class="px-5 pb-5">
+      <h3 class="text-foreground font-bold mb-3 flex items-center gap-2">
+        <span class="material-icons text-primary text-base">chat_bubble</span>
+        Discussion
+      </h3>
+
+      @if (loadingEventDetail) {
+      <div class="flex justify-center py-6">
+        <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
+      </div>
+      } @else if (eventMessages.length === 0) {
+      <p class="text-muted-foreground text-sm text-center py-6">No messages yet. Be the first!</p>
+      } @else {
+      <div class="space-y-3 mb-4 max-h-60 overflow-y-auto">
+        @for (msg of eventMessages; track msg.id) {
+        <div class="flex items-start gap-2">
+          <div
+            class="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+            {{ msg.senderUsername.substring(0, 1).toUpperCase() }}
+          </div>
+          <div class="flex-1 bg-secondary border border-border rounded-xl px-3 py-2">
+            <div class="flex items-center gap-2 mb-0.5">
+              <span class="text-foreground text-xs font-semibold">{{ msg.senderUsername }}</span>
+              <span class="text-muted-foreground text-xs">{{ timeAgo(msg.sentAt) }}</span>
+            </div>
+            <p class="text-foreground text-sm">{{ msg.content }}</p>
+          </div>
+        </div>
+        }
+      </div>
+      }
+
+      <!-- Chat Input -->
+      <div class="flex items-center gap-2 border-t border-border pt-3">
+        <input type="text" [(ngModel)]="eventChatInput" (keydown)="onEventChatKeyDown($event)"
+          placeholder="Write a message..." class="input-field flex-1 !py-2 !text-sm" />
+        <button (click)="sendEventMessage()" [disabled]="!eventChatInput.trim() || sendingEventChat"
+          class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center disabled:opacity-40 flex-shrink-0">
+          <span class="material-icons text-white text-sm">send</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+}
+
+<!-- ==================== DRIVE FOLDER PICKER MODAL ==================== -->
+@if (showDrivePicker) {
+<!-- Backdrop -->
+<div class="fixed inset-0 bg-black/70 z-40" (click)="closeDrivePicker()"></div>
+
+<!-- Modal -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="bg-card border border-border rounded-2xl w-full max-w-lg shadow-2xl animate-fade-in">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between p-6 border-b border-border">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-600/20 flex items-center justify-center">
+          <span class="material-icons text-blue-400">folder</span>
+        </div>
+        <div>
+          <h2 class="text-foreground font-bold text-lg">Select Event Folder</h2>
+          <p class="text-muted-foreground text-xs">Pick a folder to sync its photos as a community post</p>
+        </div>
+      </div>
+      <button (click)="closeDrivePicker()" class="text-muted-foreground hover:text-foreground transition-colors">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="p-6">
+
+      @if (driveError) {
+      <div class="bg-destructive/10 border border-destructive/30 text-destructive text-sm px-4 py-3 rounded-xl mb-4">
+        {{ driveError }}
+      </div>
+      }
+
+      @if (loadingFolders) {
+      <div class="flex flex-col items-center justify-center py-12 gap-3">
+        <div class="animate-spin rounded-full h-10 w-10 border-2 border-blue-500 border-t-transparent"></div>
+        <p class="text-muted-foreground text-sm">Loading folders from Google Drive...</p>
+      </div>
+      } @else if (driveFolders.length === 0 && !driveError) {
+      <div class="flex flex-col items-center justify-center py-12 gap-3 text-center">
+        <span class="material-icons text-muted-foreground text-5xl">folder_off</span>
+        <p class="text-muted-foreground">No event folders found.</p>
+        <p class="text-muted-foreground text-sm">Make sure your Drive folder contains subfolders named after events.</p>
+      </div>
+      } @else {
+      <div class="space-y-3 max-h-80 overflow-y-auto pr-1">
+        @for (folder of driveFolders; track folder.id) {
+        <button (click)="syncFolder(folder)" [disabled]="syncingFolderId !== null"
+          class="w-full flex items-center gap-4 p-4 bg-secondary border border-border hover:border-blue-500/50 rounded-xl transition-all disabled:opacity-50 text-left group">
+          <div class="w-12 h-12 rounded-xl bg-blue-600/15 flex items-center justify-center flex-shrink-0">
+            @if (syncingFolderId === folder.id) {
+            <div class="animate-spin rounded-full h-5 w-5 border-2 border-blue-400 border-t-transparent"></div>
+            } @else {
+            <span class="material-icons text-blue-400 text-2xl">photo_library</span>
+            }
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-foreground font-semibold text-sm truncate">{{ folder.name }}</p>
+            <p class="text-muted-foreground text-xs mt-0.5">
+              @if (folder.imageCount > 0) {
+              {{ folder.imageCount }} photo{{ folder.imageCount !== 1 ? 's' : '' }}
+              } @else {
+              No photos found
+              }
+            </p>
+          </div>
+          <span
+            class="material-icons text-muted-foreground group-hover:text-blue-400 transition-colors flex-shrink-0">chevron_right</span>
+        </button>
+        }
+      </div>
+      }
+    </div>
+
+  </div>
+</div>
+}
 
 }

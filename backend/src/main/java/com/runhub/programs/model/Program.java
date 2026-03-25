@@ -1,5 +1,7 @@
 package com.runhub.programs.model;
 
+import com.runhub.communities.model.Community;
+import com.runhub.users.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -35,6 +37,14 @@ public class Program {
 
     @Column(name = "target_distance_km")
     private Double targetDistanceKm;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "community_id")
+    private Community community;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by_id")
+    private User createdBy;
 
     @OneToMany(mappedBy = "program", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default

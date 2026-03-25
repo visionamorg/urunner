@@ -36,6 +36,12 @@ export interface InviteDto {
   expiresAt: string;
 }
 
+export interface CommunityTag {
+  id: number;
+  name: string;
+  color: string;
+}
+
 export interface CommunityMember {
   userId: number;
   username: string;
@@ -45,6 +51,9 @@ export interface CommunityMember {
   role: string;
   joinedAt: string;
   initials: string;
+  tags?: CommunityTag[];
+  lastRunDate?: string;
+  messageCount30d?: number;
 }
 
 export interface CreateCommunityRequest {
