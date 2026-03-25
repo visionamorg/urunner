@@ -29,7 +29,7 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
   posts: Post[] = [];
   members: CommunityMember[] = [];
   invites: InviteDto[] = [];
-  activeTab: 'feed' | 'members' | 'invites' | 'settings' | 'events' | 'calendar' | 'chat' | 'rooms' = 'feed';
+  activeTab: 'feed' | 'members' | 'invites' | 'settings' | 'events' | 'calendar' | 'chat' | 'rooms' | 'leaderboard' = 'feed';
 
   // ── Events Tab ─────────────────────────────────────────────────────────────
   communityEvents: RunEvent[] = [];
@@ -115,6 +115,14 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
   changingRole: { [userId: number]: boolean } = {};
   membersLoading = true;
 
+  // Leaderboard
+  leaderboard: any[] = [];
+  weeklyChallenge: any[] = [];
+  leaderboardLoading = false;
+  leaderboardMetric: 'distance' | 'time' | 'elevation' = 'distance';
+  weeklyGoalKm = 50;
+  generatingDigest = false;
+
   communityId!: number;
 
   constructor(
@@ -191,11 +199,12 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  switchTab(tab: 'feed' | 'members' | 'invites' | 'settings' | 'events' | 'calendar' | 'chat' | 'rooms'): void {
+  switchTab(tab: 'feed' | 'members' | 'invites' | 'settings' | 'events' | 'calendar' | 'chat' | 'rooms' | 'leaderboard'): void {
     this.activeTab = tab;
     if (tab === 'feed' && !this.eventsLoaded) this.loadEvents();
     if (tab === 'events' && !this.eventsLoaded) this.loadEvents();
     if (tab === 'chat' && !this.chatLoaded) this.loadChat();
+    if (tab === 'leaderboard') this.loadLeaderboard();
   }
 
   loadMembers(): void {
@@ -592,6 +601,58 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     return Object.entries(reactions)
       .filter(([, count]) => count > 0)
       .map(([emoji, count]) => ({ emoji, count }));
+  }
+
+  // ── Events Tab Methods ──────────────────────────────────────────────────────
+
+  // ── Leaderboard Tab Methods ─────────────────────────────────────────────────
+
+  loadLeaderboard(): void {
+    this.leaderboardLoading = true;
+    this.communityService.getCommunityRankings(this.communityId, this.leaderboardMetric).subscribe({
+      next: (data) => { this.leaderboard = data.slice(0, 10); this.leaderboardLoading = false; },
+      error: () => { this.leaderboardLoading = false; this.toast.error('Failed to load leaderboard'); }
+    });
+    this.communityService.getCommunityWeeklyChallenge(this.communityId).subscribe({
+      next: (data) => { this.weeklyChallenge = data; },
+      error: () => {}
+    });
+  }
+
+  changeLeaderboardMetric(metric: 'distance' | 'time' | 'elevation'): void {
+    this.leaderboardMetric = metric;
+    this.loadLeaderboard();
+  }
+
+  generateDigest(): void {
+    this.generatingDigest = true;
+    this.communityService.generateWeeklyDigest(this.communityId).subscribe({
+      next: () => {
+        this.generatingDigest = false;
+        this.toast.success('Weekly digest posted to feed!');
+        this.loadFeed();
+      },
+      error: () => { this.generatingDigest = false; this.toast.error('Failed to generate digest'); }
+    });
+  }
+
+  getMetricValue(entry: any): string {
+    switch (this.leaderboardMetric) {
+      case 'time': return this.formatDuration(entry.totalDurationMinutes || 0);
+      case 'elevation': return (entry.totalElevationMeters || 0) + ' m';
+      default: return (entry.totalDistanceKm?.toFixed(1) || '0') + ' km';
+    }
+  }
+
+  formatDuration(min: number): string {
+    const h = Math.floor(min / 60);
+    const m = min % 60;
+    return h > 0 ? `${h}h ${m}m` : `${m}m`;
+  }
+
+  getWeeklyChallengeProgress(entry: any): number {
+    if (!this.weeklyGoalKm) return 0;
+    return Math.min(100, (entry.totalDistanceKm / this.weeklyGoalKm) * 100);
   }
 
   // ── Events Tab Methods ──────────────────────────────────────────────────────

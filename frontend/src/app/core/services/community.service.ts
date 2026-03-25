@@ -124,6 +124,21 @@ export class CommunityService {
     return this.http.delete<void>(`/api/communities/${communityId}/events/${eventId}`);
   }
 
+  // ── Leaderboard ─────────────────────────────────────────────────────────────
+
+  getCommunityRankings(communityId: number, metric: string = 'distance'): Observable<any[]> {
+    const params = new HttpParams().set('metric', metric);
+    return this.http.get<any[]>(`/api/rankings/community/${communityId}`, { params });
+  }
+
+  getCommunityWeeklyChallenge(communityId: number): Observable<any[]> {
+    return this.http.get<any[]>(`/api/rankings/community/${communityId}/weekly`);
+  }
+
+  generateWeeklyDigest(communityId: number): Observable<Post> {
+    return this.http.post<Post>(`/api/communities/${communityId}/digest`, {});
+  }
+
   // ── Rooms ──────────────────────────────────────────────────────────────────
 
   getRooms(communityId: number): Observable<RoomDto[]> {

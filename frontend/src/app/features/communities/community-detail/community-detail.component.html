@@ -172,6 +172,14 @@
         <span class="material-icons text-base">calendar_month</span>
         Calendar
       </button>
+      <button
+        (click)="switchTab('leaderboard')"
+        [class]="activeTab === 'leaderboard'
+          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
+          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
+        <span class="material-icons text-base">leaderboard</span>
+        Ranks
+      </button>
       @if (community.joined) {
         <button
           (click)="switchTab('chat')"
@@ -675,6 +683,123 @@
         [isAdmin]="!!community.isAdmin"
         (eventCreated)="communityEvents.unshift($event); eventsLoaded = true">
       </app-community-calendar>
+    }
+
+    <!-- ==================== LEADERBOARD TAB ==================== -->
+    @if (activeTab === 'leaderboard') {
+      <div class="space-y-6">
+
+        <!-- Metric Toggle + Digest Button -->
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <div class="flex items-center gap-1 bg-secondary border border-border rounded-xl p-1">
+            @for (m of ['distance', 'time', 'elevation']; track m) {
+              <button (click)="changeLeaderboardMetric($any(m))"
+                class="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all capitalize"
+                [class]="leaderboardMetric === m ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:text-foreground'">
+                {{ m }}
+              </button>
+            }
+          </div>
+          @if (community.isAdmin) {
+            <button (click)="generateDigest()" [disabled]="generatingDigest"
+              class="btn-secondary !py-2 !px-4 !text-sm inline-flex items-center gap-2">
+              @if (generatingDigest) {
+                <div class="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
+              } @else {
+                <span class="material-icons text-sm">auto_awesome</span>
+              }
+              Post Weekly Digest
+            </button>
+          }
+        </div>
+
+        <!-- Top 10 Leaderboard -->
+        <div class="card">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="material-icons text-primary text-lg">emoji_events</span>
+            <h3 class="text-foreground font-bold">Top 10 — {{ leaderboardMetric | titlecase }}</h3>
+          </div>
+
+          @if (leaderboardLoading) {
+            <div class="space-y-3">
+              @for (i of [1,2,3,4,5]; track i) {
+                <div class="flex items-center gap-3 animate-pulse">
+                  <div class="w-8 h-8 rounded-full bg-secondary"></div>
+                  <div class="flex-1 h-4 bg-secondary rounded"></div>
+                  <div class="w-16 h-4 bg-secondary rounded"></div>
+                </div>
+              }
+            </div>
+          } @else if (leaderboard.length === 0) {
+            <div class="flex flex-col items-center py-12 gap-3 text-center">
+              <span class="material-icons text-muted-foreground text-4xl">leaderboard</span>
+              <p class="text-muted-foreground text-sm">No activity data yet</p>
+            </div>
+          } @else {
+            <div class="space-y-2">
+              @for (entry of leaderboard; track entry.userId) {
+                <div class="flex items-center gap-3 p-3 rounded-xl transition-colors"
+                  [class]="entry.rank <= 3 ? 'bg-primary/5 border border-primary/10' : 'hover:bg-secondary'">
+                  <!-- Rank -->
+                  <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-black"
+                    [class]="entry.rank === 1 ? 'bg-yellow-500/20 text-yellow-400' :
+                             entry.rank === 2 ? 'bg-gray-300/20 text-gray-300' :
+                             entry.rank === 3 ? 'bg-orange-600/20 text-orange-400' :
+                             'bg-secondary text-muted-foreground'">
+                    {{ entry.rank }}
+                  </div>
+                  <!-- Avatar -->
+                  @if (entry.profileImageUrl) {
+                    <img [src]="entry.profileImageUrl" class="w-9 h-9 rounded-full object-cover border border-border" />
+                  } @else {
+                    <div class="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-bold">
+                      {{ entry.username?.substring(0, 2)?.toUpperCase() }}
+                    </div>
+                  }
+                  <!-- Name -->
+                  <div class="flex-1 min-w-0">
+                    <p class="text-foreground font-semibold text-sm truncate">{{ entry.username }}</p>
+                    <p class="text-muted-foreground text-xs">{{ entry.totalRuns }} runs</p>
+                  </div>
+                  <!-- Value -->
+                  <div class="text-right">
+                    <p class="text-foreground font-black text-sm">{{ getMetricValue(entry) }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Weekly Challenge -->
+        @if (weeklyChallenge.length > 0) {
+          <div class="card">
+            <div class="flex items-center gap-2 mb-4">
+              <span class="material-icons text-primary text-lg">local_fire_department</span>
+              <h3 class="text-foreground font-bold">Weekly Challenge</h3>
+              <span class="text-muted-foreground text-xs ml-auto">Goal: {{ weeklyGoalKm }} km</span>
+            </div>
+
+            <div class="space-y-3">
+              @for (entry of weeklyChallenge; track entry.userId) {
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between text-sm">
+                    <span class="text-foreground font-medium">{{ entry.username }}</span>
+                    <span class="text-muted-foreground text-xs">{{ entry.totalDistanceKm?.toFixed(1) }} / {{ weeklyGoalKm }} km</span>
+                  </div>
+                  <div class="h-2.5 bg-secondary rounded-full overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-500"
+                      [style.width.%]="getWeeklyChallengeProgress(entry)"
+                      [class]="getWeeklyChallengeProgress(entry) >= 100 ? 'bg-green-500' : 'bg-primary'">
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+      </div>
     }
 
     <!-- ==================== CHAT TAB ==================== -->

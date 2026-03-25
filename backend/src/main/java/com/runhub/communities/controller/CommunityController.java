@@ -30,6 +30,7 @@ public class CommunityController {
     private final FeedService feedService;
     private final EventService eventService;
     private final CommunityGoalService goalService;
+    private final com.runhub.communities.service.WeeklyDigestService weeklyDigestService;
 
     // ── Community CRUD ────────────────────────────────────────────────────────
 
@@ -234,5 +235,14 @@ public class CommunityController {
                                               @AuthenticationPrincipal User user) {
         communityService.respondToInvite(token, false, user);
         return ResponseEntity.ok().build();
+    }
+
+    // ── Weekly Digest ──────────────────────────────────────────────────────────
+
+    @PostMapping("/{id}/digest")
+    public ResponseEntity<PostDto> generateWeeklyDigest(@PathVariable Long id,
+                                                         @AuthenticationPrincipal User user) {
+        PostDto post = weeklyDigestService.generateDigest(id, user);
+        return ResponseEntity.ok(post);
     }
 }

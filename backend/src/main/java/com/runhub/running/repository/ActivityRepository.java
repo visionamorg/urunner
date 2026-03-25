@@ -56,4 +56,26 @@ public interface ActivityRepository extends JpaRepository<RunningActivity, Long>
 
     @Query("SELECT COALESCE(SUM(a.distanceKm), 0) FROM RunningActivity a WHERE a.user.id IN :userIds AND a.activityDate >= :from AND a.activityDate <= :to")
     Double sumDistanceByUserIdsAndDateRange(@Param("userIds") List<Long> userIds, @Param("from") LocalDate from, @Param("to") LocalDate to);
+
+    @Query("SELECT a.user.id, a.user.username, a.user.firstName, a.user.lastName, a.user.profileImageUrl, " +
+           "SUM(a.durationMinutes) as totalTime, COUNT(a) as totalRuns " +
+           "FROM RunningActivity a WHERE a.user.id IN :userIds " +
+           "GROUP BY a.user.id, a.user.username, a.user.firstName, a.user.lastName, a.user.profileImageUrl " +
+           "ORDER BY totalTime DESC")
+    List<Object[]> findRankingsByUserIdsSortByTime(@Param("userIds") List<Long> userIds);
+
+    @Query("SELECT a.user.id, a.user.username, a.user.firstName, a.user.lastName, a.user.profileImageUrl, " +
+           "COALESCE(SUM(a.elevationGainMeters), 0) as totalElevation, COUNT(a) as totalRuns " +
+           "FROM RunningActivity a WHERE a.user.id IN :userIds " +
+           "GROUP BY a.user.id, a.user.username, a.user.firstName, a.user.lastName, a.user.profileImageUrl " +
+           "ORDER BY totalElevation DESC")
+    List<Object[]> findRankingsByUserIdsSortByElevation(@Param("userIds") List<Long> userIds);
+
+    @Query("SELECT a.user.id, a.user.username, a.user.firstName, a.user.lastName, a.user.profileImageUrl, " +
+           "SUM(a.distanceKm) as totalDist, COUNT(a) as totalRuns " +
+           "FROM RunningActivity a WHERE a.user.id IN :userIds AND a.activityDate >= :from AND a.activityDate <= :to " +
+           "GROUP BY a.user.id, a.user.username, a.user.firstName, a.user.lastName, a.user.profileImageUrl " +
+           "ORDER BY totalDist DESC")
+    List<Object[]> findRankingsByUserIdsAndDateRange(@Param("userIds") List<Long> userIds,
+                                                     @Param("from") LocalDate from, @Param("to") LocalDate to);
 }

@@ -22,7 +22,14 @@ public class RankingController {
     }
 
     @GetMapping("/community/{communityId}")
-    public ResponseEntity<List<RankingDto>> getCommunityRankings(@PathVariable Long communityId) {
-        return ResponseEntity.ok(rankingService.getCommunityRankings(communityId));
+    public ResponseEntity<List<RankingDto>> getCommunityRankings(
+            @PathVariable Long communityId,
+            @RequestParam(defaultValue = "distance") String metric) {
+        return ResponseEntity.ok(rankingService.getCommunityRankings(communityId, metric));
+    }
+
+    @GetMapping("/community/{communityId}/weekly")
+    public ResponseEntity<List<RankingDto>> getCommunityWeeklyChallenge(@PathVariable Long communityId) {
+        return ResponseEntity.ok(rankingService.getCommunityWeeklyChallenge(communityId));
     }
 }

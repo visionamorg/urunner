@@ -12,4 +12,6 @@ public class RankingDto {
     private String profileImageUrl;
     private Double totalDistanceKm;
     private Long totalRuns;
+    private Long totalDurationMinutes;
+    private Long totalElevationMeters;
 }
