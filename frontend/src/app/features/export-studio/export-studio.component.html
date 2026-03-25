@@ -224,7 +224,7 @@
             <span class="material-icons">directions_run</span>
           </div>
           <div class="urc-stamp-text">
-            <span class="urc-stamp-headline" [style.color]="brandColor">URC</span>
+            <span class="urc-stamp-headline" [style.color]="brandColor">UR</span>
             <span class="urc-stamp-sub">Urban Runners</span>
           </div>
         </div>
@@ -462,7 +462,7 @@
               </div>
             </div>
             <div class="np-bottom-line"></div>
-            <p class="np-byline">BY {{ (selectedActivity.username || 'RUNNER').toUpperCase() }} · URC SPORT
+            <p class="np-byline">BY {{ (selectedActivity.username || 'RUNNER').toUpperCase() }} · UR SPORT
               CORRESPONDENT</p>
           </div>
         </div>
@@ -559,7 +559,7 @@
               <div class="rp-divider-dash">--------------------------------</div>
               <div class="rp-barcode">||| ||||| || ||| ||||| || |||</div>
               <div class="rp-barcode-num">{{ getVerificationCode() }}</div>
-              <div class="rp-urc">URC · urc.run/verify/{{ selectedActivity.id }}</div>
+              <div class="rp-urc">UR· ur.run/verify/{{ selectedActivity.id }}</div>
             </div>
             <div class="rp-zigzag-bottom"></div>
           </div>
@@ -600,7 +600,7 @@
             }
             <div class="wr-footer">
               <span>&#64;{{ selectedActivity.username }}</span>
-              <span class="wr-footer-brand">URC</span>
+              <span class="wr-footer-brand">UR</span>
             </div>
           </div>
         </div>
@@ -900,7 +900,7 @@
           </div>
           <div class="ss-right" [class.glass]="useGlassmorphism">
             <div class="ss-header">
-              <span class="ss-club" [style.color]="accentColor">URC</span>
+              <span class="ss-club" [style.color]="accentColor">UR</span>
               <span class="ss-date">{{ formatShortDate(selectedActivity.activityDate) }}</span>
             </div>
             @if (showDistance) {
@@ -958,7 +958,7 @@
           }
           <div class="mc-bottom">
             <span class="mc-runner">{{ selectedActivity.username }}</span>
-            <span class="mc-brand">URC</span>
+            <span class="mc-brand">UR</span>
           </div>
         </div>
         }
@@ -1375,7 +1375,7 @@
         <!-- ═══ BRANDING TAB ═══ -->
         @if (sidebarTab === 'branding') {
         <div class="control-section">
-          <h3 class="control-label">URC Branding</h3>
+          <h3 class="control-label">UR Branding</h3>
           <div class="slider-group">
             <div class="slider-header">
               <span class="slider-label">Color</span>
