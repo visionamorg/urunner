@@ -37,4 +37,5 @@ export interface PageResponse<T> {
   totalPages: number;
   number: number;
   size: number;
+  last: boolean;
 }

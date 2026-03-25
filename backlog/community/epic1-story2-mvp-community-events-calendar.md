@@ -1,5 +1,5 @@
 # Epic: Community MVP & Enhancements
-## Story: MVP2 - Make Community Events & Calendar Functional
+## Story: MVP2 - Make Community Events & Calendar Functional Done
 
 **As a** Community Member or Admin
 **I want** the Events and Calendar tabs to be fully functional

@@ -1,5 +1,5 @@
 # Epic: Community MVP & Enhancements
-## Story: MVP1 - Make Community Feed & Members Tab Functional
+## Story: MVP1 - Make Community Feed & Members Tab Functional Done
 
 **As a** Community Member or Admin
 **I want** the Community Feed and Members tab to be fully functional

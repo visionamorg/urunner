@@ -15,6 +15,7 @@ import { Message } from '../../../core/models/message.model';
 import { CommunityCalendarComponent } from '../community-calendar/community-calendar.component';
 import { CommunityRoomsComponent } from '../community-rooms/community-rooms.component';
 import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-community-detail',
@@ -62,6 +63,8 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
   currentUsername = '';
   loading = true;
   feedLoading = false;
+  feedPage = 0;
+  feedHasMore = false;
   syncing = false;
   postContent = '';
   saving = false;
@@ -110,6 +113,7 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
 
   // Role change state
   changingRole: { [userId: number]: boolean } = {};
+  membersLoading = true;
 
   communityId!: number;
 
@@ -121,7 +125,8 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     private chatService: ChatService,
     private authService: AuthService,
     private eventService: EventService,
-    private goalService: CommunityGoalService
+    private goalService: CommunityGoalService,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -160,14 +165,30 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
 
   loadFeed(): void {
     this.feedLoading = true;
-    this.communityService.getFeed(this.communityId).subscribe({
+    this.feedPage = 0;
+    this.communityService.getFeed(this.communityId, 0).subscribe({
       next: (page) => {
         this.posts = page.content;
+        this.feedHasMore = !page.last;
         this.feedLoading = false;
       },
-      error: () => { this.feedLoading = false; }
+      error: () => { this.feedLoading = false; this.toast.error('Failed to load feed'); }
     });
     if (!this.eventsLoaded) this.loadEvents();
+  }
+
+  loadMorePosts(): void {
+    if (this.feedLoading || !this.feedHasMore) return;
+    this.feedLoading = true;
+    this.feedPage++;
+    this.communityService.getFeed(this.communityId, this.feedPage).subscribe({
+      next: (page) => {
+        this.posts = [...this.posts, ...page.content];
+        this.feedHasMore = !page.last;
+        this.feedLoading = false;
+      },
+      error: () => { this.feedLoading = false; this.toast.error('Failed to load more posts'); }
+    });
   }
 
   switchTab(tab: 'feed' | 'members' | 'invites' | 'settings' | 'events' | 'calendar' | 'chat' | 'rooms'): void {
@@ -179,15 +200,15 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
 
   loadMembers(): void {
     this.communityService.getMembers(this.communityId).subscribe({
-      next: (members) => { this.members = members; },
-      error: () => {}
+      next: (members) => { this.members = members; this.membersLoading = false; },
+      error: () => { this.membersLoading = false; this.toast.error('Failed to load members'); }
     });
   }
 
   loadInvites(): void {
     this.communityService.getCommunityInvites(this.communityId).subscribe({
       next: (invites) => { this.invites = invites; },
-      error: () => {}
+      error: () => { this.toast.error('Failed to load invites'); }
     });
   }
 
@@ -300,14 +321,14 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     if (!confirm('Delete this post?')) return;
     this.communityService.deletePost(this.communityId, postId).subscribe({
       next: () => { this.posts = this.posts.filter(p => p.id !== postId); },
-      error: (err) => alert(err.error?.message || 'Failed to delete post')
+      error: (err) => this.toast.error(err.error?.message || 'Failed to delete post')
     });
   }
 
   pinPost(post: Post): void {
     this.communityService.pinPost(this.communityId, post.id).subscribe({
       next: () => { post.pinned = !post.pinned; },
-      error: (err) => alert(err.error?.message || 'Failed to pin post')
+      error: (err) => this.toast.error(err.error?.message || 'Failed to pin post')
     });
   }
 
@@ -320,7 +341,7 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
         this.members = this.members.filter(m => m.userId !== userId);
         if (this.community) this.community.memberCount = Math.max(0, this.community.memberCount - 1);
       },
-      error: (err) => alert(err.error?.message || 'Failed to kick member')
+      error: (err) => this.toast.error(err.error?.message || 'Failed to remove member')
     });
   }
 
@@ -333,7 +354,7 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
         this.changingRole[userId] = false;
       },
       error: (err) => {
-        alert(err.error?.message || 'Failed to change role');
+        this.toast.error(err.error?.message || 'Failed to change role');
         this.changingRole[userId] = false;
       }
     });
@@ -370,7 +391,7 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
         if (this.community && this.community.pendingInviteCount)
           this.community.pendingInviteCount = Math.max(0, this.community.pendingInviteCount - 1);
       },
-      error: (err) => alert(err.error?.message || 'Failed to cancel invite')
+      error: (err) => this.toast.error(err.error?.message || 'Failed to cancel invite')
     });
   }
 
@@ -580,7 +601,7 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     this.eventsLoading = true;
     this.communityService.getCommunityEvents(this.communityId).subscribe({
       next: (events) => { this.communityEvents = events; this.eventsLoading = false; this.eventsLoaded = true; },
-      error: () => { this.eventsLoading = false; }
+      error: () => { this.eventsLoading = false; this.toast.error('Failed to load events'); }
     });
   }
 
@@ -645,7 +666,7 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     if (!confirm(`Cancel event "${event.name}"?`)) return;
     this.communityService.cancelCommunityEvent(this.communityId, event.id).subscribe({
       next: () => { event.isCancelled = true; },
-      error: (err) => alert(err.error?.message || 'Failed to cancel event')
+      error: (err) => this.toast.error(err.error?.message || 'Failed to cancel event')
     });
   }
 
@@ -663,8 +684,16 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     this.chatLoading = true;
     this.chatService.getMessages(this.communityId).subscribe({
       next: (msgs) => { this.chatMessages = msgs; this.chatLoading = false; this.chatLoaded = true; },
-      error: () => { this.chatLoading = false; }
+      error: () => { this.chatLoading = false; this.chatOffline = true; this.toast.error('Failed to load chat'); }
     });
+  }
+
+  chatOffline = false;
+
+  retryChatConnection(): void {
+    this.chatOffline = false;
+    this.chatLoaded = false;
+    this.loadChat();
   }
 
   onChatKeyDown(e: KeyboardEvent): void {
@@ -757,7 +786,7 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
         this.eventRegistered[event.id] = true;
         event.participantCount = (event.participantCount || 0) + 1;
       },
-      error: (err) => alert(err.error?.message || 'Failed to register for event')
+      error: (err) => this.toast.error(err.error?.message || 'Failed to register for event')
     });
   }
 
@@ -781,7 +810,7 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
         this.showChatMediaInput = false;
         this.sendingChat = false;
       },
-      error: () => { this.sendingChat = false; }
+      error: () => { this.sendingChat = false; this.toast.error('Message failed to send'); }
     });
   }
 }
