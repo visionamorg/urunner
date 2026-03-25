@@ -15,6 +15,7 @@ import com.runhub.events.dto.UpdateEventRequest;
 import com.runhub.events.mapper.EventMapper;
 import com.runhub.events.model.Event;
 import com.runhub.events.model.EventRegistration;
+import com.runhub.events.repository.EventGalleryRepository;
 import com.runhub.events.repository.EventRegistrationRepository;
 import com.runhub.events.repository.EventRepository;
 import com.runhub.users.model.User;
@@ -32,6 +33,7 @@ public class EventService {
 
     private final EventRepository eventRepository;
     private final EventRegistrationRepository registrationRepository;
+    private final EventGalleryRepository galleryRepository;
     private final EventMapper eventMapper;
     private final UserService userService;
     private final CommunityRepository communityRepository;
@@ -52,20 +54,11 @@ public class EventService {
 
     public List<EventDto> getAllEvents() {
         return eventRepository.findAllByOrderByEventDateAsc().stream()
-                .map(e -> {
-                    EventDto dto = eventMapper.toDto(e);
-                    dto.setParticipantCount(registrationRepository.countActiveByEventId(e.getId()));
-                    dto.setPhotoUrls(parsePhotoUrls(e.getPhotoUrls()));
-                    return dto;
-                }).toList();
+                .map(this::enrichDto).toList();
     }
 
     public EventDto getEventById(Long id) {
-        Event event = findById(id);
-        EventDto dto = eventMapper.toDto(event);
-        dto.setParticipantCount(registrationRepository.countActiveByEventId(id));
-        dto.setPhotoUrls(parsePhotoUrls(event.getPhotoUrls()));
-        return dto;
+        return enrichDto(findById(id));
     }
 
     @Transactional
@@ -90,10 +83,7 @@ public class EventService {
 
         event.setPhotoUrls(serializePhotoUrls(request.getPhotoUrls()));
         event = eventRepository.save(event);
-        EventDto dto = eventMapper.toDto(event);
-        dto.setParticipantCount(0L);
-        dto.setPhotoUrls(parsePhotoUrls(event.getPhotoUrls()));
-        return dto;
+        return enrichDto(event);
     }
 
     @Transactional
@@ -130,12 +120,7 @@ public class EventService {
 
     public List<EventDto> getCommunityEvents(Long communityId) {
         return eventRepository.findByCommunityIdOrderByEventDateAsc(communityId)
-                .stream().map(e -> {
-                    EventDto dto = eventMapper.toDto(e);
-                    dto.setParticipantCount(registrationRepository.countActiveByEventId(e.getId()));
-                    dto.setPhotoUrls(parsePhotoUrls(e.getPhotoUrls()));
-                    return dto;
-                }).toList();
+                .stream().map(this::enrichDto).toList();
     }
 
     @Transactional
@@ -162,10 +147,7 @@ public class EventService {
 
         event.setPhotoUrls(serializePhotoUrls(request.getPhotoUrls()));
         event = eventRepository.save(event);
-        EventDto dto = eventMapper.toDto(event);
-        dto.setParticipantCount(0L);
-        dto.setPhotoUrls(parsePhotoUrls(event.getPhotoUrls()));
-        return dto;
+        return enrichDto(event);
     }
 
     @Transactional
@@ -187,10 +169,7 @@ public class EventService {
         if (request.getPhotoUrls() != null) event.setPhotoUrls(serializePhotoUrls(request.getPhotoUrls()));
 
         event = eventRepository.save(event);
-        EventDto dto = eventMapper.toDto(event);
-        dto.setParticipantCount(registrationRepository.countActiveByEventId(event.getId()));
-        dto.setPhotoUrls(parsePhotoUrls(event.getPhotoUrls()));
-        return dto;
+        return enrichDto(event);
     }
 
     @Transactional
@@ -213,6 +192,14 @@ public class EventService {
                 .findFirst().orElse(null);
         if (!"ADMIN".equals(role))
             throw new BadRequestException("Only community admins can manage events");
+    }
+
+    private EventDto enrichDto(Event event) {
+        EventDto dto = eventMapper.toDto(event);
+        dto.setParticipantCount(registrationRepository.countActiveByEventId(event.getId()));
+        dto.setPhotoUrls(parsePhotoUrls(event.getPhotoUrls()));
+        dto.setGalleryCount(galleryRepository.countByEventId(event.getId()));
+        return dto;
     }
 
     private Event findById(Long id) {

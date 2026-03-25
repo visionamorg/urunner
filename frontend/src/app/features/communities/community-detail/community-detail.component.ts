@@ -51,6 +51,15 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
   loadingEventDetail = false;
   eventRegistered: { [eventId: number]: boolean } = {};
 
+  // ── Event Gallery ─────────────────────────────────────────────────────────
+  galleryPhotos: any[] = [];
+  galleryLoading = false;
+  gallerySyncing = false;
+  galleryUploadUrl = '';
+  galleryUploading = false;
+  galleryDriveFolderInput = '';
+  showGalleryLinkForm = false;
+
   // ── Chat Tab ───────────────────────────────────────────────────────────────
   chatMessages: Message[] = [];
   chatInput = '';
@@ -805,6 +814,7 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     this.loadingEventDetail = true;
     this.eventParticipants = [];
     this.eventMessages = [];
+    this.galleryPhotos = [];
 
     this.eventService.getParticipants(event.id).subscribe({
       next: (participants) => { this.eventParticipants = participants; },
@@ -814,6 +824,60 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     this.chatService.getMessages(undefined, event.id).subscribe({
       next: (msgs) => { this.eventMessages = msgs; this.loadingEventDetail = false; },
       error: () => { this.loadingEventDetail = false; }
+    });
+
+    this.loadGallery(event.id);
+  }
+
+  get galleryPhotoUrls(): string[] {
+    return this.galleryPhotos.map(p => p.photoUrl);
+  }
+
+  loadGallery(eventId: number): void {
+    this.galleryLoading = true;
+    this.eventService.getGallery(eventId).subscribe({
+      next: (photos) => { this.galleryPhotos = photos; this.galleryLoading = false; },
+      error: () => { this.galleryLoading = false; }
+    });
+  }
+
+  linkDriveToEvent(): void {
+    if (!this.selectedEvent || !this.galleryDriveFolderInput.trim()) return;
+    this.eventService.linkDriveFolder(this.selectedEvent.id, this.galleryDriveFolderInput.trim()).subscribe({
+      next: () => {
+        this.selectedEvent!.driveFolderId = this.galleryDriveFolderInput.trim();
+        this.showGalleryLinkForm = false;
+        this.galleryDriveFolderInput = '';
+        this.toast.success('Drive folder linked');
+      },
+      error: () => this.toast.error('Failed to link Drive folder')
+    });
+  }
+
+  syncEventGallery(): void {
+    if (!this.selectedEvent) return;
+    this.gallerySyncing = true;
+    this.eventService.syncGallery(this.selectedEvent.id).subscribe({
+      next: (res) => {
+        this.gallerySyncing = false;
+        this.toast.success(`${res.imported} photos synced`);
+        this.loadGallery(this.selectedEvent!.id);
+      },
+      error: () => { this.gallerySyncing = false; this.toast.error('Failed to sync gallery'); }
+    });
+  }
+
+  uploadGalleryPhoto(): void {
+    if (!this.selectedEvent || !this.galleryUploadUrl.trim()) return;
+    this.galleryUploading = true;
+    this.eventService.addGalleryPhoto(this.selectedEvent.id, this.galleryUploadUrl.trim()).subscribe({
+      next: (photo) => {
+        this.galleryPhotos.unshift(photo);
+        this.galleryUploadUrl = '';
+        this.galleryUploading = false;
+        this.toast.success('Photo added');
+      },
+      error: () => { this.galleryUploading = false; this.toast.error('Failed to upload photo'); }
     });
   }
 

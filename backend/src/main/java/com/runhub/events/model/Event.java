@@ -58,6 +58,9 @@ public class Event {
     @Column(name = "photo_urls", columnDefinition = "TEXT")
     private String photoUrls;
 
+    @Column(name = "drive_folder_id")
+    private String driveFolderId;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();

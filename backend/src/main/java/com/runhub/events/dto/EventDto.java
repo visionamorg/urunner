@@ -24,4 +24,6 @@ public class EventDto {
     private Boolean isCancelled;
     private LocalDateTime createdAt;
     private List<String> photoUrls;
+    private String driveFolderId;
+    private Long galleryCount;
 }

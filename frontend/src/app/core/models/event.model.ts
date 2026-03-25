@@ -1,3 +1,13 @@
+export interface GalleryPhoto {
+  id: number;
+  photoUrl: string;
+  thumbnailUrl: string;
+  uploadedByUsername?: string;
+  bibNumber?: string;
+  taggedUsername?: string;
+  createdAt: string;
+}
+
 export interface RunEvent {
   id: number;
   name: string;
@@ -15,6 +25,8 @@ export interface RunEvent {
   isCancelled?: boolean;
   createdAt: string;
   photoUrls?: string[];
+  driveFolderId?: string;
+  galleryCount?: number;
 }
 
 export interface CreateEventRequest {

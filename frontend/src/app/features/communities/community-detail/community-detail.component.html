@@ -1308,22 +1308,106 @@
           </div>
         }
 
-        <!-- Event Photos -->
-        @if (selectedEvent.photoUrls && selectedEvent.photoUrls.length > 0) {
-          <div class="px-5 pb-4">
-            <h3 class="text-foreground font-bold mb-3 flex items-center gap-2">
+        <!-- Event Gallery -->
+        <div class="px-5 pb-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-foreground font-bold flex items-center gap-2">
               <span class="material-icons text-primary text-base">photo_library</span>
-              Photos
+              Gallery
+              @if (galleryPhotos.length > 0) {
+                <span class="text-muted-foreground text-xs font-normal">({{ galleryPhotos.length }})</span>
+              }
             </h3>
-            <div class="grid grid-cols-3 gap-2">
-              @for (url of selectedEvent.photoUrls; track url; let i = $index) {
-                <img (click)="openLightbox(selectedEvent.photoUrls!, i)"
-                  [src]="url" alt="Event photo"
-                  class="w-full aspect-square object-cover rounded-xl cursor-pointer hover:opacity-90 transition-opacity" />
+            <div class="flex items-center gap-2">
+              @if (community.isAdmin && selectedEvent.driveFolderId) {
+                <button (click)="syncEventGallery()" [disabled]="gallerySyncing"
+                  class="text-xs px-2 py-1 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors inline-flex items-center gap-1">
+                  @if (gallerySyncing) {
+                    <div class="animate-spin rounded-full h-3 w-3 border border-primary border-t-transparent"></div>
+                  } @else {
+                    <span class="material-icons text-xs">sync</span>
+                  }
+                  Sync Drive
+                </button>
+              }
+              @if (community.isAdmin && !selectedEvent.driveFolderId) {
+                <button (click)="showGalleryLinkForm = !showGalleryLinkForm"
+                  class="text-xs px-2 py-1 rounded-lg bg-secondary border border-border text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+                  <span class="material-icons text-xs">link</span>
+                  Link Drive
+                </button>
               }
             </div>
           </div>
-        }
+
+          <!-- Link Drive Form -->
+          @if (showGalleryLinkForm && community.isAdmin) {
+            <div class="flex gap-2 mb-3">
+              <input type="text" [(ngModel)]="galleryDriveFolderInput" placeholder="Google Drive Folder ID"
+                class="input-field flex-1 !text-sm !py-2" />
+              <button (click)="linkDriveToEvent()" class="btn-primary !py-2 !px-3 !text-sm">Link</button>
+            </div>
+          }
+
+          <!-- Upload Photo -->
+          <div class="flex gap-2 mb-3">
+            <input type="url" [(ngModel)]="galleryUploadUrl" placeholder="Add photo URL..."
+              class="input-field flex-1 !text-sm !py-2" />
+            <button (click)="uploadGalleryPhoto()" [disabled]="galleryUploading || !galleryUploadUrl.trim()"
+              class="btn-secondary !py-2 !px-3 !text-sm disabled:opacity-40 inline-flex items-center gap-1">
+              @if (galleryUploading) {
+                <div class="animate-spin rounded-full h-3 w-3 border border-primary border-t-transparent"></div>
+              } @else {
+                <span class="material-icons text-sm">add_photo_alternate</span>
+              }
+              Add
+            </button>
+          </div>
+
+          <!-- Gallery Grid (Masonry-style) -->
+          @if (galleryLoading) {
+            <div class="grid grid-cols-3 gap-2">
+              @for (i of [1,2,3,4,5,6]; track i) {
+                <div class="aspect-square bg-secondary rounded-xl animate-pulse"></div>
+              }
+            </div>
+          } @else if (galleryPhotos.length > 0) {
+            <div class="columns-2 sm:columns-3 gap-2 space-y-2">
+              @for (photo of galleryPhotos; track photo.id; let i = $index) {
+                <div class="break-inside-avoid group relative cursor-pointer" (click)="openLightbox(galleryPhotoUrls, i)">
+                  <img [src]="photo.thumbnailUrl || photo.photoUrl" alt="Gallery photo"
+                    class="w-full rounded-xl hover:opacity-90 transition-opacity" />
+                  @if (photo.taggedUsername) {
+                    <div class="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full backdrop-blur-sm">
+                      <span class="material-icons text-xs align-middle mr-0.5">person</span>{{ photo.taggedUsername }}
+                    </div>
+                  }
+                  @if (photo.uploadedByUsername) {
+                    <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full backdrop-blur-sm transition-opacity">
+                      by {{ photo.uploadedByUsername }}
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          } @else if (selectedEvent.photoUrls && selectedEvent.photoUrls.length > 0) {
+            <!-- Fallback: legacy photoUrls from event -->
+            <div class="columns-2 sm:columns-3 gap-2 space-y-2">
+              @for (url of selectedEvent.photoUrls; track url; let i = $index) {
+                <div class="break-inside-avoid">
+                  <img (click)="openLightbox(selectedEvent.photoUrls!, i)"
+                    [src]="url" alt="Event photo"
+                    class="w-full rounded-xl cursor-pointer hover:opacity-90 transition-opacity" />
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="text-center py-6">
+              <span class="material-icons text-muted-foreground text-3xl">add_a_photo</span>
+              <p class="text-muted-foreground text-sm mt-2">No photos yet. Be the first to share!</p>
+            </div>
+          }
+        </div>
 
         <!-- Event Discussion -->
         <div class="px-5 pb-5">
