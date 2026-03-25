@@ -9,7 +9,7 @@ import com.runhub.communities.model.CommunityMember;
 import com.runhub.communities.model.CommunityMemberId;
 import com.runhub.communities.model.CommunityTag;
 import com.runhub.communities.model.MemberTag;
-import com.runhub.communities.repository.*;;
+import com.runhub.communities.repository.*;
 import com.runhub.notifications.service.NotificationService;
 import com.runhub.config.BadRequestException;
 import com.runhub.config.ResourceNotFoundException;

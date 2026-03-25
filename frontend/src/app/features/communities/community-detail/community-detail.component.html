@@ -324,6 +324,10 @@
               {{ role }}
             </span>
             }
+            @for (tag of getMemberTags(post.authorUsername); track tag.id) {
+              <span class="text-[10px] font-medium px-1.5 py-0.5 rounded-full"
+                [style.background-color]="tag.color + '30'" [style.color]="tag.color">{{ tag.name }}</span>
+            }
             @if (post.pinned) {
             <span class="flex items-center gap-1 text-primary text-xs">
               <span class="material-icons text-xs">push_pin</span>
@@ -1054,7 +1058,13 @@
         }
         <div class="max-w-[70%] space-y-1">
           @if (!isOwnMessage(msg)) {
-          <p class="text-muted-foreground text-xs px-1">{{ msg.senderUsername }}</p>
+          <div class="flex items-center gap-1 px-1">
+            <p class="text-muted-foreground text-xs">{{ msg.senderUsername }}</p>
+            @for (tag of getMemberTags(msg.senderUsername); track tag.id) {
+              <span class="text-[9px] font-medium px-1 py-0 rounded-full"
+                [style.background-color]="tag.color + '30'" [style.color]="tag.color">{{ tag.name }}</span>
+            }
+          </div>
           }
           <div class="rounded-2xl text-sm overflow-hidden" [class]="isOwnMessage(msg)
                       ? 'bg-primary text-foreground rounded-br-sm'
@@ -1119,7 +1129,41 @@
 
   <!-- ==================== MEMBERS TAB ==================== -->
   @if (activeTab === 'members') {
-  <div>
+  <div class="space-y-5">
+
+    <!-- Admin: Tag Management + View Toggle -->
+    @if (community.isAdmin) {
+    <div class="flex flex-wrap items-center gap-3">
+      <button (click)="membersView = 'list'"
+        [class]="membersView === 'list' ? 'px-3 py-1.5 rounded-lg bg-primary/20 text-primary text-sm font-medium' : 'px-3 py-1.5 rounded-lg text-muted-foreground text-sm hover:text-foreground'">
+        Members
+      </button>
+      <button (click)="membersView = 'activity'"
+        [class]="membersView === 'activity' ? 'px-3 py-1.5 rounded-lg bg-primary/20 text-primary text-sm font-medium' : 'px-3 py-1.5 rounded-lg text-muted-foreground text-sm hover:text-foreground'">
+        Activity
+      </button>
+      <div class="ml-auto flex items-center gap-2">
+        @for (tag of communityTags; track tag.id) {
+          <span class="text-xs px-2 py-0.5 rounded-full font-medium border flex items-center gap-1"
+            [style.background-color]="tag.color + '30'" [style.color]="tag.color" [style.border-color]="tag.color + '50'">
+            {{ tag.name }}
+            <button (click)="deleteCommunityTag(tag.id)" class="hover:opacity-70">&times;</button>
+          </span>
+        }
+      </div>
+    </div>
+
+    <!-- Create Tag -->
+    <div class="flex items-center gap-2">
+      <input [(ngModel)]="newTagName" placeholder="New tag name" class="input-field text-sm w-40">
+      <input type="color" [(ngModel)]="newTagColor" class="w-8 h-8 rounded border-0 cursor-pointer bg-transparent">
+      <button (click)="createCommunityTag()" [disabled]="!newTagName.trim()"
+        class="px-3 py-1.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors">
+        + Tag
+      </button>
+    </div>
+    }
+
     @if (membersLoading) {
     <div class="space-y-3">
       @for (i of [1,2,3,4,5]; track i) {
@@ -1137,35 +1181,145 @@
       <span class="material-icons text-muted-foreground text-4xl">group</span>
       <p class="text-muted-foreground">No members found</p>
     </div>
+
+    <!-- ─── ACTIVITY VIEW ─── -->
+    } @else if (membersView === 'activity' && community.isAdmin) {
+    <div class="space-y-3">
+      <!-- Batch Controls -->
+      <div class="flex flex-wrap items-center gap-2">
+        <button (click)="selectInactiveMembers(30)" class="text-xs px-3 py-1.5 rounded-lg bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30 transition-colors">
+          Select Inactive 30d
+        </button>
+        <button (click)="selectInactiveMembers(60)" class="text-xs px-3 py-1.5 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors">
+          Select Inactive 60d
+        </button>
+        @if (selectedMembers.size > 0) {
+          <span class="text-xs text-muted-foreground">{{ selectedMembers.size }} selected</span>
+          <button (click)="batchNotify()" [disabled]="batchActioning"
+            class="text-xs px-3 py-1.5 rounded-lg bg-primary/20 text-primary hover:bg-primary/30 disabled:opacity-50 transition-colors">
+            Send Re-engage
+          </button>
+          <button (click)="batchKick()" [disabled]="batchActioning"
+            class="text-xs px-3 py-1.5 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 disabled:opacity-50 transition-colors">
+            Remove Selected
+          </button>
+          <button (click)="selectedMembers.clear()" class="text-xs text-muted-foreground hover:text-foreground">Clear</button>
+        }
+      </div>
+
+      <!-- Activity Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-xs text-muted-foreground border-b border-border">
+              <th class="pb-2 pl-2 w-8"></th>
+              <th class="pb-2">Member</th>
+              <th class="pb-2">Role</th>
+              <th class="pb-2">Tags</th>
+              <th class="pb-2">Last Run</th>
+              <th class="pb-2">Msgs (30d)</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (member of members; track member.userId) {
+            <tr class="border-b border-border/50 hover:bg-muted/20" [class]="selectedMembers.has(member.userId) ? 'bg-primary/5' : ''">
+              <td class="py-2 pl-2">
+                <input type="checkbox" [checked]="selectedMembers.has(member.userId)" (change)="toggleMemberSelect(member.userId)"
+                  class="rounded border-border">
+              </td>
+              <td class="py-2">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0 overflow-hidden">
+                    <app-avatar [imageUrl]="member.profileImageUrl" [username]="member.username"></app-avatar>
+                  </div>
+                  <span class="text-foreground font-medium truncate">{{ member.username }}</span>
+                </div>
+              </td>
+              <td class="py-2">
+                <span class="text-xs px-1.5 py-0.5 rounded-full border" [class]="getRoleBadgeClass(member.role)">{{ member.role }}</span>
+              </td>
+              <td class="py-2">
+                <div class="flex gap-1 flex-wrap">
+                  @for (tag of member.tags; track tag.id) {
+                    <span class="text-[10px] px-1.5 py-0.5 rounded-full font-medium"
+                      [style.background-color]="tag.color + '30'" [style.color]="tag.color">{{ tag.name }}</span>
+                  }
+                </div>
+              </td>
+              <td class="py-2">
+                @if (daysSinceLastRun(member) !== null) {
+                  <span [class]="daysSinceLastRun(member)! > 30 ? 'text-red-400' : daysSinceLastRun(member)! > 14 ? 'text-yellow-400' : 'text-green-400'">
+                    {{ daysSinceLastRun(member) }}d ago
+                  </span>
+                } @else {
+                  <span class="text-muted-foreground">Never</span>
+                }
+              </td>
+              <td class="py-2 text-muted-foreground">{{ member.messageCount30d || 0 }}</td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ─── LIST VIEW ─── -->
     } @else {
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       @for (member of members; track member.userId) {
-      <div class="card flex items-center gap-4">
-        <!-- Avatar -->
-        <div
-          class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-bold text-base flex-shrink-0 overflow-hidden">
+      <div class="card flex items-start gap-4">
+        <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-bold text-base flex-shrink-0 overflow-hidden">
           <app-avatar [imageUrl]="member.profileImageUrl" [username]="member.username"></app-avatar>
         </div>
-        <!-- Info -->
         <div class="flex-1 min-w-0">
           <p class="text-foreground font-semibold text-sm truncate">{{ member.firstName }} {{ member.lastName }}</p>
           <p class="text-muted-foreground text-xs">&#64;{{ member.username }}</p>
+          <!-- Tags -->
+          @if (member.tags && member.tags.length > 0) {
+          <div class="flex gap-1 flex-wrap mt-1.5">
+            @for (tag of member.tags; track tag.id) {
+              <span class="text-[10px] px-1.5 py-0.5 rounded-full font-medium flex items-center gap-0.5"
+                [style.background-color]="tag.color + '30'" [style.color]="tag.color">
+                {{ tag.name }}
+                @if (community.isAdmin) {
+                  <button (click)="removeTagFromMember(member.userId, tag.id)" class="hover:opacity-70">&times;</button>
+                }
+              </span>
+            }
+          </div>
+          }
         </div>
-        <!-- Role badge / selector -->
         @if (community.isAdmin) {
-        <div class="flex items-center gap-2 flex-shrink-0">
-          <select [value]="member.role" (change)="changeRole(member.userId, $any($event.target).value)"
-            [disabled]="changingRole[member.userId]"
-            class="bg-secondary border border-border text-foreground text-xs rounded-lg px-2 py-1 focus:outline-none focus:border-primary">
-            <option value="MEMBER">MEMBER</option>
-            <option value="MODERATOR">MODERATOR</option>
-            <option value="ADMIN">ADMIN</option>
-          </select>
-          <button (click)="kickMember(member.userId, member.username)"
-            class="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-            title="Kick member">
-            <span class="material-icons text-sm">person_remove</span>
-          </button>
+        <div class="flex flex-col items-end gap-2 flex-shrink-0">
+          <div class="flex items-center gap-2">
+            <select [value]="member.role" (change)="changeRole(member.userId, $any($event.target).value)"
+              [disabled]="changingRole[member.userId]"
+              class="bg-secondary border border-border text-foreground text-xs rounded-lg px-2 py-1 focus:outline-none focus:border-primary">
+              <option value="MEMBER">MEMBER</option>
+              <option value="MODERATOR">MODERATOR</option>
+              <option value="ADMIN">ADMIN</option>
+            </select>
+            <button (click)="kickMember(member.userId, member.username)"
+              class="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+              title="Kick member">
+              <span class="material-icons text-sm">person_remove</span>
+            </button>
+          </div>
+          <!-- Assign Tag Dropdown -->
+          @if (communityTags.length > 0) {
+          <div class="flex gap-1 flex-wrap">
+            @for (tag of communityTags; track tag.id) {
+              @if (!memberHasTag(member, tag.id)) {
+                <button (click)="assignTagToMember(member.userId, tag.id)"
+                  class="text-[10px] px-1.5 py-0.5 rounded-full border border-dashed opacity-50 hover:opacity-100 transition-opacity"
+                  [style.border-color]="tag.color" [style.color]="tag.color"
+                  title="Assign {{ tag.name }}">
+                  +{{ tag.name }}
+                </button>
+              }
+            }
+          </div>
+          }
         </div>
         } @else {
         <span class="text-xs font-semibold px-2.5 py-1 rounded-full border" [class]="getRoleBadgeClass(member.role)">
