@@ -61,6 +61,14 @@ export const routes: Routes = [
         loadComponent: () => import('./features/programs/programs.component').then(m => m.ProgramsComponent)
       },
       {
+        path: 'programs/:id/live',
+        loadComponent: () => import('./features/programs/live-session/live-session.component').then(m => m.LiveSessionComponent)
+      },
+      {
+        path: 'performance',
+        loadComponent: () => import('./features/performance/performance.component').then(m => m.PerformanceComponent)
+      },
+      {
         path: 'rankings',
         loadComponent: () => import('./features/rankings/rankings.component').then(m => m.RankingsComponent)
       },

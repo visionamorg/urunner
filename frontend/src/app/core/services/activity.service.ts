@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Activity, ActivityStats, CreateActivityRequest, ActivityInsight, ActivityChatRequest, ActivityChatResponse } from '../models/activity.model';
+import { Activity, ActivityStats, CreateActivityRequest, ActivityInsight, ActivityChatRequest, ActivityChatResponse, ReadinessScore, PerformanceData } from '../models/activity.model';
 
 export interface Streak {
   currentStreak: number;
@@ -62,5 +62,13 @@ export class ActivityService {
 
   chatAboutActivity(id: number, request: ActivityChatRequest): Observable<ActivityChatResponse> {
     return this.http.post<ActivityChatResponse>(`/api/activities/${id}/chat`, request);
+  }
+
+  getReadiness(): Observable<ReadinessScore> {
+    return this.http.get<ReadinessScore>('/api/readiness');
+  }
+
+  getPerformance(): Observable<PerformanceData> {
+    return this.http.get<PerformanceData>('/api/performance');
   }
 }

@@ -1,9 +1,15 @@
 <div class="max-w-7xl mx-auto space-y-6 animate-fade-in">
 
   <!-- Page Header -->
-  <div>
-    <h1 class="text-3xl font-black text-foreground">Training Programs</h1>
-    <p class="text-muted-foreground mt-1">Structured plans to reach your running goals</p>
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-black text-foreground">Training Programs</h1>
+      <p class="text-muted-foreground mt-1">Structured plans to reach your running goals</p>
+    </div>
+    <button (click)="openGenerator()" class="btn-primary flex items-center gap-2">
+      <span class="material-icons text-xl">auto_awesome</span>
+      AI Plan Generator
+    </button>
   </div>
 
   <!-- Active Programs -->
@@ -27,16 +33,15 @@
                 </div>
                 <span class="text-primary font-black text-xl">{{ progressPercent(p) }}%</span>
               </div>
-              <!-- Progress Bar -->
               <div class="w-full h-2 bg-border rounded-full overflow-hidden">
-                <div
-                  class="h-full bg-primary rounded-full transition-all duration-500"
-                  [style.width.%]="progressPercent(p)">
-                </div>
+                <div class="h-full bg-primary rounded-full transition-all duration-500" [style.width.%]="progressPercent(p)"></div>
               </div>
-              <div class="flex justify-between mt-2">
-                <span class="text-muted-foreground text-xs">{{ p.completedSessions }} sessions done</span>
-                <span class="text-muted-foreground text-xs">{{ p.totalSessions }} total</span>
+              <div class="flex justify-between items-center mt-2">
+                <span class="text-muted-foreground text-xs">{{ p.completedSessions }} sessions done / {{ p.totalSessions }} total</span>
+                <button (click)="goToLiveSession(p.programId)" class="flex items-center gap-1 px-3 py-1.5 bg-primary/20 text-primary rounded-lg text-xs font-semibold hover:bg-primary/30 transition-colors">
+                  <span class="material-icons text-sm">play_circle</span>
+                  Today's Workout
+                </button>
               </div>
             </div>
           }
@@ -56,17 +61,24 @@
         <span class="material-icons text-muted-foreground text-3xl">fitness_center</span>
       </div>
       <p class="text-foreground font-semibold">No programs available</p>
+      <p class="text-muted-foreground text-sm">Generate your first AI training plan!</p>
+      <button (click)="openGenerator()" class="btn-primary flex items-center gap-2 mt-2">
+        <span class="material-icons">auto_awesome</span>
+        Create AI Plan
+      </button>
     </div>
   } @else {
     <h2 class="text-foreground font-bold text-lg">All Programs</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
       @for (program of programs; track program.id) {
-        <div class="card flex flex-col hover:border-primary/20 transition-colors">
-          <!-- Header -->
+        <div class="card flex flex-col hover:border-primary/20 transition-colors cursor-pointer" (click)="openPlanDetail(program)">
           <div class="flex items-start justify-between mb-3">
-            <span class="badge border text-xs {{ getLevelColor(program.level) }}">
-              {{ program.level }}
-            </span>
+            <div class="flex items-center gap-2">
+              <span class="badge border text-xs {{ getLevelColor(program.level) }}">{{ program.level }}</span>
+              @if (program.price && program.price > 0) {
+                <span class="badge bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 text-xs">${{ program.price.toFixed(2) }}</span>
+              }
+            </div>
             @if (isEnrolled(program.id)) {
               <span class="badge bg-green-500/10 text-green-400 border border-green-500/20 text-xs">
                 <span class="material-icons text-sm">check_circle</span>
@@ -74,35 +86,36 @@
               </span>
             }
           </div>
-
-          <!-- Name + Description -->
           <h3 class="text-foreground font-bold text-lg mb-2">{{ program.name }}</h3>
-          <p class="text-muted-foreground text-sm leading-relaxed flex-1 mb-5">{{ program.description }}</p>
-
-          <!-- Stats -->
+          <p class="text-muted-foreground text-sm leading-relaxed flex-1 mb-5 line-clamp-2">{{ program.description }}</p>
           <div class="flex flex-wrap gap-3 mb-5">
             <div class="flex items-center gap-1.5 text-muted-foreground text-sm">
               <span class="material-icons text-primary text-base">schedule</span>
               <span>{{ program.durationWeeks }} weeks</span>
             </div>
-            <div class="flex items-center gap-1.5 text-muted-foreground text-sm">
-              <span class="material-icons text-primary text-base">directions_run</span>
-              <span>{{ program.targetDistanceKm }} km goal</span>
-            </div>
+            @if (program.targetDistanceKm) {
+              <div class="flex items-center gap-1.5 text-muted-foreground text-sm">
+                <span class="material-icons text-primary text-base">directions_run</span>
+                <span>{{ program.targetDistanceKm }} km goal</span>
+              </div>
+            }
             <div class="flex items-center gap-1.5 text-muted-foreground text-sm">
               <span class="material-icons text-primary text-base">checklist</span>
               <span>{{ program.sessionsCount }} sessions</span>
             </div>
           </div>
-
-          <!-- Action -->
           @if (isEnrolled(program.id)) {
             <div class="flex items-center gap-2 px-4 py-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 font-semibold text-sm">
               <span class="material-icons text-base">check_circle</span>
               Currently Enrolled
             </div>
+          } @else if (program.price && program.price > 0) {
+            <button (click)="startProgram(program.id); $event.stopPropagation()" class="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-semibold text-sm hover:bg-yellow-500/30 transition-colors">
+              <span class="material-icons text-xl">lock</span>
+              Unlock for ${{ program.price.toFixed(2) }}
+            </button>
           } @else {
-            <button (click)="startProgram(program.id)" class="btn-primary w-full flex items-center justify-center gap-2">
+            <button (click)="startProgram(program.id); $event.stopPropagation()" class="btn-primary w-full flex items-center justify-center gap-2">
               <span class="material-icons text-xl">play_arrow</span>
               Start Program
             </button>
@@ -111,5 +124,263 @@
       }
     </div>
   }
-
 </div>
+
+<!-- ═══ AI PLAN GENERATOR MODAL ═══ -->
+@if (showGenerator) {
+  <div class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" (click)="closeGenerator()">
+    <div class="bg-card border border-border rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
+
+      <!-- Header -->
+      <div class="p-6 border-b border-border">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+              <span class="material-icons text-primary">auto_awesome</span>
+            </div>
+            <div>
+              <h2 class="text-foreground font-bold text-lg">AI Plan Generator</h2>
+              <p class="text-muted-foreground text-xs">Step {{ generatorStep }} of 2</p>
+            </div>
+          </div>
+          <button (click)="closeGenerator()" class="text-muted-foreground hover:text-foreground">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+        <!-- Progress bar -->
+        <div class="flex gap-2 mt-4">
+          <div class="flex-1 h-1 rounded-full" [class]="generatorStep >= 1 ? 'bg-primary' : 'bg-border'"></div>
+          <div class="flex-1 h-1 rounded-full" [class]="generatorStep >= 2 ? 'bg-primary' : 'bg-border'"></div>
+        </div>
+      </div>
+
+      <div class="p-6">
+        <!-- Step 1: Goal -->
+        @if (generatorStep === 1) {
+          <h3 class="text-foreground font-semibold mb-4">What's your goal?</h3>
+          <div class="grid grid-cols-2 gap-3">
+            @for (goal of goalOptions; track goal.value) {
+              <button
+                (click)="selectGoal(goal.value)"
+                class="p-4 rounded-xl border-2 text-left transition-all"
+                [class]="planRequest.goalType === goal.value
+                  ? 'border-primary bg-primary/10'
+                  : 'border-border bg-secondary hover:border-primary/30'">
+                <span class="material-icons text-2xl mb-2" [class]="planRequest.goalType === goal.value ? 'text-primary' : 'text-muted-foreground'">{{ goal.icon }}</span>
+                <p class="text-foreground font-semibold text-sm">{{ goal.label }}</p>
+                <p class="text-muted-foreground text-xs mt-0.5">{{ goal.weeks }} weeks default</p>
+              </button>
+            }
+          </div>
+
+          <!-- Target time (optional) -->
+          @if (planRequest.goalType !== 'BASE_BUILDING') {
+            <div class="mt-5">
+              <label class="text-muted-foreground text-sm mb-1.5 block">Target finish time (optional)</label>
+              <input type="text" [(ngModel)]="planRequest.targetTime" placeholder="e.g. 1:45:00"
+                class="w-full px-4 py-2.5 bg-secondary border border-border rounded-xl text-foreground text-sm focus:outline-none focus:border-primary">
+              <p class="text-muted-foreground text-xs mt-1">Leave blank to focus on completion</p>
+            </div>
+          }
+
+          <button (click)="nextStep()" class="btn-primary w-full mt-6 flex items-center justify-center gap-2">
+            Next: Schedule
+            <span class="material-icons text-base">arrow_forward</span>
+          </button>
+        }
+
+        <!-- Step 2: Schedule -->
+        @if (generatorStep === 2) {
+          <h3 class="text-foreground font-semibold mb-4">Training schedule</h3>
+
+          <div class="space-y-4">
+            <div>
+              <label class="text-muted-foreground text-sm mb-1.5 block">Plan duration (weeks)</label>
+              <div class="flex items-center gap-3">
+                <input type="range" [(ngModel)]="planRequest.durationWeeks" min="4" max="24" step="1"
+                  class="flex-1 accent-primary">
+                <span class="text-foreground font-bold text-lg w-12 text-center">{{ planRequest.durationWeeks }}</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="text-muted-foreground text-sm mb-1.5 block">Training days per week</label>
+              <div class="flex gap-2">
+                @for (d of [3, 4, 5, 6]; track d) {
+                  <button
+                    (click)="planRequest.daysPerWeek = d"
+                    class="flex-1 py-2.5 rounded-xl border-2 text-sm font-semibold transition-all"
+                    [class]="planRequest.daysPerWeek === d
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border bg-secondary text-muted-foreground hover:border-primary/30'">
+                    {{ d }} days
+                  </button>
+                }
+              </div>
+            </div>
+
+            <div>
+              <label class="text-muted-foreground text-sm mb-1.5 block">Current weekly distance (optional, km)</label>
+              <input type="number" [(ngModel)]="planRequest.currentWeeklyKm" placeholder="Auto-detect from Strava"
+                class="w-full px-4 py-2.5 bg-secondary border border-border rounded-xl text-foreground text-sm focus:outline-none focus:border-primary">
+              <p class="text-muted-foreground text-xs mt-1">Leave blank to auto-analyze from your activities</p>
+            </div>
+          </div>
+
+          <!-- Summary -->
+          <div class="mt-5 p-4 bg-secondary rounded-xl border border-border">
+            <p class="text-muted-foreground text-xs uppercase tracking-wider mb-2">Plan Summary</p>
+            <div class="flex items-center gap-4 text-sm">
+              <span class="text-foreground font-semibold">{{ getSelectedGoal()?.label }}</span>
+              <span class="text-muted-foreground">{{ planRequest.durationWeeks }}w</span>
+              <span class="text-muted-foreground">{{ planRequest.daysPerWeek }}d/w</span>
+              @if (planRequest.targetTime) {
+                <span class="text-primary font-medium">{{ planRequest.targetTime }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="flex gap-3 mt-6">
+            <button (click)="prevStep()" class="flex-1 py-2.5 rounded-xl border border-border text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all text-sm font-semibold">
+              Back
+            </button>
+            <button (click)="nextStep()" class="flex-[2] btn-primary flex items-center justify-center gap-2">
+              <span class="material-icons text-base">auto_awesome</span>
+              Generate Plan
+            </button>
+          </div>
+        }
+
+        <!-- Step 3: Generating / Result -->
+        @if (generatorStep === 3) {
+          @if (generating) {
+            <div class="flex flex-col items-center py-10 gap-4">
+              <div class="w-16 h-16 rounded-2xl bg-primary/20 flex items-center justify-center animate-pulse">
+                <span class="material-icons text-primary text-3xl">psychology</span>
+              </div>
+              <p class="text-foreground font-semibold">AI is building your plan...</p>
+              <p class="text-muted-foreground text-sm text-center">Analyzing your activity history and crafting a periodized {{ getSelectedGoal()?.label }} program</p>
+              <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent mt-2"></div>
+            </div>
+          } @else if (generatedProgram) {
+            <div class="flex flex-col items-center py-6 gap-4">
+              <div class="w-16 h-16 rounded-2xl bg-green-500/20 flex items-center justify-center">
+                <span class="material-icons text-green-400 text-3xl">check_circle</span>
+              </div>
+              <p class="text-foreground font-bold text-lg">Plan Ready!</p>
+
+              <div class="w-full p-4 bg-secondary rounded-xl border border-border">
+                <h4 class="text-foreground font-semibold">{{ generatedProgram.name }}</h4>
+                <p class="text-muted-foreground text-sm mt-1">{{ generatedProgram.description }}</p>
+                <div class="flex gap-4 mt-3 text-sm text-muted-foreground">
+                  <span>{{ generatedProgram.durationWeeks }} weeks</span>
+                  <span>{{ generatedProgram.sessionsCount }} sessions</span>
+                  <span class="badge border text-xs {{ getLevelColor(generatedProgram.level) }}">{{ generatedProgram.level }}</span>
+                </div>
+              </div>
+
+              <div class="flex gap-3 w-full mt-2">
+                <button (click)="closeGenerator()" class="flex-1 py-2.5 rounded-xl border border-border text-muted-foreground hover:text-foreground transition-all text-sm font-semibold">
+                  View Later
+                </button>
+                <button (click)="enrollInGenerated()" class="flex-[2] btn-primary flex items-center justify-center gap-2">
+                  <span class="material-icons text-base">play_arrow</span>
+                  Start Training
+                </button>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ═══ PLAN DETAIL MODAL ═══ -->
+@if (selectedProgram) {
+  <div class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" (click)="closePlanDetail()">
+    <div class="bg-card border border-border rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
+
+      <!-- Header -->
+      <div class="p-6 border-b border-border">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-foreground font-bold text-lg">{{ selectedProgram.name }}</h2>
+            <p class="text-muted-foreground text-sm mt-1">{{ selectedProgram.description }}</p>
+          </div>
+          <button (click)="closePlanDetail()" class="text-muted-foreground hover:text-foreground">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+        <div class="flex gap-3 mt-3">
+          <span class="badge border text-xs {{ getLevelColor(selectedProgram.level) }}">{{ selectedProgram.level }}</span>
+          <span class="text-muted-foreground text-sm">{{ selectedProgram.durationWeeks }} weeks</span>
+          <span class="text-muted-foreground text-sm">{{ selectedProgram.sessionsCount }} sessions</span>
+          @if (selectedProgram.targetDistanceKm) {
+            <span class="text-muted-foreground text-sm">{{ selectedProgram.targetDistanceKm }} km target</span>
+          }
+        </div>
+      </div>
+
+      <div class="p-6">
+        @if (sessionsLoading) {
+          <div class="flex justify-center py-10">
+            <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
+          </div>
+        } @else if (programSessions.length === 0) {
+          <p class="text-muted-foreground text-center py-10">No sessions in this plan yet.</p>
+        } @else {
+          <div class="space-y-5">
+            @for (weekGroup of getSessionsByWeek(); track weekGroup.week) {
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="text-foreground font-semibold text-sm">Week {{ weekGroup.week }}</h3>
+                  <span class="text-muted-foreground text-xs">{{ getWeekDistance(weekGroup.sessions) | number:'1.1-1' }} km</span>
+                </div>
+                <div class="space-y-2">
+                  @for (session of weekGroup.sessions; track session.id) {
+                    <div class="flex items-center gap-3 p-3 bg-secondary rounded-xl border border-border">
+                      <span class="text-muted-foreground text-xs font-mono w-8">{{ getDayName(session.dayNumber) }}</span>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-foreground text-sm font-medium truncate">{{ session.title }}</p>
+                        @if (session.description) {
+                          <p class="text-muted-foreground text-xs truncate">{{ session.description }}</p>
+                        }
+                      </div>
+                      <div class="flex items-center gap-3 text-xs text-muted-foreground shrink-0">
+                        @if (session.distanceKm) {
+                          <span>{{ session.distanceKm }} km</span>
+                        }
+                        @if (session.durationMinutes) {
+                          <span>{{ session.durationMinutes }}min</span>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Enroll button -->
+        @if (!isEnrolled(selectedProgram.id) && selectedProgram.price && selectedProgram.price > 0) {
+          <button (click)="startProgram(selectedProgram.id)" class="w-full mt-6 flex items-center justify-center gap-2 py-3 rounded-xl bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-semibold hover:bg-yellow-500/30 transition-colors">
+            <span class="material-icons text-xl">lock</span>
+            Unlock Programme for ${{ selectedProgram.price.toFixed(2) }}
+          </button>
+        } @else if (!isEnrolled(selectedProgram.id)) {
+          <button (click)="startProgram(selectedProgram.id)" class="btn-primary w-full mt-6 flex items-center justify-center gap-2">
+            <span class="material-icons text-xl">play_arrow</span>
+            Start Program
+          </button>
+        } @else {
+          <div class="flex items-center gap-2 px-4 py-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 font-semibold text-sm mt-6 justify-center">
+            <span class="material-icons text-base">check_circle</span>
+            Currently Enrolled
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

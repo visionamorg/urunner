@@ -6,7 +6,7 @@ import { EventService } from '../../core/services/event.service';
 import { RankingService } from '../../core/services/ranking.service';
 import { ProgramService } from '../../core/services/program.service';
 import { UserService } from '../../core/services/user.service';
-import { Activity, ActivityStats } from '../../core/models/activity.model';
+import { Activity, ActivityStats, ReadinessScore } from '../../core/models/activity.model';
 import { RunEvent } from '../../core/models/event.model';
 import { Ranking } from '../../core/models/ranking.model';
 import { AuthService } from '../../core/services/auth.service';
@@ -42,6 +42,7 @@ export class DashboardComponent implements OnInit {
   loading = false;
   currentUser = this.authService.getCurrentUser();
 
+  readiness: ReadinessScore | null = null;
   thisWeekDays: { date: Date; isToday: boolean; hasActivity: boolean }[] = [];
 
   challenges = [
@@ -111,6 +112,11 @@ export class DashboardComponent implements OnInit {
 
     this.programService.getMyProgress().subscribe({
       next: p => { this.programProgress = p.slice(0, 2); this.cdr.detectChanges(); },
+      error: () => {}
+    });
+
+    this.activityService.getReadiness().subscribe({
+      next: r => { this.readiness = r; this.cdr.detectChanges(); },
       error: () => {}
     });
   }
@@ -276,6 +282,39 @@ export class DashboardComponent implements OnInit {
 
   getInitials(username: string): string {
     return username.substring(0, 2).toUpperCase();
+  }
+
+  getReadinessBorderColor(): string {
+    if (!this.readiness) return '';
+    switch (this.readiness.level) {
+      case 'HIGH': return 'border-green-500/20';
+      case 'MODERATE': return 'border-primary/20';
+      case 'LOW': return 'border-yellow-500/20';
+      case 'CRITICAL': return 'border-red-500/20';
+      default: return '';
+    }
+  }
+
+  getReadinessScoreColor(): string {
+    if (!this.readiness) return '';
+    switch (this.readiness.level) {
+      case 'HIGH': return 'border-green-500 text-green-400';
+      case 'MODERATE': return 'border-primary text-primary';
+      case 'LOW': return 'border-yellow-500 text-yellow-400';
+      case 'CRITICAL': return 'border-red-500 text-red-400';
+      default: return '';
+    }
+  }
+
+  getReadinessTextColor(): string {
+    if (!this.readiness) return '';
+    switch (this.readiness.level) {
+      case 'HIGH': return 'text-green-400';
+      case 'MODERATE': return 'text-primary';
+      case 'LOW': return 'text-yellow-400';
+      case 'CRITICAL': return 'text-red-400';
+      default: return '';
+    }
   }
 
   getProgramProgress(prog: any): number {

@@ -20,8 +20,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -52,7 +56,22 @@ public class ProgramService {
     }
 
     public List<ProgramSessionDto> getProgramSessions(Long programId) {
-        findById(programId);
+        return sessionRepository.findByProgramIdOrderByWeekNumberAscDayNumberAsc(programId)
+                .stream().map(programMapper::toSessionDto).toList();
+    }
+
+    public List<ProgramSessionDto> getProgramSessionsGuarded(Long programId, String email) {
+        Program program = findById(programId);
+        boolean isPaid = program.getPrice() != null && program.getPrice().compareTo(BigDecimal.ZERO) > 0;
+
+        if (isPaid) {
+            User user = userService.getUserEntityByEmail(email);
+            boolean enrolled = progressRepository.findByUserId(user.getId()).stream()
+                    .anyMatch(p -> p.getProgram().getId().equals(programId) && "ACTIVE".equals(p.getStatus()));
+            if (!enrolled) {
+                throw new BadRequestException("You must purchase this programme to view workouts");
+            }
+        }
         return sessionRepository.findByProgramIdOrderByWeekNumberAscDayNumberAsc(programId)
                 .stream().map(programMapper::toSessionDto).toList();
     }
@@ -65,15 +84,33 @@ public class ProgramService {
         if (progressRepository.existsByUserIdAndProgramIdAndStatus(user.getId(), programId, "ACTIVE")) {
             throw new BadRequestException("You are already enrolled in this program");
         }
+        if (progressRepository.existsByUserIdAndProgramIdAndStatus(user.getId(), programId, "PENDING")) {
+            throw new BadRequestException("Payment pending for this program");
+        }
+
+        boolean isPaid = program.getPrice() != null && program.getPrice().compareTo(BigDecimal.ZERO) > 0;
+        String status = isPaid ? "PENDING" : "ACTIVE";
 
         UserProgramProgress progress = UserProgramProgress.builder()
                 .user(user)
                 .program(program)
-                .status("ACTIVE")
+                .status(status)
                 .build();
 
         UserProgramProgress saved = progressRepository.save(progress);
         return buildProgressDto(saved);
+    }
+
+    @Transactional
+    public void activateEnrollment(Long programId, String userEmail) {
+        User user = userService.getUserEntityByEmail(userEmail);
+        progressRepository.findByUserId(user.getId()).stream()
+                .filter(p -> p.getProgram().getId().equals(programId) && "PENDING".equals(p.getStatus()))
+                .findFirst()
+                .ifPresent(p -> {
+                    p.setStatus("ACTIVE");
+                    progressRepository.save(p);
+                });
     }
 
     public List<ProgramProgressDto> getMyProgress(String email) {
@@ -101,6 +138,7 @@ public class ProgramService {
                 .level(req.getLevel() != null ? req.getLevel() : "BEGINNER")
                 .durationWeeks(req.getDurationWeeks())
                 .targetDistanceKm(req.getTargetDistanceKm())
+                .price(req.getPrice())
                 .community(community)
                 .createdBy(admin)
                 .sessions(new ArrayList<>())
@@ -178,6 +216,33 @@ public class ProgramService {
         }
         progressRepository.save(progress);
         return buildProgressDto(progress);
+    }
+
+    public Optional<ProgramSessionDto> getTodaySession(Long programId, String email) {
+        User user = userService.getUserEntityByEmail(email);
+        UserProgramProgress progress = progressRepository.findByUserId(user.getId()).stream()
+                .filter(p -> p.getProgram().getId().equals(programId) && "ACTIVE".equals(p.getStatus()))
+                .findFirst()
+                .orElseThrow(() -> new BadRequestException("Not enrolled in this programme"));
+
+        // Calculate which week/day we're on based on start date
+        long daysSinceStart = ChronoUnit.DAYS.between(progress.getStartedAt().toLocalDate(), LocalDate.now());
+        int currentWeek = (int) (daysSinceStart / 7) + 1;
+        int currentDayOfWeek = (int) (daysSinceStart % 7) + 1; // 1=Mon(start day)
+
+        List<ProgramSession> sessions = sessionRepository.findByProgramIdOrderByWeekNumberAscDayNumberAsc(programId);
+
+        // Find session matching current week/day
+        return sessions.stream()
+                .filter(s -> s.getWeekNumber() == currentWeek && s.getDayNumber() == currentDayOfWeek)
+                .findFirst()
+                .or(() -> {
+                    // Fallback: find next upcoming session in current week
+                    return sessions.stream()
+                            .filter(s -> s.getWeekNumber() == currentWeek && s.getDayNumber() >= currentDayOfWeek)
+                            .findFirst();
+                })
+                .map(programMapper::toSessionDto);
     }
 
     private void requireCommunityAdmin(Long communityId, User user) {

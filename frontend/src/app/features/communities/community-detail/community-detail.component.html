@@ -921,6 +921,8 @@
               class="input-field">
             <input type="number" [(ngModel)]="programmeForm.targetDistanceKm" placeholder="Target distance (km)" min="0"
               class="input-field">
+            <input type="number" [(ngModel)]="programmeForm.price" placeholder="Price ($ — 0 = free)" min="0" step="0.01"
+              class="input-field">
           </div>
           <div class="flex gap-2">
             <button (click)="createProgramme()" [disabled]="savingProgramme || !programmeForm.name.trim()"

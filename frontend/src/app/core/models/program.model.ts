@@ -5,6 +5,7 @@ export interface Program {
   level: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
   durationWeeks: number;
   targetDistanceKm: number;
+  price?: number;
   sessionsCount: number;
   communityId?: number;
   createdByUsername?: string;
@@ -47,4 +48,12 @@ export interface CreateProgramRequest {
   durationWeeks: number;
   targetDistanceKm?: number;
   sessions?: Partial<ProgramSession>[];
+}
+
+export interface GeneratePlanRequest {
+  goalType: 'MARATHON' | 'HALF_MARATHON' | '10K' | '5K' | 'BASE_BUILDING';
+  targetTime?: string;
+  durationWeeks: number;
+  daysPerWeek: number;
+  currentWeeklyKm?: number;
 }

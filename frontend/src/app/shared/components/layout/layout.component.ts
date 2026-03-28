@@ -30,6 +30,7 @@ export class LayoutComponent implements OnInit {
     { path: '/communities', icon: 'group', label: 'Communities' },
     { path: '/events', icon: 'event', label: 'Events' },
     { path: '/programs', icon: 'fitness_center', label: 'Programs' },
+    { path: '/performance', icon: 'show_chart', label: 'Performance' },
     { path: '/rankings', icon: 'leaderboard', label: 'Rankings' },
     { path: '/notifications', icon: 'notifications', label: 'Notifications' },
     { path: '/profile', icon: 'person', label: 'Profile' },

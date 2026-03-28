@@ -1,0 +1,159 @@
+<div class="max-w-7xl mx-auto space-y-6 animate-fade-in">
+
+  <!-- Header -->
+  <div>
+    <h1 class="text-3xl font-black text-foreground">Performance Dashboard</h1>
+    <p class="text-muted-foreground mt-1">Fitness, Fatigue & Form — your training load over time</p>
+  </div>
+
+  @if (loading) {
+    <div class="flex justify-center py-16">
+      <div class="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent"></div>
+    </div>
+  } @else if (!data || data.history.length === 0) {
+    <div class="card flex flex-col items-center justify-center py-16 gap-4 text-center">
+      <div class="w-16 h-16 rounded-2xl bg-secondary border border-border flex items-center justify-center">
+        <span class="material-icons text-muted-foreground text-3xl">show_chart</span>
+      </div>
+      <p class="text-foreground font-semibold">No activity data yet</p>
+      <p class="text-muted-foreground text-sm">Log some runs to see your performance metrics.</p>
+    </div>
+  } @else {
+    <!-- Current Metrics Row -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- CTL (Fitness) -->
+      <div class="card">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+          <p class="text-muted-foreground text-xs uppercase tracking-wider font-semibold">Fitness (CTL)</p>
+        </div>
+        <p class="text-3xl font-black text-foreground">{{ data.currentCTL }}</p>
+        <p class="text-muted-foreground text-xs mt-1">42-day chronic load</p>
+      </div>
+
+      <!-- ATL (Fatigue) -->
+      <div class="card">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-3 h-3 rounded-full bg-red-500"></div>
+          <p class="text-muted-foreground text-xs uppercase tracking-wider font-semibold">Fatigue (ATL)</p>
+        </div>
+        <p class="text-3xl font-black text-foreground">{{ data.currentATL }}</p>
+        <p class="text-muted-foreground text-xs mt-1">7-day acute load</p>
+      </div>
+
+      <!-- TSB (Form) -->
+      <div class="card">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-3 h-3 rounded-full bg-green-500"></div>
+          <p class="text-muted-foreground text-xs uppercase tracking-wider font-semibold">Form (TSB)</p>
+        </div>
+        <p class="text-3xl font-black" [class]="data.currentTSB >= 0 ? 'text-green-400' : 'text-red-400'">
+          {{ data.currentTSB > 0 ? '+' : '' }}{{ data.currentTSB }}
+        </p>
+        <p class="text-muted-foreground text-xs mt-1">Fitness minus fatigue</p>
+      </div>
+
+      <!-- Training Zone -->
+      <div [class]="'card border ' + getZoneBg()">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="material-icons text-base" [class]="getZoneColor()">
+            {{ data.trainingZone === 'OPTIMAL' ? 'check_circle' : data.trainingZone === 'OVERREACHING' ? 'warning' : data.trainingZone === 'RECOVERY' ? 'spa' : 'trending_down' }}
+          </span>
+          <p class="text-muted-foreground text-xs uppercase tracking-wider font-semibold">Zone</p>
+        </div>
+        <p class="text-xl font-black" [class]="getZoneColor()">{{ data.trainingZone }}</p>
+        <p class="text-muted-foreground text-xs mt-1">{{ getZoneDescription() }}</p>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="card">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-foreground font-bold">Training Load Chart</h2>
+          <p class="text-muted-foreground text-xs mt-0.5">Last 60 days — CTL, ATL, TSB</p>
+        </div>
+        <button (click)="toggleTaper()"
+          [class]="'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ' + (showTaper ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground hover:text-foreground')">
+          <span class="material-icons text-sm">auto_graph</span>
+          Taper Predictor
+        </button>
+      </div>
+
+      <!-- Legend -->
+      <div class="flex items-center gap-5 mb-4 text-xs">
+        <div class="flex items-center gap-1.5">
+          <div class="w-6 h-0.5 bg-blue-500 rounded"></div>
+          <span class="text-muted-foreground">Fitness (CTL)</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <div class="w-6 h-0.5 bg-red-500 rounded"></div>
+          <span class="text-muted-foreground">Fatigue (ATL)</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <div class="w-6 h-0.5 bg-green-500 rounded"></div>
+          <span class="text-muted-foreground">Form (TSB)</span>
+        </div>
+        @if (showTaper) {
+          <div class="flex items-center gap-1.5">
+            <div class="w-6 h-0.5 border-t-2 border-dashed border-purple-400"></div>
+            <span class="text-purple-400">Taper simulation</span>
+          </div>
+        }
+      </div>
+
+      <!-- SVG Chart -->
+      <div class="overflow-x-auto">
+        <svg [attr.viewBox]="'0 0 ' + chartWidth + ' ' + chartHeight" class="w-full h-auto min-w-[600px]">
+          <!-- Grid lines -->
+          @for (v of getYGridLines(); track v) {
+            <line [attr.x1]="padding.left" [attr.x2]="chartWidth - padding.right"
+              [attr.y1]="scaleY(v)" [attr.y2]="scaleY(v)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+            <text [attr.x]="padding.left - 8" [attr.y]="scaleY(v) + 4" fill="rgba(255,255,255,0.3)"
+              font-size="10" text-anchor="end">{{ v }}</text>
+          }
+
+          <!-- Zero line -->
+          <line [attr.x1]="padding.left" [attr.x2]="chartWidth - padding.right"
+            [attr.y1]="getZeroLineY()" [attr.y2]="getZeroLineY()" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="4,4"/>
+
+          <!-- X axis labels -->
+          @for (label of getXLabels(); track label.x) {
+            <text [attr.x]="label.x" [attr.y]="chartHeight - 5" fill="rgba(255,255,255,0.3)"
+              font-size="10" text-anchor="middle">{{ label.label }}</text>
+          }
+
+          <!-- CTL line (blue) -->
+          <path [attr.d]="getCtlPath()" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round"/>
+
+          <!-- ATL line (red) -->
+          <path [attr.d]="getAtlPath()" fill="none" stroke="#ef4444" stroke-width="2" stroke-linejoin="round"/>
+
+          <!-- TSB line (green) -->
+          <path [attr.d]="getTsbPath()" fill="none" stroke="#22c55e" stroke-width="2" stroke-linejoin="round"/>
+
+          <!-- Taper projection lines (dashed) -->
+          @if (showTaper) {
+            <path [attr.d]="getTaperCtlPath()" fill="none" stroke="#a855f7" stroke-width="2" stroke-dasharray="6,4" stroke-linejoin="round"/>
+            <path [attr.d]="getTaperTsbPath()" fill="none" stroke="#a855f7" stroke-width="2" stroke-dasharray="6,4" stroke-linejoin="round"/>
+          }
+        </svg>
+      </div>
+
+      <!-- Taper prediction -->
+      @if (showTaper && getTaperProjectedTSB() !== null) {
+        <div class="mt-4 p-3 bg-purple-500/10 border border-purple-500/20 rounded-xl">
+          <div class="flex items-center gap-2">
+            <span class="material-icons text-purple-400 text-base">auto_graph</span>
+            <p class="text-sm">
+              <span class="text-purple-400 font-semibold">Taper Predictor:</span>
+              <span class="text-muted-foreground"> If you rest for 7 days, your Form (TSB) will reach </span>
+              <span class="text-foreground font-bold">{{ getTaperProjectedTSB() }}</span>
+              <span class="text-muted-foreground"> — {{ getTaperProjectedTSB()! > 15 ? 'ideal for race day!' : getTaperProjectedTSB()! > 5 ? 'good readiness level.' : 'you may need more rest.' }}</span>
+            </p>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

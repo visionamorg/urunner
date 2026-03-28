@@ -86,7 +86,7 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
   programmeEnrollees: any[] = [];
   programmeSessionsLoading = false;
   showProgrammeForm = false;
-  programmeForm = { name: '', description: '', level: 'BEGINNER', durationWeeks: 4, targetDistanceKm: 0 };
+  programmeForm = { name: '', description: '', level: 'BEGINNER', durationWeeks: 4, targetDistanceKm: 0, price: 0 };
   savingProgramme = false;
   sessionForm = { weekNumber: 1, dayNumber: 1, title: '', description: '', distanceKm: 0, durationMinutes: 0 };
   addingSession = false;
@@ -783,7 +783,7 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
         this.programmes.unshift(p);
         this.savingProgramme = false;
         this.showProgrammeForm = false;
-        this.programmeForm = { name: '', description: '', level: 'BEGINNER', durationWeeks: 4, targetDistanceKm: 0 };
+        this.programmeForm = { name: '', description: '', level: 'BEGINNER', durationWeeks: 4, targetDistanceKm: 0, price: 0 };
         this.toast.success('Programme created');
       },
       error: () => { this.savingProgramme = false; this.toast.error('Failed to create programme'); }

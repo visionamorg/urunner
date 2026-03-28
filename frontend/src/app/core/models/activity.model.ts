@@ -67,3 +67,32 @@ export interface ActivityChatRequest {
 export interface ActivityChatResponse {
   reply: string;
 }
+
+export interface DailyMetric {
+  date: string;
+  tss: number;
+  ctl: number;
+  atl: number;
+  tsb: number;
+}
+
+export interface PerformanceData {
+  currentCTL: number;
+  currentATL: number;
+  currentTSB: number;
+  trainingZone: 'OPTIMAL' | 'OVERREACHING' | 'RECOVERY' | 'DETRAINING';
+  history: DailyMetric[];
+  taperSimulation: DailyMetric[];
+}
+
+export interface ReadinessScore {
+  score: number;
+  level: 'HIGH' | 'MODERATE' | 'LOW' | 'CRITICAL';
+  recommendation: string;
+  weeklyVolumeKm: number;
+  previousWeekVolumeKm: number;
+  volumeChangePercent: number;
+  avgEfficiencyFactor: number | null;
+  runsLast7Days: number;
+  restDaysSinceLast: number;
+}

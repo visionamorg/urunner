@@ -1,0 +1,222 @@
+<!-- Full-screen workout mode with high contrast -->
+<div class="min-h-screen bg-black text-white flex flex-col">
+
+  @if (loading) {
+    <div class="flex-1 flex items-center justify-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-2 border-primary border-t-transparent"></div>
+    </div>
+  } @else if (noSession) {
+    <div class="flex-1 flex flex-col items-center justify-center gap-6 p-6 text-center">
+      <div class="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center">
+        <span class="material-icons text-4xl text-white/50">event_busy</span>
+      </div>
+      <h2 class="text-2xl font-bold">No Session Today</h2>
+      <p class="text-white/60">You don't have a workout scheduled for today, or you're not enrolled in this program.</p>
+      <button (click)="goBack()" class="px-6 py-3 bg-primary rounded-xl font-semibold">
+        Back to Programs
+      </button>
+    </div>
+  } @else if (!isRunning && !isCompleted) {
+    <div class="flex-1 flex flex-col items-center justify-center gap-8 p-6">
+      <!-- Back button -->
+      <button (click)="goBack()" class="absolute top-6 left-6 text-white/60 hover:text-white">
+        <span class="material-icons text-3xl">arrow_back</span>
+      </button>
+
+      <div class="text-center">
+        <p class="text-white/40 uppercase text-sm tracking-wider mb-2">Today's Workout</p>
+        <h1 class="text-4xl font-black">{{ session?.title }}</h1>
+        @if (session?.description) {
+          <p class="text-white/60 mt-3 max-w-md text-lg">{{ session?.description }}</p>
+        }
+      </div>
+
+      <!-- Stats preview -->
+      <div class="flex gap-8">
+        @if (session?.distanceKm) {
+          <div class="text-center">
+            <p class="text-5xl font-black text-primary">{{ session?.distanceKm }}</p>
+            <p class="text-white/40 text-sm uppercase mt-1">km</p>
+          </div>
+        }
+        @if (session?.durationMinutes) {
+          <div class="text-center">
+            <p class="text-5xl font-black text-primary">{{ session?.durationMinutes }}</p>
+            <p class="text-white/40 text-sm uppercase mt-1">minutes</p>
+          </div>
+        }
+        @if (targetPaceMinPerKm) {
+          <div class="text-center">
+            <p class="text-5xl font-black text-primary">{{ formatPace(targetPaceMinPerKm) }}</p>
+            <p class="text-white/40 text-sm uppercase mt-1">/km target</p>
+          </div>
+        }
+      </div>
+
+      <!-- Start button -->
+      <button (click)="startRun()" class="w-32 h-32 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/30 hover:scale-105 transition-transform">
+        <span class="material-icons text-6xl text-white">play_arrow</span>
+      </button>
+      <p class="text-white/40 text-sm">Tap to start</p>
+    </div>
+  } @else if (isRunning) {
+    <!-- Top bar -->
+    <div class="p-4 flex items-center justify-between">
+      <p class="text-white/40 text-sm uppercase tracking-wider">{{ session?.title }}</p>
+      @if (paceStatus !== 'unknown') {
+        <span [class]="'px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ' + getPaceStatusColor() + (paceStatus === 'on-target' ? ' bg-green-400/20' : paceStatus === 'too-fast' ? ' bg-yellow-400/20' : ' bg-red-400/20')">
+          {{ getPaceStatusLabel() }}
+        </span>
+      }
+    </div>
+
+    <!-- Main metrics -->
+    <div class="flex-1 flex flex-col items-center justify-center gap-8 px-6">
+      <!-- Timer (largest) -->
+      <div class="text-center">
+        <p class="text-8xl font-black tracking-tight font-mono">{{ formatTime(elapsedSeconds) }}</p>
+        <p class="text-white/30 text-sm uppercase mt-1">Duration</p>
+      </div>
+
+      <!-- Distance & Pace row -->
+      <div class="flex gap-12">
+        <div class="text-center">
+          <p class="text-5xl font-black">{{ totalDistanceKm.toFixed(2) }}</p>
+          <p class="text-white/30 text-sm uppercase mt-1">km</p>
+        </div>
+        <div class="text-center">
+          <p class="text-5xl font-black {{ getPaceStatusColor() }}">{{ formatPace(currentPace) }}</p>
+          <p class="text-white/30 text-sm uppercase mt-1">Pace /km</p>
+        </div>
+        <div class="text-center">
+          <p class="text-5xl font-black">{{ formatPace(averagePace) }}</p>
+          <p class="text-white/30 text-sm uppercase mt-1">Avg Pace</p>
+        </div>
+      </div>
+
+      <!-- Progress bars -->
+      @if (session?.distanceKm && session!.distanceKm! > 0) {
+        <div class="w-full max-w-md">
+          <div class="flex justify-between text-xs text-white/40 mb-1">
+            <span>Distance</span>
+            <span>{{ totalDistanceKm.toFixed(1) }} / {{ session?.distanceKm }} km</span>
+          </div>
+          <div class="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+            <div class="h-full bg-primary rounded-full transition-all duration-500" [style.width.%]="getDistanceProgress()"></div>
+          </div>
+          <!-- Ghost runner indicator -->
+          @if (targetPaceMinPerKm) {
+            <div class="relative mt-2 h-6">
+              <!-- Ghost position based on target pace -->
+              <div class="absolute top-0 h-6 flex items-center text-white/30 transition-all duration-1000"
+                [style.left.%]="getTimeProgress()">
+                <span class="material-icons text-sm">directions_run</span>
+                <span class="text-xs ml-0.5">Ghost</span>
+              </div>
+              <!-- Your position -->
+              <div class="absolute top-0 h-6 flex items-center text-primary transition-all duration-500"
+                [style.left.%]="getDistanceProgress()">
+                <span class="material-icons text-sm">person_pin</span>
+                <span class="text-xs ml-0.5">You</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- GPS error -->
+    @if (geoError) {
+      <div class="mx-6 mb-2 p-3 bg-yellow-500/20 rounded-xl text-yellow-400 text-sm text-center">
+        GPS: {{ geoError }}
+      </div>
+    }
+
+    <!-- Controls -->
+    <div class="p-6 flex items-center justify-center gap-6">
+      @if (isPaused) {
+        <button (click)="resumeRun()" class="w-20 h-20 rounded-full bg-primary flex items-center justify-center">
+          <span class="material-icons text-4xl">play_arrow</span>
+        </button>
+        <button (click)="finishRun()" class="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center">
+          <span class="material-icons text-3xl">stop</span>
+        </button>
+      } @else {
+        <button (click)="pauseRun()" class="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center border-2 border-white/20">
+          <span class="material-icons text-4xl">pause</span>
+        </button>
+        <button (click)="finishRun()" class="w-16 h-16 rounded-full bg-red-500/80 flex items-center justify-center">
+          <span class="material-icons text-3xl">stop</span>
+        </button>
+      }
+    </div>
+  } @else if (isCompleted) {
+    <div class="flex-1 flex flex-col items-center justify-center gap-6 p-6">
+      <div class="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center">
+        <span class="material-icons text-4xl text-green-400">emoji_events</span>
+      </div>
+      <h2 class="text-3xl font-black">Workout Complete!</h2>
+
+      <!-- Summary stats -->
+      <div class="grid grid-cols-2 gap-4 w-full max-w-sm">
+        <div class="bg-white/5 rounded-xl p-4 text-center">
+          <p class="text-3xl font-black text-primary">{{ totalDistanceKm.toFixed(2) }}</p>
+          <p class="text-white/40 text-xs uppercase mt-1">km</p>
+        </div>
+        <div class="bg-white/5 rounded-xl p-4 text-center">
+          <p class="text-3xl font-black">{{ formatTime(elapsedSeconds) }}</p>
+          <p class="text-white/40 text-xs uppercase mt-1">Duration</p>
+        </div>
+        <div class="bg-white/5 rounded-xl p-4 text-center">
+          <p class="text-3xl font-black">{{ formatPace(averagePace) }}</p>
+          <p class="text-white/40 text-xs uppercase mt-1">Avg Pace</p>
+        </div>
+        @if (targetPaceMinPerKm) {
+          <div class="bg-white/5 rounded-xl p-4 text-center">
+            <p class="text-3xl font-black">{{ formatPace(targetPaceMinPerKm) }}</p>
+            <p class="text-white/40 text-xs uppercase mt-1">Target Pace</p>
+          </div>
+        }
+      </div>
+
+      <!-- Target vs Actual comparison -->
+      @if (targetPaceMinPerKm && averagePace) {
+        <div class="w-full max-w-sm p-4 rounded-xl"
+          [class]="averagePace <= targetPaceMinPerKm + 0.3 ? 'bg-green-500/10 border border-green-500/20' : 'bg-red-500/10 border border-red-500/20'">
+          <div class="flex items-center gap-3">
+            <span class="material-icons text-2xl"
+              [class]="averagePace <= targetPaceMinPerKm + 0.3 ? 'text-green-400' : 'text-red-400'">
+              {{ averagePace <= targetPaceMinPerKm + 0.3 ? 'thumb_up' : 'trending_down' }}
+            </span>
+            <div>
+              <p class="font-semibold"
+                [class]="averagePace <= targetPaceMinPerKm + 0.3 ? 'text-green-400' : 'text-red-400'">
+                {{ averagePace <= targetPaceMinPerKm + 0.3 ? 'Target Met!' : 'Below Target' }}
+              </p>
+              <p class="text-white/50 text-sm">
+                {{ formatPace(averagePace) }} vs {{ formatPace(targetPaceMinPerKm) }} target
+              </p>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Progress update -->
+      @if (completedProgress) {
+        <div class="w-full max-w-sm">
+          <div class="flex justify-between text-sm mb-2">
+            <span class="text-white/60">Program Progress</span>
+            <span class="font-bold">{{ completedProgress.completedSessions }}/{{ completedProgress.totalSessions }}</span>
+          </div>
+          <div class="w-full h-3 bg-white/10 rounded-full overflow-hidden">
+            <div class="h-full bg-primary rounded-full transition-all" [style.width.%]="(completedProgress.completedSessions / completedProgress.totalSessions) * 100"></div>
+          </div>
+        </div>
+      }
+
+      <button (click)="goBack()" class="px-8 py-3 bg-primary rounded-xl font-semibold mt-4">
+        Done
+      </button>
+    </div>
+  }
+</div>

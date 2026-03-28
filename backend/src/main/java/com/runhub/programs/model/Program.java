@@ -5,6 +5,7 @@ import com.runhub.users.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,9 @@ public class Program {
 
     @Column(name = "target_distance_km")
     private Double targetDistanceKm;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal price;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "community_id")

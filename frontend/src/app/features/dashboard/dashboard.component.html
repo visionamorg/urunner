@@ -89,6 +89,44 @@
 
     </div>
 
+    <!-- Daily Readiness Score -->
+    @if (readiness) {
+      <div [class]="'card relative overflow-hidden ' + getReadinessBorderColor()">
+        <div class="relative flex flex-col md:flex-row md:items-center gap-4">
+          <div class="flex items-center gap-4 shrink-0">
+            <div [class]="'w-16 h-16 rounded-full flex items-center justify-center border-4 ' + getReadinessScoreColor()">
+              <span class="text-2xl font-black">{{ readiness.score }}</span>
+            </div>
+            <div>
+              <p class="text-foreground font-bold text-sm">Daily Readiness</p>
+              <p [class]="'text-xs font-semibold uppercase tracking-wider ' + getReadinessTextColor()">{{ readiness.level }}</p>
+            </div>
+          </div>
+          <div class="flex-1">
+            <p class="text-muted-foreground text-sm leading-relaxed">{{ readiness.recommendation }}</p>
+          </div>
+          <div class="flex gap-4 text-xs text-muted-foreground shrink-0">
+            <div class="text-center">
+              <p class="text-foreground font-bold text-base">{{ readiness.weeklyVolumeKm }}</p>
+              <p>km/week</p>
+            </div>
+            <div class="text-center">
+              <p class="text-foreground font-bold text-base">{{ readiness.runsLast7Days }}</p>
+              <p>runs/7d</p>
+            </div>
+            @if (readiness.volumeChangePercent !== 0) {
+              <div class="text-center">
+                <p [class]="'font-bold text-base ' + (readiness.volumeChangePercent > 10 ? 'text-red-400' : 'text-foreground')">
+                  {{ readiness.volumeChangePercent > 0 ? '+' : '' }}{{ readiness.volumeChangePercent }}%
+                </p>
+                <p>vol change</p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
     <!-- Streak + RunPoints row -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 

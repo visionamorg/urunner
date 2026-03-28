@@ -1,9 +1,8 @@
 package com.runhub.programs.controller;
 
-import com.runhub.programs.dto.ProgramDto;
-import com.runhub.programs.dto.ProgramProgressDto;
-import com.runhub.programs.dto.ProgramSessionDto;
+import com.runhub.programs.dto.*;
 import com.runhub.programs.service.ProgramService;
+import com.runhub.programs.service.TrainingPlanAIService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +16,7 @@ import java.util.List;
 public class ProgramController {
 
     private final ProgramService programService;
+    private final TrainingPlanAIService trainingPlanAIService;
 
     @GetMapping
     public ResponseEntity<List<ProgramDto>> getAllPrograms() {
@@ -29,7 +29,10 @@ public class ProgramController {
     }
 
     @GetMapping("/{id}/sessions")
-    public ResponseEntity<List<ProgramSessionDto>> getProgramSessions(@PathVariable Long id) {
+    public ResponseEntity<List<ProgramSessionDto>> getProgramSessions(@PathVariable Long id, Principal principal) {
+        if (principal != null) {
+            return ResponseEntity.ok(programService.getProgramSessionsGuarded(id, principal.getName()));
+        }
         return ResponseEntity.ok(programService.getProgramSessions(id));
     }
 
@@ -41,5 +44,22 @@ public class ProgramController {
     @GetMapping("/my-progress")
     public ResponseEntity<List<ProgramProgressDto>> getMyProgress(Principal principal) {
         return ResponseEntity.ok(programService.getMyProgress(principal.getName()));
+    }
+
+    @PostMapping("/generate")
+    public ResponseEntity<ProgramDto> generatePlan(@RequestBody GeneratePlanRequest request, Principal principal) {
+        return ResponseEntity.ok(trainingPlanAIService.generatePlan(request, principal.getName()));
+    }
+
+    @GetMapping("/{id}/today-session")
+    public ResponseEntity<ProgramSessionDto> getTodaySession(@PathVariable Long id, Principal principal) {
+        return programService.getTodaySession(id, principal.getName())
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
+    }
+
+    @PostMapping("/{id}/complete-session")
+    public ResponseEntity<ProgramProgressDto> completeSession(@PathVariable Long id, Principal principal) {
+        return ResponseEntity.ok(programService.completeSession(id, principal.getName()));
     }
 }
