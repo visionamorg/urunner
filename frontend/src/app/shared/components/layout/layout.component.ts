@@ -1,18 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, RouterModule, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService } from '../../../core/services/user.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { AuthResponse } from '../../../core/models/user.model';
 import { ThemeService } from '../../../core/services/theme.service';
 import { AvatarComponent } from '../../components/avatar/avatar.component';
-import { filter } from 'rxjs/operators';
+import { filter, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { Subject, of } from 'rxjs';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, RouterOutlet, RouterLinkActive, AvatarComponent],
+  imports: [CommonModule, FormsModule, RouterModule, RouterOutlet, RouterLinkActive, AvatarComponent],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss',
   host: { '[class.studio-mode]': 'isStudioMode' }
@@ -48,13 +51,34 @@ export class LayoutComponent implements OnInit {
 
   unreadCount = 0;
 
+  // Search
+  searchQuery = '';
+  searchOpen = false;
+  searchResults: any = { users: [], communities: [], events: [] };
+  searchLoading = false;
+  private searchSubject = new Subject<string>();
+
   constructor(
     private authService: AuthService,
     private userService: UserService,
     private router: Router,
+    private http: HttpClient,
     public themeService: ThemeService,
     public notificationService: NotificationService
-  ) {}
+  ) {
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(q => {
+        if (q.length < 2) return of({ users: [], communities: [], events: [] });
+        this.searchLoading = true;
+        return this.http.get<any>(`/api/search?q=${encodeURIComponent(q)}`);
+      })
+    ).subscribe({
+      next: r => { this.searchResults = r; this.searchLoading = false; },
+      error: () => { this.searchLoading = false; }
+    });
+  }
 
   ngOnInit(): void {
     this.isStudioMode = this.router.url.startsWith('/export-studio');
@@ -96,5 +120,34 @@ export class LayoutComponent implements OnInit {
   getInitials(): string {
     if (!this.currentUser) return '?';
     return this.currentUser.username.substring(0, 2).toUpperCase();
+  }
+
+  onSearchInput(): void {
+    this.searchSubject.next(this.searchQuery);
+  }
+
+  openSearch(): void {
+    this.searchOpen = true;
+  }
+
+  closeSearch(): void {
+    this.searchOpen = false;
+    this.searchQuery = '';
+    this.searchResults = { users: [], communities: [], events: [] };
+  }
+
+  navigateResult(type: string, id: number): void {
+    this.closeSearch();
+    switch (type) {
+      case 'user': this.router.navigate(['/profile']); break;
+      case 'community': this.router.navigate(['/communities', id]); break;
+      case 'event': this.router.navigate(['/events', id]); break;
+    }
+  }
+
+  hasResults(): boolean {
+    return (this.searchResults.users?.length > 0)
+      || (this.searchResults.communities?.length > 0)
+      || (this.searchResults.events?.length > 0);
   }
 }

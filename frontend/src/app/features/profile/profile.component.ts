@@ -1,11 +1,12 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, TitleCasePipe } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { UserService } from '../../core/services/user.service';
 import { BadgeService } from '../../core/services/badge.service';
 import { ActivityService } from '../../core/services/activity.service';
 import { AuthService } from '../../core/services/auth.service';
+import { HttpClient } from '@angular/common/http';
 import { User } from '../../core/models/user.model';
 import { UserBadge } from '../../core/models/badge.model';
 import { ActivityStats } from '../../core/models/activity.model';
@@ -13,7 +14,7 @@ import { ActivityStats } from '../../core/models/activity.model';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, TitleCasePipe, ReactiveFormsModule, MatSnackBarModule],
+  imports: [CommonModule, TitleCasePipe, FormsModule, ReactiveFormsModule, MatSnackBarModule],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })
@@ -28,6 +29,13 @@ export class ProfileComponent implements OnInit {
   form: FormGroup;
   authUser = this.authService.getCurrentUser();
 
+  // Shoes (Gear)
+  shoes: any[] = [];
+  showShoeForm = false;
+  shoeForm = { brand: '', model: '', nickname: '', maxDistanceKm: 800, isDefault: false };
+  savingShoe = false;
+  profileTab: 'profile' | 'gear' = 'profile';
+
   readonly categories = ['TRAIL', 'MARATHON', 'SPRINT', 'ULTRA', 'ROAD', 'CASUAL', 'TRACK'];
   readonly genders = ['Male', 'Female', 'Non-binary', 'Prefer not to say'];
 
@@ -38,7 +46,8 @@ export class ProfileComponent implements OnInit {
     private authService: AuthService,
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private http: HttpClient
   ) {
     this.form = this.fb.group({
       firstName: [''],
@@ -195,5 +204,55 @@ export class ProfileComponent implements OnInit {
 
   get previewImageUrl(): string {
     return this.form.get('profileImageUrl')?.value || '';
+  }
+
+  // ── Gear (Shoes) ──────────────────────────────────────────────────────────
+  loadShoes(): void {
+    this.http.get<any[]>('/api/shoes').subscribe({
+      next: s => { this.shoes = s; this.cdr.detectChanges(); },
+      error: () => {}
+    });
+  }
+
+  createShoe(): void {
+    if (!this.shoeForm.brand || !this.shoeForm.model) return;
+    this.savingShoe = true;
+    this.http.post<any>('/api/shoes', this.shoeForm).subscribe({
+      next: s => {
+        this.shoes.unshift(s);
+        this.showShoeForm = false;
+        this.savingShoe = false;
+        this.shoeForm = { brand: '', model: '', nickname: '', maxDistanceKm: 800, isDefault: false };
+        this.cdr.detectChanges();
+      },
+      error: () => { this.savingShoe = false; }
+    });
+  }
+
+  retireShoe(id: number): void {
+    this.http.post<any>(`/api/shoes/${id}/retire`, {}).subscribe({
+      next: s => {
+        const idx = this.shoes.findIndex((sh: any) => sh.id === id);
+        if (idx >= 0) this.shoes[idx] = s;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  switchProfileTab(tab: 'profile' | 'gear'): void {
+    this.profileTab = tab;
+    if (tab === 'gear' && this.shoes.length === 0) this.loadShoes();
+  }
+
+  getShoeStatusColor(status: string): string {
+    if (status === 'CRITICAL') return 'bg-red-500';
+    if (status === 'WARNING') return 'bg-yellow-500';
+    return 'bg-green-500';
+  }
+
+  getShoeBarColor(status: string): string {
+    if (status === 'CRITICAL') return 'bg-red-500';
+    if (status === 'WARNING') return 'bg-yellow-500';
+    return 'bg-primary';
   }
 }

@@ -238,4 +238,25 @@ export class CommunityService {
   removeSponsor(communityId: number, sponsorId: number): Observable<void> {
     return this.http.delete<void>(`/api/communities/${communityId}/sponsors/${sponsorId}`);
   }
+
+  // Challenges
+  getChallenges(communityId: number): Observable<any[]> {
+    return this.http.get<any[]>(`/api/communities/${communityId}/challenges`);
+  }
+
+  createChallenge(communityId: number, data: any): Observable<any> {
+    return this.http.post<any>(`/api/communities/${communityId}/challenges`, data);
+  }
+
+  joinChallenge(communityId: number, challengeId: number): Observable<any> {
+    return this.http.post<any>(`/api/communities/${communityId}/challenges/${challengeId}/join`, {});
+  }
+
+  refreshChallenge(communityId: number, challengeId: number): Observable<any> {
+    return this.http.post<any>(`/api/communities/${communityId}/challenges/${challengeId}/refresh`, {});
+  }
+
+  getChallengeLeaderboard(communityId: number, challengeId: number): Observable<any[]> {
+    return this.http.get<any[]>(`/api/communities/${communityId}/challenges/${challengeId}/leaderboard`);
+  }
 }

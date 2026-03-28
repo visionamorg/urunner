@@ -30,7 +30,7 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
   posts: Post[] = [];
   members: CommunityMember[] = [];
   invites: InviteDto[] = [];
-  activeTab: 'feed' | 'members' | 'invites' | 'settings' | 'events' | 'calendar' | 'chat' | 'rooms' | 'leaderboard' | 'programmes' = 'feed';
+  activeTab: 'feed' | 'members' | 'invites' | 'settings' | 'events' | 'calendar' | 'chat' | 'rooms' | 'leaderboard' | 'programmes' | 'challenges' = 'feed';
 
   // ── Events Tab ─────────────────────────────────────────────────────────────
   communityEvents: RunEvent[] = [];
@@ -179,6 +179,16 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
   weeklyGoalKm = 50;
   generatingDigest = false;
 
+  // Challenges
+  challenges: any[] = [];
+  challengesLoading = false;
+  challengesLoaded = false;
+  showChallengeForm = false;
+  challengeForm = { title: '', description: '', targetType: 'DISTANCE', targetValue: 100, startDate: '', endDate: '' };
+  savingChallenge = false;
+  selectedChallenge: any = null;
+  challengeLeaderboard: any[] = [];
+
   communityId!: number;
 
   constructor(
@@ -264,6 +274,7 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     if (tab === 'chat' && !this.chatLoaded) this.loadChat();
     if (tab === 'leaderboard') this.loadLeaderboard();
     if (tab === 'programmes' && !this.programmesLoaded) this.loadProgrammes();
+    if (tab === 'challenges' && !this.challengesLoaded) this.loadChallenges();
   }
 
   loadMembers(): void {
@@ -305,6 +316,67 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
       next: (g) => { this.communityGoal = g; this.showGoalForm = false; this.savingGoal = false; },
       error: () => { this.savingGoal = false; }
     });
+  }
+
+  // ── Challenges ──────────────────────────────────────────────────────────────
+  loadChallenges(): void {
+    this.challengesLoading = true;
+    this.communityService.getChallenges(this.communityId).subscribe({
+      next: (c) => { this.challenges = c; this.challengesLoading = false; this.challengesLoaded = true; },
+      error: () => { this.challengesLoading = false; this.challengesLoaded = true; }
+    });
+  }
+
+  createChallenge(): void {
+    if (!this.challengeForm.title || !this.challengeForm.targetValue) return;
+    this.savingChallenge = true;
+    this.communityService.createChallenge(this.communityId, this.challengeForm).subscribe({
+      next: (c) => {
+        this.challenges.unshift(c);
+        this.showChallengeForm = false;
+        this.savingChallenge = false;
+        this.challengeForm = { title: '', description: '', targetType: 'DISTANCE', targetValue: 100, startDate: '', endDate: '' };
+      },
+      error: () => { this.savingChallenge = false; }
+    });
+  }
+
+  joinChallenge(challengeId: number): void {
+    this.communityService.joinChallenge(this.communityId, challengeId).subscribe({
+      next: (c) => {
+        const idx = this.challenges.findIndex((ch: any) => ch.id === challengeId);
+        if (idx >= 0) this.challenges[idx] = c;
+      },
+      error: () => this.toast.error('Failed to join challenge')
+    });
+  }
+
+  refreshChallenge(challengeId: number): void {
+    this.communityService.refreshChallenge(this.communityId, challengeId).subscribe({
+      next: (c) => {
+        const idx = this.challenges.findIndex((ch: any) => ch.id === challengeId);
+        if (idx >= 0) this.challenges[idx] = c;
+        if (this.selectedChallenge?.id === challengeId) this.selectedChallenge = c;
+      }
+    });
+  }
+
+  selectChallenge(challenge: any): void {
+    this.selectedChallenge = challenge;
+    this.communityService.getChallengeLeaderboard(this.communityId, challenge.id).subscribe({
+      next: (lb) => this.challengeLeaderboard = lb,
+      error: () => {}
+    });
+    this.refreshChallenge(challenge.id);
+  }
+
+  getTargetTypeLabel(type: string): string {
+    switch (type) {
+      case 'DISTANCE': return 'km';
+      case 'RUNS': return 'runs';
+      case 'ELEVATION': return 'm';
+      default: return '';
+    }
   }
 
   joinOrLeave(): void {

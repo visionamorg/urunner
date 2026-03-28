@@ -101,6 +101,21 @@ public class User implements UserDetails {
     @Builder.Default
     private Integer runPoints = 0;
 
+    @Column(name = "streak_count", nullable = false)
+    @Builder.Default
+    private Integer streakCount = 0;
+
+    @Column(name = "last_run_date")
+    private java.time.LocalDate lastRunDate;
+
+    @Column(name = "streak_freezes", nullable = false)
+    @Builder.Default
+    private Integer streakFreezes = 0;
+
+    @Column(name = "streak_freeze_active", nullable = false)
+    @Builder.Default
+    private Boolean streakFreezeActive = false;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Builder.Default

@@ -53,4 +53,12 @@ public class ActivityController {
     public ResponseEntity<StreakDto> getMyStreak(Principal principal) {
         return ResponseEntity.ok(streakService.getStreak(principal.getName()));
     }
+
+    @PutMapping("/{id}/nutrition")
+    public ResponseEntity<ActivityDto> updateNutrition(
+            @PathVariable Long id,
+            @RequestBody java.util.Map<String, Object> nutrition,
+            Principal principal) {
+        return ResponseEntity.ok(activityService.updateNutrition(id, nutrition, principal.getName()));
+    }
 }

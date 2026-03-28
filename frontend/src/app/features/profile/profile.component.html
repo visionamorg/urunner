@@ -90,6 +90,104 @@
       </div>
     </div>
 
+    <!-- Profile / Gear Tabs -->
+    <div class="flex items-center gap-1 bg-secondary border border-border rounded-2xl p-1">
+      <button (click)="switchProfileTab('profile')"
+        [class]="profileTab === 'profile'
+            ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all'
+            : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all'">
+        <span class="material-icons text-base">person</span> Profile
+      </button>
+      <button (click)="switchProfileTab('gear')"
+        [class]="profileTab === 'gear'
+            ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all'
+            : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all'">
+        <span class="material-icons text-base">hiking</span> Gear
+      </button>
+    </div>
+
+    @if (profileTab === 'gear') {
+    <div class="space-y-6">
+      <div class="flex justify-between items-center">
+        <h2 class="text-foreground font-bold text-lg">My Shoes</h2>
+        <button (click)="showShoeForm = !showShoeForm" class="btn-primary !py-2 !px-4 text-sm">
+          <span class="material-icons text-base mr-1">add</span> Add Shoe
+        </button>
+      </div>
+
+      @if (showShoeForm) {
+      <div class="card space-y-4">
+        <h3 class="text-foreground font-bold">New Shoe</h3>
+        <div class="grid grid-cols-2 gap-4">
+          <input [(ngModel)]="shoeForm.brand" placeholder="Brand (e.g. Nike)" class="input-field">
+          <input [(ngModel)]="shoeForm.model" placeholder="Model (e.g. Pegasus 40)" class="input-field">
+          <input [(ngModel)]="shoeForm.nickname" placeholder="Nickname (optional)" class="input-field">
+          <input [(ngModel)]="shoeForm.maxDistanceKm" type="number" placeholder="Max km (default 800)" class="input-field">
+        </div>
+        <label class="flex items-center gap-2 text-sm text-muted-foreground">
+          <input type="checkbox" [(ngModel)]="shoeForm.isDefault" class="rounded">
+          Set as default shoe
+        </label>
+        <div class="flex gap-2 justify-end">
+          <button (click)="showShoeForm = false" class="btn-ghost !py-2 !px-4">Cancel</button>
+          <button (click)="createShoe()" [disabled]="savingShoe || !shoeForm.brand || !shoeForm.model" class="btn-primary !py-2 !px-4">
+            {{ savingShoe ? 'Saving...' : 'Add' }}
+          </button>
+        </div>
+      </div>
+      }
+
+      @if (shoes.length === 0) {
+        <div class="card text-center py-12">
+          <span class="material-icons text-4xl text-muted-foreground mb-2">hiking</span>
+          <p class="text-muted-foreground">No shoes tracked yet. Add your first pair!</p>
+        </div>
+      } @else {
+        <div class="grid gap-4">
+          @for (shoe of shoes; track shoe.id) {
+          <div class="card" [class.opacity-50]="shoe.retired">
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 class="text-foreground font-semibold">{{ shoe.brand }} {{ shoe.model }}</h3>
+                  @if (shoe.isDefault) {
+                    <span class="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full font-semibold">Default</span>
+                  }
+                  @if (shoe.retired) {
+                    <span class="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">Retired</span>
+                  }
+                </div>
+                @if (shoe.nickname) {
+                  <p class="text-xs text-muted-foreground">{{ shoe.nickname }}</p>
+                }
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full" [class]="getShoeStatusColor(shoe.status)"></span>
+                <span class="text-xs font-bold" [class]="shoe.status === 'CRITICAL' ? 'text-red-400' : shoe.status === 'WARNING' ? 'text-yellow-400' : 'text-green-400'">
+                  {{ shoe.status }}
+                </span>
+              </div>
+            </div>
+            <div class="flex justify-between text-sm mb-1">
+              <span class="text-foreground font-medium">{{ shoe.totalDistanceKm | number:'1.0-0' }} / {{ shoe.maxDistanceKm }} km</span>
+              <span class="text-primary font-bold">{{ shoe.wearPercent | number:'1.0-0' }}%</span>
+            </div>
+            <div class="h-2.5 bg-secondary rounded-full overflow-hidden">
+              <div class="h-full rounded-full transition-all duration-500" [class]="getShoeBarColor(shoe.status)" [style.width.%]="shoe.wearPercent"></div>
+            </div>
+            @if (!shoe.retired) {
+              <div class="flex justify-end mt-3">
+                <button (click)="retireShoe(shoe.id)" class="text-xs text-muted-foreground hover:text-red-400 transition-colors">Retire</button>
+              </div>
+            }
+          </div>
+          }
+        </div>
+      }
+    </div>
+    }
+
+    @if (profileTab === 'profile') {
     <!-- Stats Row -->
     @if (stats) {
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -351,5 +449,6 @@
       </div>
 
     </div>
+    } <!-- end profileTab === 'profile' -->
   </div>
 }

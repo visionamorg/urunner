@@ -11,6 +11,61 @@
       <span class="sidebar-logo-text text-xl font-black text-primary tracking-wider">UR</span>
     </div>
 
+    <!-- Search -->
+    <div class="px-3 pt-3">
+      <div class="relative">
+        <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-base">search</span>
+        <input type="text" [(ngModel)]="searchQuery" (input)="onSearchInput()" (focus)="searchOpen = true" placeholder="Search..."
+          class="w-full pl-9 pr-3 py-2 bg-secondary border border-border rounded-xl text-foreground text-sm focus:outline-none focus:border-primary">
+      </div>
+      @if (searchOpen && searchQuery.length >= 2) {
+        <div class="absolute left-3 right-3 mt-1 bg-card border border-border rounded-xl shadow-2xl max-h-72 overflow-y-auto z-50">
+          @if (searchLoading) {
+            <div class="p-4 text-center text-muted-foreground text-sm">Searching...</div>
+          } @else if (!hasResults()) {
+            <div class="p-4 text-center text-muted-foreground text-sm">No results found</div>
+          } @else {
+            @if (searchResults.users?.length > 0) {
+              <p class="px-3 pt-2 pb-1 text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Users</p>
+              @for (r of searchResults.users; track r.id) {
+                <button (click)="navigateResult('user', r.id)" class="w-full flex items-center gap-3 px-3 py-2 hover:bg-secondary transition-colors text-left">
+                  <span class="material-icons text-base text-primary">person</span>
+                  <div class="min-w-0">
+                    <p class="text-foreground text-sm font-medium truncate">{{ r.title }}</p>
+                    <p class="text-muted-foreground text-xs truncate">{{ r.subtitle }}</p>
+                  </div>
+                </button>
+              }
+            }
+            @if (searchResults.communities?.length > 0) {
+              <p class="px-3 pt-2 pb-1 text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Communities</p>
+              @for (r of searchResults.communities; track r.id) {
+                <button (click)="navigateResult('community', r.id)" class="w-full flex items-center gap-3 px-3 py-2 hover:bg-secondary transition-colors text-left">
+                  <span class="material-icons text-base text-primary">group</span>
+                  <div class="min-w-0">
+                    <p class="text-foreground text-sm font-medium truncate">{{ r.title }}</p>
+                    <p class="text-muted-foreground text-xs truncate">{{ r.subtitle }}</p>
+                  </div>
+                </button>
+              }
+            }
+            @if (searchResults.events?.length > 0) {
+              <p class="px-3 pt-2 pb-1 text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Events</p>
+              @for (r of searchResults.events; track r.id) {
+                <button (click)="navigateResult('event', r.id)" class="w-full flex items-center gap-3 px-3 py-2 hover:bg-secondary transition-colors text-left">
+                  <span class="material-icons text-base text-primary">event</span>
+                  <div class="min-w-0">
+                    <p class="text-foreground text-sm font-medium truncate">{{ r.title }}</p>
+                    <p class="text-muted-foreground text-xs truncate">{{ r.subtitle }}</p>
+                  </div>
+                </button>
+              }
+            }
+          }
+        </div>
+      }
+    </div>
+
     <!-- Nav Items -->
     <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
       @for (item of navItems; track item.path) {

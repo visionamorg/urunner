@@ -74,6 +74,12 @@ public class RunningActivity {
     @Column(name = "map_polyline", columnDefinition = "TEXT")
     private String mapPolyline;
 
+    @Column(name = "shoe_id", insertable = false, updatable = false)
+    private Long shoeId;
+
+    @Column(name = "nutrition_data", columnDefinition = "TEXT")
+    private String nutritionData; // JSON string: {water:0, gels:0, electrolytes:0, caffeine:false}
+
     @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("splitKm ASC")
     @Builder.Default

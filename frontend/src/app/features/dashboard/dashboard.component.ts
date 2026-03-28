@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { ActivityService, Streak } from '../../core/services/activity.service';
+import { ActivityService, Streak, StreakInfo } from '../../core/services/activity.service';
 import { EventService } from '../../core/services/event.service';
 import { RankingService } from '../../core/services/ranking.service';
 import { ProgramService } from '../../core/services/program.service';
@@ -42,6 +42,7 @@ export class DashboardComponent implements OnInit {
   loading = false;
   currentUser = this.authService.getCurrentUser();
 
+  streakInfo: StreakInfo | null = null;
   readiness: ReadinessScore | null = null;
   thisWeekDays: { date: Date; isToday: boolean; hasActivity: boolean }[] = [];
 
@@ -65,6 +66,11 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.activityService.getMyStreak().subscribe({
       next: s => { this.streak = s; this.cdr.detectChanges(); },
+      error: () => {}
+    });
+
+    this.activityService.getStreakInfo().subscribe({
+      next: s => { this.streakInfo = s; this.cdr.detectChanges(); },
       error: () => {}
     });
 
@@ -271,6 +277,13 @@ export class DashboardComponent implements OnInit {
     if (!this.stats?.totalDurationMinutes) return '0h';
     const h = Math.floor(this.stats.totalDurationMinutes / 60);
     return `${h}h`;
+  }
+
+  activateStreakFreeze(): void {
+    this.activityService.activateStreakFreeze().subscribe({
+      next: s => { this.streakInfo = s; this.cdr.detectChanges(); },
+      error: () => {}
+    });
   }
 
   getGreeting(): string {

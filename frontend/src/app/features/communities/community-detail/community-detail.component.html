@@ -246,6 +246,13 @@
       <span class="material-icons text-base">fitness_center</span>
       Plans
     </button>
+    <button (click)="switchTab('challenges')"
+      [class]="activeTab === 'challenges'
+          ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-primary/20 text-primary font-semibold text-sm transition-all whitespace-nowrap'
+          : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all whitespace-nowrap'">
+      <span class="material-icons text-base">emoji_events</span>
+      Challenges
+    </button>
     @if (community.joined) {
     <button (click)="switchTab('chat')"
       [class]="activeTab === 'chat'
@@ -890,6 +897,142 @@
     </div>
     }
 
+  </div>
+  }
+
+  <!-- ==================== CHALLENGES TAB ==================== -->
+  @if (activeTab === 'challenges') {
+  <div class="space-y-6">
+
+    <!-- Admin: Create Challenge -->
+    @if (community.isAdmin) {
+    <div class="flex justify-end">
+      <button (click)="showChallengeForm = !showChallengeForm" class="btn-primary !py-2 !px-4 text-sm">
+        <span class="material-icons text-base mr-1">add</span> New Challenge
+      </button>
+    </div>
+    @if (showChallengeForm) {
+    <div class="card space-y-4">
+      <h3 class="text-lg font-bold text-foreground">Create Challenge</h3>
+      <input [(ngModel)]="challengeForm.title" placeholder="Challenge title" class="input-field">
+      <textarea [(ngModel)]="challengeForm.description" placeholder="Description (optional)" rows="2" class="input-field resize-none"></textarea>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-xs text-muted-foreground mb-1 block">Target Type</label>
+          <select [(ngModel)]="challengeForm.targetType" class="input-field">
+            <option value="DISTANCE">Total Distance (km)</option>
+            <option value="RUNS">Total Runs</option>
+            <option value="ELEVATION">Total Elevation (m)</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs text-muted-foreground mb-1 block">Target Value</label>
+          <input [(ngModel)]="challengeForm.targetValue" type="number" placeholder="e.g. 1000" class="input-field">
+        </div>
+        <div>
+          <label class="text-xs text-muted-foreground mb-1 block">Start Date</label>
+          <input [(ngModel)]="challengeForm.startDate" type="date" class="input-field">
+        </div>
+        <div>
+          <label class="text-xs text-muted-foreground mb-1 block">End Date</label>
+          <input [(ngModel)]="challengeForm.endDate" type="date" class="input-field">
+        </div>
+      </div>
+      <div class="flex gap-2 justify-end">
+        <button (click)="showChallengeForm = false" class="btn-ghost !py-2 !px-4">Cancel</button>
+        <button (click)="createChallenge()" [disabled]="savingChallenge || !challengeForm.title" class="btn-primary !py-2 !px-4">
+          {{ savingChallenge ? 'Creating...' : 'Create' }}
+        </button>
+      </div>
+    </div>
+    }
+    }
+
+    @if (challengesLoading) {
+      <div class="text-center py-12 text-muted-foreground">Loading challenges...</div>
+    } @else if (challenges.length === 0) {
+      <div class="card text-center py-12">
+        <span class="material-icons text-4xl text-muted-foreground mb-2">emoji_events</span>
+        <p class="text-muted-foreground">No challenges yet</p>
+      </div>
+    } @else {
+
+      <!-- Selected Challenge Detail -->
+      @if (selectedChallenge) {
+      <div class="card space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-bold text-foreground">{{ selectedChallenge.title }}</h3>
+          <button (click)="selectedChallenge = null" class="text-muted-foreground hover:text-foreground">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+        @if (selectedChallenge.description) {
+          <p class="text-sm text-muted-foreground">{{ selectedChallenge.description }}</p>
+        }
+        <!-- Progress Bar -->
+        <div>
+          <div class="flex justify-between text-sm mb-1">
+            <span class="text-foreground font-medium">{{ selectedChallenge.currentValue | number:'1.1-1' }} / {{ selectedChallenge.targetValue }} {{ getTargetTypeLabel(selectedChallenge.targetType) }}</span>
+            <span class="text-primary font-bold">{{ selectedChallenge.progress | number:'1.0-0' }}%</span>
+          </div>
+          <div class="h-3 bg-secondary rounded-full overflow-hidden">
+            <div class="h-full bg-primary rounded-full transition-all duration-500" [style.width.%]="selectedChallenge.progress"></div>
+          </div>
+        </div>
+        <div class="flex items-center gap-4 text-xs text-muted-foreground">
+          <span>{{ selectedChallenge.startDate }} — {{ selectedChallenge.endDate }}</span>
+          <span>{{ selectedChallenge.participantCount }} participants</span>
+          <span [class]="selectedChallenge.status === 'COMPLETED' ? 'text-green-400 font-bold' : selectedChallenge.status === 'EXPIRED' ? 'text-red-400' : 'text-primary'">
+            {{ selectedChallenge.status }}
+          </span>
+        </div>
+        <!-- Leaderboard -->
+        @if (challengeLeaderboard.length > 0) {
+        <div>
+          <h4 class="text-sm font-semibold text-foreground mb-2">Leaderboard</h4>
+          @for (p of challengeLeaderboard; track p.userId; let i = $index) {
+          <div class="flex items-center gap-3 py-2 border-b border-border last:border-0">
+            <span class="w-6 text-center text-sm font-bold" [class]="i === 0 ? 'text-yellow-400' : i === 1 ? 'text-gray-400' : i === 2 ? 'text-orange-400' : 'text-muted-foreground'">{{ i + 1 }}</span>
+            <div class="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold text-primary overflow-hidden">
+              @if (p.profileImageUrl) {
+                <img [src]="p.profileImageUrl" class="w-full h-full object-cover">
+              } @else {
+                {{ p.username?.substring(0,2)?.toUpperCase() }}
+              }
+            </div>
+            <span class="flex-1 text-sm text-foreground">{{ p.username }}</span>
+            <span class="text-sm font-mono text-primary">{{ p.contribution | number:'1.1-1' }} {{ getTargetTypeLabel(selectedChallenge.targetType) }}</span>
+          </div>
+          }
+        </div>
+        }
+      </div>
+      }
+
+      <!-- Challenge Cards -->
+      <div class="grid gap-4">
+        @for (ch of challenges; track ch.id) {
+        <div (click)="selectChallenge(ch)" class="card cursor-pointer hover:border-primary/50 transition-all">
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <h4 class="text-foreground font-semibold">{{ ch.title }}</h4>
+              <p class="text-xs text-muted-foreground mt-0.5">{{ ch.startDate }} — {{ ch.endDate }}</p>
+            </div>
+            <span [class]="ch.status === 'COMPLETED' ? 'px-2 py-0.5 rounded-full text-xs font-bold bg-green-500/20 text-green-400' : ch.status === 'EXPIRED' ? 'px-2 py-0.5 rounded-full text-xs font-bold bg-red-500/20 text-red-400' : 'px-2 py-0.5 rounded-full text-xs font-bold bg-primary/20 text-primary'">
+              {{ ch.status }}
+            </span>
+          </div>
+          <div class="h-2 bg-secondary rounded-full overflow-hidden mb-2">
+            <div class="h-full bg-primary rounded-full transition-all" [style.width.%]="ch.progress"></div>
+          </div>
+          <div class="flex justify-between text-xs text-muted-foreground">
+            <span>{{ ch.currentValue | number:'1.1-1' }} / {{ ch.targetValue }} {{ getTargetTypeLabel(ch.targetType) }}</span>
+            <span>{{ ch.participantCount }} joined</span>
+          </div>
+        </div>
+        }
+      </div>
+    }
   </div>
   }
 

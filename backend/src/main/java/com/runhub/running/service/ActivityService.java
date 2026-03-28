@@ -12,8 +12,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -93,5 +95,21 @@ public class ActivityService {
                 .weeklyDistanceKm(weeklyDist)
                 .monthlyDistanceKm(monthlyDist)
                 .build();
+    }
+
+    @Transactional
+    public ActivityDto updateNutrition(Long activityId, Map<String, Object> nutrition, String email) {
+        User user = userService.getUserEntityByEmail(email);
+        RunningActivity activity = activityRepository.findById(activityId)
+                .orElseThrow(() -> new RuntimeException("Activity not found"));
+        if (!activity.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized");
+        }
+        try {
+            activity.setNutritionData(new ObjectMapper().writeValueAsString(nutrition));
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid nutrition data");
+        }
+        return activityMapper.toDto(activityRepository.save(activity));
     }
 }

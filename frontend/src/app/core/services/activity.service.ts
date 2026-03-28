@@ -10,6 +10,14 @@ export interface Streak {
   totalActiveDays: number;
 }
 
+export interface StreakInfo {
+  streakCount: number;
+  lastRunDate: string | null;
+  streakFreezes: number;
+  freezeActive: boolean;
+  streakAtRisk: boolean;
+}
+
 export interface SyncResult {
   imported: number;
   skipped: number;
@@ -70,5 +78,13 @@ export class ActivityService {
 
   getPerformance(): Observable<PerformanceData> {
     return this.http.get<PerformanceData>('/api/performance');
+  }
+
+  getStreakInfo(): Observable<StreakInfo> {
+    return this.http.get<StreakInfo>('/api/streak');
+  }
+
+  activateStreakFreeze(): Observable<StreakInfo> {
+    return this.http.post<StreakInfo>('/api/streak/freeze', {});
   }
 }
