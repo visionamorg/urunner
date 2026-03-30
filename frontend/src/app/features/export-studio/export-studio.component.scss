@@ -761,6 +761,64 @@
 }
 
 /* ═══════════════════════════════════════
+   PROFILE PHOTO OVERLAY
+   ═══════════════════════════════════════ */
+.profile-photo-overlay {
+  position: absolute;
+  bottom: 56px;
+  left: 56px;
+  z-index: 9;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.profile-photo-overlay-avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+
+  app-avatar {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.profile-photo-overlay-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-photo-overlay-username {
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.01em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  line-height: 1;
+}
+
+.profile-photo-overlay-app {
+  font-size: 18px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+/* ═══════════════════════════════════════
    WATERMARK
    ═══════════════════════════════════════ */
 .watermark {

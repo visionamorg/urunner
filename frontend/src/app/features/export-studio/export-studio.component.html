@@ -975,6 +975,20 @@
         </div>
         }
 
+        <!-- Profile Photo Overlay -->
+        @if (showProfilePhoto && selectedActivity) {
+        <div class="profile-photo-overlay">
+          <div class="profile-photo-overlay-avatar">
+            <app-avatar [imageUrl]="currentUserProfileImageUrl"
+              [username]="selectedActivity.username || ''"></app-avatar>
+          </div>
+          <div class="profile-photo-overlay-info">
+            <span class="profile-photo-overlay-username">&#64;{{ selectedActivity.username }}</span>
+            <span class="profile-photo-overlay-app">RunHub</span>
+          </div>
+        </div>
+        }
+
         <!-- Verification Watermark -->
         @if (showWatermark) {
         <div class="watermark">
@@ -1088,6 +1102,10 @@
             <label class="toggle-item">
               <span class="toggle-label">Runner Name</span>
               <input type="checkbox" [(ngModel)]="showRunnerName" class="toggle-switch">
+            </label>
+            <label class="toggle-item">
+              <span class="toggle-label">Profile Photo</span>
+              <input type="checkbox" [(ngModel)]="showProfilePhoto" class="toggle-switch">
             </label>
             <label class="toggle-item">
               <span class="toggle-label">Verification Watermark</span>
@@ -1204,17 +1222,49 @@
         <div class="control-section">
           <div class="flex items-center justify-between mb-4">
             <h3 class="control-label mb-0">Background</h3>
-            <div class="flex items-center gap-2">
-              <span class="text-[10px] font-bold uppercase text-muted-foreground opacity-60">Transparent</span>
-              <input type="checkbox" [(ngModel)]="transparentBackground" class="toggle-switch scale-75 origin-right">
-            </div>
           </div>
           @if (backgroundImages.length === 0 && !selectedGradient && !selectedPattern) {
-          <label class="bg-upload-btn">
-            <span class="material-icons">add_photo_alternate</span>
-            <span>Upload Photos (up to 3)</span>
-            <input type="file" accept="image/*" multiple (change)="onBackgroundUpload($event)" class="hidden">
-          </label>
+          <!-- No background: show upload + transparent overlay options -->
+          <div class="flex flex-col gap-2 mb-3">
+            <label class="bg-upload-btn">
+              <span class="material-icons">add_photo_alternate</span>
+              <span>Upload Photos (up to 3)</span>
+              <input type="file" accept="image/*" multiple (change)="onBackgroundUpload($event)" class="hidden">
+            </label>
+            <!-- Transparent overlay option -->
+            <button (click)="transparentBackground = !transparentBackground"
+              class="flex items-center gap-3 w-full rounded-xl px-4 py-3 border transition-all text-left"
+              [ngClass]="transparentBackground
+                ? 'border-blue-500/60 bg-blue-500/10 text-white'
+                : 'border-white/10 bg-white/3 text-gray-400 hover:border-white/20 hover:text-white'">
+              <!-- Checkerboard icon -->
+              <div class="w-8 h-8 rounded-lg shrink-0 overflow-hidden grid grid-cols-2"
+                style="background: repeating-conic-gradient(#334155 0% 25%, #1e293b 0% 50%) 0 0 / 16px 16px;">
+              </div>
+              <div class="min-w-0">
+                <p class="text-sm font-semibold leading-tight"
+                  [class.text-white]="transparentBackground"
+                  [class.text-gray-300]="!transparentBackground">
+                  Transparent Background
+                </p>
+                <p class="text-xs text-gray-500 leading-tight mt-0.5">
+                  Export PNG overlay — paste on any photo in Instagram / WhatsApp
+                </p>
+              </div>
+              <span *ngIf="transparentBackground" class="material-icons text-blue-400 shrink-0 ml-auto">check_circle</span>
+            </button>
+          </div>
+          <!-- Active transparent hint -->
+          @if (transparentBackground) {
+          <div class="rounded-xl border border-blue-500/20 bg-blue-500/5 px-4 py-3 mb-3 flex items-start gap-3">
+            <span class="material-icons text-blue-400 text-base shrink-0 mt-0.5">info</span>
+            <p class="text-xs text-blue-300 leading-relaxed">
+              Only your stats overlay will be exported — no solid background.
+              Download the <strong>PNG</strong> and paste it on top of your own photo in
+              Instagram Stories, Canva, or any editor.
+            </p>
+          </div>
+          }
           } @else if (backgroundImages.length > 0) {
           <div class="bg-preview-grid">
             @for (img of backgroundImages; track img) {

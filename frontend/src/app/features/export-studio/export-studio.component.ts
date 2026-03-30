@@ -111,6 +111,9 @@ export class ExportStudioComponent implements OnInit {
     { id: 'grid', label: 'Grid', icon: 'grid_on' },
   ];
 
+  // Profile photo overlay
+  showProfilePhoto = true;
+
   // Watermark
   showWatermark = true;
 
@@ -617,7 +620,8 @@ export class ExportStudioComponent implements OnInit {
     try {
       const canvas = await this.renderCanvas();
       const link = document.createElement('a');
-      link.download = `urc-export-${this.selectedActivity?.id || 'activity'}.png`;
+      const prefix = this.transparentBackground ? 'urc-overlay' : 'urc-export';
+      link.download = `${prefix}-${this.selectedActivity?.id || 'activity'}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
     } catch (err) {
@@ -765,6 +769,7 @@ export class ExportStudioComponent implements OnInit {
 
     const files = Array.from(input.files).slice(0, 3);
 
+    this.transparentBackground = false;
     this.backgroundImages = [];
     let loadedCount = 0;
 
@@ -1126,6 +1131,7 @@ export class ExportStudioComponent implements OnInit {
     this.selectedPattern = null;
     this.backgroundImageUrl = null;
     this.backgroundImages = [];
+    this.transparentBackground = false;
   }
 
   selectPattern(id: string): void {
@@ -1133,6 +1139,7 @@ export class ExportStudioComponent implements OnInit {
     this.selectedGradient = null;
     this.backgroundImageUrl = null;
     this.backgroundImages = [];
+    this.transparentBackground = false;
   }
 
   clearBackgroundPreset(): void {
