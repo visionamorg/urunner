@@ -4,14 +4,19 @@ import com.runhub.auth.dto.AuthResponse;
 import com.runhub.auth.service.GarminOAuthService;
 import com.runhub.auth.service.StravaOAuthService;
 import com.runhub.config.OAuthProperties;
+import com.runhub.users.model.User;
+import com.runhub.users.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -23,6 +28,7 @@ public class OAuthController {
     private final StravaOAuthService stravaOAuthService;
     private final GarminOAuthService garminOAuthService;
     private final OAuthProperties oAuthProperties;
+    private final UserService userService;
 
     // ── Strava ─────────────────────────────────────────────────────────────
 
@@ -85,6 +91,19 @@ public class OAuthController {
             log.error("Garmin OAuth callback failed", e);
             response.sendRedirect(oAuthProperties.getFrontendCallbackUrl() + "?error=server_error");
         }
+    }
+
+    @PostMapping("/garmin/disconnect")
+    public ResponseEntity<Map<String, Object>> garminDisconnect(Authentication auth) {
+        User user = userService.getUserEntityByEmail(auth.getName());
+        garminOAuthService.disconnectGarmin(user);
+        return ResponseEntity.ok(Map.of("success", true, "message", "Garmin disconnected"));
+    }
+
+    @GetMapping("/garmin/status")
+    public ResponseEntity<Map<String, Object>> garminStatus(Authentication auth) {
+        User user = userService.getUserEntityByEmail(auth.getName());
+        return ResponseEntity.ok(garminOAuthService.getGarminStatus(user));
     }
 
     // ── helpers ─────────────────────────────────────────────────────────────

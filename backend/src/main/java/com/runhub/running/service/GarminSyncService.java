@@ -18,9 +18,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.runhub.users.model.AuthProvider;
+import com.runhub.users.repository.UserRepository;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -35,6 +38,7 @@ public class GarminSyncService {
     private final GarminOAuthService garminOAuthService;
     private final BadgeService badgeService;
     private final ObjectMapper objectMapper;
+    private final UserRepository userRepository;
 
     @Transactional
     public SyncResultDto syncActivities(User user) {
@@ -64,6 +68,76 @@ public class GarminSyncService {
         } catch (Exception e) {
             log.error("Garmin sync failed for user {}", user.getId(), e);
             return SyncResultDto.builder().message("Sync failed: " + e.getMessage()).build();
+        }
+    }
+
+    @Transactional
+    public void processWebhookActivity(String garminUserId, JsonNode activityNode) {
+        try {
+            Optional<User> userOpt = userRepository.findByProviderIdAndAuthProvider(garminUserId, AuthProvider.GARMIN);
+            if (userOpt.isEmpty()) {
+                log.warn("Webhook: no user found for garminUserId={}", garminUserId);
+                return;
+            }
+            User user = userOpt.get();
+
+            String summaryId = activityNode.has("summaryId") ? activityNode.get("summaryId").asText()
+                    : (activityNode.has("activityId") ? activityNode.get("activityId").asText() : null);
+            if (summaryId == null) {
+                log.warn("Webhook activity has no summaryId/activityId, skipping");
+                return;
+            }
+
+            String externalId = "garmin_" + summaryId;
+            if (activityRepository.existsByExternalId(externalId)) {
+                log.debug("Webhook activity {} already exists, skipping", externalId);
+                return;
+            }
+
+            double distanceMeters = activityNode.has("distanceInMeters") ? activityNode.get("distanceInMeters").asDouble()
+                    : (activityNode.has("totalDistanceInMeters") ? activityNode.get("totalDistanceInMeters").asDouble() : 0);
+            double distanceKm = distanceMeters / 1000.0;
+
+            int durationSec = activityNode.has("durationInSeconds") ? activityNode.get("durationInSeconds").asInt()
+                    : (activityNode.has("movingDurationInSeconds") ? activityNode.get("movingDurationInSeconds").asInt() : 0);
+            int durationMinutes = Math.max(1, durationSec / 60);
+
+            long startEpoch = activityNode.has("startTimeInSeconds") ? activityNode.get("startTimeInSeconds").asLong() : 0;
+            LocalDate activityDate = startEpoch > 0
+                    ? Instant.ofEpochSecond(startEpoch).atZone(ZoneOffset.UTC).toLocalDate()
+                    : LocalDate.now();
+
+            Integer elevationGain = activityNode.has("elevationGainInMeters")
+                    ? (int) activityNode.get("elevationGainInMeters").asDouble() : null;
+            Integer avgHr = activityNode.has("averageHeartRateInBeatsPerMinute")
+                    ? activityNode.get("averageHeartRateInBeatsPerMinute").asInt() : null;
+            Integer maxHr = activityNode.has("maxHeartRateInBeatsPerMinute")
+                    ? activityNode.get("maxHeartRateInBeatsPerMinute").asInt() : null;
+            Integer avgCadence = activityNode.has("averageRunCadenceInStepsPerMinute")
+                    ? activityNode.get("averageRunCadenceInStepsPerMinute").asInt() : null;
+
+            User userRef = new User();
+            userRef.setId(user.getId());
+
+            RunningActivity activity = RunningActivity.builder()
+                    .user(userRef)
+                    .title(activityNode.has("activityName") ? activityNode.get("activityName").asText() : "Garmin Run")
+                    .distanceKm(distanceKm)
+                    .durationMinutes(durationMinutes)
+                    .activityDate(activityDate)
+                    .source(ActivitySource.GARMIN)
+                    .externalId(externalId)
+                    .elevationGainMeters(elevationGain)
+                    .avgHeartRate(avgHr)
+                    .maxHeartRate(maxHr)
+                    .avgCadence(avgCadence)
+                    .build();
+
+            activityRepository.save(activity);
+            badgeService.checkAndAwardBadges(user.getId());
+            log.info("Webhook: imported activity {} for user {}", externalId, user.getId());
+        } catch (Exception e) {
+            log.error("Webhook activity processing failed for garminUserId={}", garminUserId, e);
         }
     }
 

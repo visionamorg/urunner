@@ -1,11 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { FeedService } from '../../core/services/feed.service';
 import { UserService } from '../../core/services/user.service';
 import { Post } from '../../core/models/post.model';
 import { AuthService } from '../../core/services/auth.service';
 import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
+
+export interface LiveSession {
+  token: string;
+  username: string;
+  profileImageUrl: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  lastUpdate: string | null;
+  garminLiveTrackUrl: string | null;
+  shareUrl: string;
+}
 
 @Component({
   selector: 'app-feed',
@@ -20,18 +32,28 @@ export class FeedComponent implements OnInit {
   newPostContent = '';
   currentUserId = this.authService.getCurrentUser()?.userId;
   currentUserProfileImageUrl: string | null = null;
+  liveSessions: LiveSession[] = [];
 
   constructor(
     private feedService: FeedService,
     private authService: AuthService,
-    private userService: UserService
+    private userService: UserService,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
     this.load();
+    this.loadLiveSessions();
     this.userService.getMe().subscribe({
       next: (profile) => { this.currentUserProfileImageUrl = profile.profileImageUrl ?? null; },
       error: () => {}
+    });
+  }
+
+  loadLiveSessions(): void {
+    this.http.get<LiveSession[]>('/api/live-tracking/active').subscribe({
+      next: sessions => { this.liveSessions = sessions; },
+      error: () => { this.liveSessions = []; }
     });
   }
 

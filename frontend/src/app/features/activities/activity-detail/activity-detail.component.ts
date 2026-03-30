@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } fr
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { ActivityService } from '../../../core/services/activity.service';
 import { Activity, ActivityInsight, ActivityChatMessage, ActivitySplit } from '../../../core/models/activity.model';
 import * as L from 'leaflet';
@@ -27,12 +28,18 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
   showChat = false;
   copiedCaption = false;
 
+  // Coaching feedback
+  coachingComments: any[] = [];
+  newComment: { content: string; rating: number | null; lapNumber: number | null } = { content: '', rating: null, lapNumber: null };
+  submittingComment = false;
+
   private map: L.Map | null = null;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private activityService: ActivityService
+    private activityService: ActivityService,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -47,6 +54,7 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
         this.activity = a;
         this.loading = false;
         this.loadInsight(id);
+        this.loadCoachingComments(id);
         setTimeout(() => this.initMap(), 100);
       },
       error: () => {
@@ -260,5 +268,35 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
     if (this.activity) {
       this.router.navigate(['/export-studio'], { queryParams: { activityId: this.activity.id } });
     }
+  }
+
+  loadCoachingComments(activityId: number): void {
+    this.http.get<any[]>(`/api/coaching/activities/${activityId}/comments`).subscribe({
+      next: comments => { this.coachingComments = comments; },
+      error: () => {}
+    });
+  }
+
+  submitCoachingComment(): void {
+    if (!this.activity || !this.newComment.content.trim() || this.submittingComment) return;
+    this.submittingComment = true;
+    this.http.post<any>('/api/coaching/comments', {
+      activityId: this.activity.id,
+      content: this.newComment.content,
+      rating: this.newComment.rating,
+      lapNumber: this.newComment.lapNumber
+    }).subscribe({
+      next: comment => {
+        this.coachingComments.push(comment);
+        this.newComment = { content: '', rating: null, lapNumber: null };
+        this.submittingComment = false;
+      },
+      error: () => { this.submittingComment = false; }
+    });
+  }
+
+  getRatingStars(rating: number | null): string {
+    if (!rating) return '';
+    return '★'.repeat(rating) + '☆'.repeat(10 - rating);
   }
 }

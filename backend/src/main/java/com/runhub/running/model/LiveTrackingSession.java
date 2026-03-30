@@ -35,6 +35,9 @@ public class LiveTrackingSession {
     @Builder.Default
     private Boolean active = true;
 
+    @Column(name = "garmin_live_track_url", length = 500)
+    private String garminLiveTrackUrl;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();

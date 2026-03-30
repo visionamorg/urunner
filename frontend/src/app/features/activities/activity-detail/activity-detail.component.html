@@ -330,5 +330,87 @@
 
     </div>
 
+    <!-- Coach Feedback Section -->
+    <div class="card space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
+          <span class="material-icons text-blue-400 text-lg">sports</span>
+        </div>
+        <div>
+          <h3 class="text-foreground font-bold">Coach Feedback</h3>
+          <p class="text-muted-foreground text-xs">Comments from your coach on this activity</p>
+        </div>
+      </div>
+
+      @if (coachingComments.length === 0) {
+        <div class="text-center py-8">
+          <span class="material-icons text-muted-foreground/30 text-4xl">rate_review</span>
+          <p class="text-muted-foreground text-sm mt-2">No coach feedback yet for this activity.</p>
+        </div>
+      } @else {
+        <div class="space-y-3">
+          @for (comment of coachingComments; track comment.id) {
+            <div class="bg-secondary border border-border rounded-xl p-4 space-y-2" [class.border-blue-500/30]="comment.pinnedToAthleteDashboard">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="material-icons text-blue-400 text-base">sports</span>
+                  <span class="text-foreground font-semibold text-sm">{{ comment.coachUsername }}</span>
+                  @if (comment.lapNumber != null) {
+                    <span class="badge bg-secondary border border-border text-muted-foreground text-xs">Lap {{ comment.lapNumber }}</span>
+                  }
+                  @if (comment.pinnedToAthleteDashboard) {
+                    <span class="badge bg-blue-500/15 border border-blue-500/30 text-blue-400 text-xs">
+                      <span class="material-icons text-xs">push_pin</span> Pinned
+                    </span>
+                  }
+                </div>
+                @if (comment.rating) {
+                  <div class="text-yellow-400 text-xs font-mono tracking-tighter">{{ getRatingStars(comment.rating) }}</div>
+                }
+              </div>
+              <p class="text-foreground text-sm leading-relaxed">{{ comment.content }}</p>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Add comment form (always shown — backend will validate coach access) -->
+      <div class="border-t border-border pt-4 space-y-3">
+        <h4 class="text-muted-foreground text-xs font-semibold uppercase tracking-wider">Add Coach Feedback</h4>
+        <textarea
+          [(ngModel)]="newComment.content"
+          placeholder="Write coaching feedback for this activity..."
+          rows="3"
+          class="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors resize-none">
+        </textarea>
+        <div class="flex gap-3">
+          <div class="flex-1">
+            <label class="label text-xs">Rating (1–10)</label>
+            <input type="number" min="1" max="10" [(ngModel)]="newComment.rating"
+              placeholder="Optional"
+              class="input-field !text-sm" />
+          </div>
+          <div class="flex-1">
+            <label class="label text-xs">Lap Number</label>
+            <input type="number" min="1" [(ngModel)]="newComment.lapNumber"
+              placeholder="Optional"
+              class="input-field !text-sm" />
+          </div>
+        </div>
+        <button
+          (click)="submitCoachingComment()"
+          [disabled]="!newComment.content.trim() || submittingComment"
+          class="btn-primary flex items-center gap-2">
+          @if (submittingComment) {
+            <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+            Saving...
+          } @else {
+            <span class="material-icons text-base">send</span>
+            Post Feedback
+          }
+        </button>
+      </div>
+    </div>
+
   </div>
 }

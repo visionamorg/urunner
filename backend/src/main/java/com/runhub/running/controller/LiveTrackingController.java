@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/live-tracking")
@@ -61,6 +62,26 @@ public class LiveTrackingController {
         trackingRepository.findByUserIdAndActiveTrue(user.getId())
                 .ifPresent(s -> { s.setActive(false); trackingRepository.save(s); });
         return ResponseEntity.ok().build();
+    }
+
+    // Returns all currently active live sessions (for LIVE NOW section in feed)
+    @GetMapping("/active")
+    public ResponseEntity<List<Map<String, Object>>> getActiveSessions() {
+        List<Map<String, Object>> result = trackingRepository.findAllByActiveTrue().stream()
+                .map(s -> {
+                    Map<String, Object> m = new LinkedHashMap<>();
+                    m.put("token", s.getToken());
+                    m.put("username", s.getUser().getDisplayUsername());
+                    m.put("profileImageUrl", s.getUser().getProfileImageUrl());
+                    m.put("latitude", s.getLatitude());
+                    m.put("longitude", s.getLongitude());
+                    m.put("lastUpdate", s.getLastUpdate() != null ? s.getLastUpdate().toString() : null);
+                    m.put("garminLiveTrackUrl", s.getGarminLiveTrackUrl());
+                    m.put("shareUrl", "/track/" + s.getToken());
+                    return m;
+                })
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(result);
     }
 
     // Public endpoint: no auth required - Safety Buddy views this

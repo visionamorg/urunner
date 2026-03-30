@@ -20,6 +20,10 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+  task:
+    execution:
+      pool:
+        max-size: 10
   jackson:
     time-zone: UTC
     serialization:
@@ -39,6 +43,7 @@ application:
       consumer-key: ${GARMIN_CONSUMER_KEY}
       consumer-secret: ${GARMIN_CONSUMER_SECRET}
       redirect-uri: ${APP_BASE_URL:http://localhost:8080}/api/oauth/garmin/callback
+      webhook-secret: ${GARMIN_WEBHOOK_SECRET:}
     frontend-callback-url: ${FRONTEND_URL:http://localhost:4200}/oauth/callback
   drive:
     api-key: ${GOOGLE_DRIVE_API_KEY:}

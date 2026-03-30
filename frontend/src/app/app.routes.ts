@@ -91,6 +91,10 @@ export const routes: Routes = [
       {
         path: 'export-studio',
         loadComponent: () => import('./features/export-studio/export-studio.component').then(m => m.ExportStudioComponent)
+      },
+      {
+        path: 'coach',
+        loadComponent: () => import('./features/coach/coach-hub.component').then(m => m.CoachHubComponent)
       }
     ]
   },

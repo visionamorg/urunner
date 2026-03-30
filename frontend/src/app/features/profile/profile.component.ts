@@ -26,8 +26,13 @@ export class ProfileComponent implements OnInit {
   editMode = false;
   syncing = false;
   saving = false;
+  garminConnected = false;
+  disconnectingGarmin = false;
   form: FormGroup;
   authUser = this.authService.getCurrentUser();
+
+  // Coaching
+  myCoaches: any[] = [];
 
   // Shoes (Gear)
   shoes: any[] = [];
@@ -77,6 +82,34 @@ export class ProfileComponent implements OnInit {
     });
     this.badgeService.getMyBadges().subscribe(b => { this.badges = b; this.cdr.detectChanges(); });
     this.activityService.getMyStats().subscribe(s => { this.stats = s; this.cdr.detectChanges(); });
+    this.loadGarminStatus();
+    this.loadMyCoaches();
+  }
+
+  loadGarminStatus(): void {
+    this.http.get<{ connected: boolean; garminUserId: string | null }>('/api/oauth/garmin/status').subscribe({
+      next: status => {
+        this.garminConnected = status.connected;
+        this.cdr.detectChanges();
+      },
+      error: () => {}
+    });
+  }
+
+  disconnectGarmin(): void {
+    this.disconnectingGarmin = true;
+    this.http.post<{ success: boolean; message: string }>('/api/oauth/garmin/disconnect', {}).subscribe({
+      next: () => {
+        this.garminConnected = false;
+        this.disconnectingGarmin = false;
+        this.snackBar.open('Garmin disconnected', 'Close', { duration: 3000 });
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.disconnectingGarmin = false;
+        this.snackBar.open('Failed to disconnect Garmin', 'Close', { duration: 3000 });
+      }
+    });
   }
 
   private patchForm(u: User): void {
@@ -157,6 +190,24 @@ export class ProfileComponent implements OnInit {
 
   connectStrava(): void { this.authService.connectStrava(); }
   connectGarmin(): void { this.authService.connectGarmin(); }
+
+  loadMyCoaches(): void {
+    this.http.get<any[]>('/api/coaching/my-coaches').subscribe({
+      next: coaches => { this.myCoaches = coaches; this.cdr.detectChanges(); },
+      error: () => {}
+    });
+  }
+
+  unlinkCoach(id: number): void {
+    this.http.delete(`/api/coaching/${id}/revoke`).subscribe({
+      next: () => {
+        this.myCoaches = this.myCoaches.filter((c: any) => c.id !== id);
+        this.snackBar.open('Coach unlinked', 'Close', { duration: 2000 });
+        this.cdr.detectChanges();
+      },
+      error: () => { this.snackBar.open('Failed to unlink coach', 'Close', { duration: 3000 }); }
+    });
+  }
 
   getInitials(): string {
     if (!this.user) return '?';

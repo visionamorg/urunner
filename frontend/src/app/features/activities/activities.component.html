@@ -6,10 +6,17 @@
       <h1 class="text-3xl font-black text-foreground">Activities</h1>
       <p class="text-muted-foreground mt-1">Track and review your running history</p>
     </div>
-    <button (click)="showForm = !showForm" class="btn-primary inline-flex items-center gap-2 self-start">
-      <span class="material-icons text-xl">{{ showForm ? 'close' : 'add' }}</span>
-      {{ showForm ? 'Cancel' : 'Log Run' }}
-    </button>
+    <div class="flex items-center gap-2 self-start">
+      <button (click)="showForm = !showForm" class="btn-primary inline-flex items-center gap-2">
+        <span class="material-icons text-xl">{{ showForm ? 'close' : 'add' }}</span>
+        {{ showForm ? 'Cancel' : 'Log Run' }}
+      </button>
+      <label class="btn-secondary inline-flex items-center gap-2 cursor-pointer" title="Upload .FIT file">
+        <span class="material-icons text-xl">upload_file</span>
+        @if (uploadingFit) { Importing... } @else { Upload .FIT }
+        <input type="file" accept=".fit" class="hidden" (change)="onFitFileSelect($event)" [disabled]="uploadingFit">
+      </label>
+    </div>
   </div>
 
   <!-- Stats Row -->

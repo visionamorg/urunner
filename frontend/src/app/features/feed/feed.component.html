@@ -6,6 +6,32 @@
     <p class="text-muted-foreground mt-1">Share runs, celebrate achievements, inspire others</p>
   </div>
 
+  <!-- LIVE NOW section -->
+  @if (liveSessions.length > 0) {
+    <div class="card border-red-500/30 bg-red-500/5">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+        <h3 class="text-red-400 font-bold text-sm uppercase tracking-wider">Live Now</h3>
+        <span class="badge bg-red-500/20 border border-red-500/30 text-red-400 text-xs">{{ liveSessions.length }}</span>
+      </div>
+      <div class="flex flex-wrap gap-3">
+        @for (session of liveSessions; track session.token) {
+          <a [href]="session.garminLiveTrackUrl || ('/track/' + session.token)" target="_blank" rel="noopener"
+            class="flex items-center gap-2 bg-secondary border border-red-500/20 rounded-xl px-3 py-2 hover:border-red-500/40 transition-colors">
+            <div class="w-7 h-7 rounded-full bg-red-500/20 flex items-center justify-center text-xs font-bold text-red-400 flex-shrink-0">
+              {{ session.username.substring(0, 2).toUpperCase() }}
+            </div>
+            <div>
+              <p class="text-foreground text-xs font-semibold">{{ session.username }}</p>
+              <p class="text-muted-foreground text-xs">Running live</p>
+            </div>
+            <span class="material-icons text-red-400 text-sm ml-1">open_in_new</span>
+          </a>
+        }
+      </div>
+    </div>
+  }
+
   <!-- Create Post -->
   <div class="card">
     <div class="flex items-start gap-4">

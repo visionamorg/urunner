@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { ActivityService, Streak, StreakInfo } from '../../core/services/activity.service';
 import { EventService } from '../../core/services/event.service';
 import { RankingService } from '../../core/services/ranking.service';
@@ -10,6 +11,18 @@ import { Activity, ActivityStats, ReadinessScore } from '../../core/models/activ
 import { RunEvent } from '../../core/models/event.model';
 import { Ranking } from '../../core/models/ranking.model';
 import { AuthService } from '../../core/services/auth.service';
+
+export interface HealthMetric {
+  id: number;
+  date: string;
+  restingHeartRate: number | null;
+  sleepScore: number | null;
+  vo2Max: number | null;
+  fitnessAge: number | null;
+  hrvStatus: string | null;
+  bodyBatteryMax: number | null;
+  stressLevel: number | null;
+}
 
 export interface ScheduleItem {
   id: string;
@@ -25,7 +38,7 @@ export interface ScheduleItem {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, NgClass],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -45,6 +58,8 @@ export class DashboardComponent implements OnInit {
   streakInfo: StreakInfo | null = null;
   readiness: ReadinessScore | null = null;
   thisWeekDays: { date: Date; isToday: boolean; hasActivity: boolean }[] = [];
+  healthMetrics: HealthMetric[] = [];
+  syncingHealth = false;
 
   challenges = [
     { id: 1, title: '100km Month', target: 100, icon: 'emoji_events', color: 'orange', description: 'Run 100km this month' },
@@ -60,7 +75,8 @@ export class DashboardComponent implements OnInit {
     private userService: UserService,
     private authService: AuthService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -125,6 +141,83 @@ export class DashboardComponent implements OnInit {
       next: r => { this.readiness = r; this.cdr.detectChanges(); },
       error: () => {}
     });
+
+    this.loadHealthMetrics();
+  }
+
+  loadHealthMetrics(): void {
+    this.http.get<HealthMetric[]>('/api/garmin/health/metrics').subscribe({
+      next: metrics => {
+        // API returns newest first; keep last 7 and reverse for charting oldest→newest
+        this.healthMetrics = metrics.slice(0, 7).reverse();
+        this.cdr.detectChanges();
+      },
+      error: () => { this.healthMetrics = []; }
+    });
+  }
+
+  syncHealthMetrics(): void {
+    this.syncingHealth = true;
+    this.http.post<{ imported: number; message: string }>('/api/garmin/health/sync', {}).subscribe({
+      next: () => {
+        this.syncingHealth = false;
+        this.loadHealthMetrics();
+      },
+      error: () => { this.syncingHealth = false; }
+    });
+  }
+
+  // ── SVG chart helpers ────────────────────────────────────────────────────
+
+  private buildLinePoints(values: (number | null)[], min: number, max: number): string {
+    const pts = values.filter(v => v !== null) as number[];
+    if (pts.length === 0) return '';
+    const range = max - min || 1;
+    const step = 120 / Math.max(1, pts.length - 1);
+    return pts.map((v, i) => {
+      const x = i * step;
+      const y = 38 - ((v - min) / range) * 36;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+  }
+
+  private buildDots(values: (number | null)[], min: number, max: number): { x: number; y: number }[] {
+    const pts = values.filter(v => v !== null) as number[];
+    if (pts.length === 0) return [];
+    const range = max - min || 1;
+    const step = 120 / Math.max(1, pts.length - 1);
+    return pts.map((v, i) => ({
+      x: parseFloat((i * step).toFixed(1)),
+      y: parseFloat((38 - ((v - min) / range) * 36).toFixed(1))
+    }));
+  }
+
+  getHrLinePoints(): string {
+    const vals = this.healthMetrics.map(m => m.restingHeartRate);
+    const nums = vals.filter(v => v !== null) as number[];
+    return this.buildLinePoints(vals, Math.min(...nums) - 5, Math.max(...nums) + 5);
+  }
+
+  getHrDots(): { x: number; y: number }[] {
+    const vals = this.healthMetrics.map(m => m.restingHeartRate);
+    const nums = vals.filter(v => v !== null) as number[];
+    return this.buildDots(vals, Math.min(...nums) - 5, Math.max(...nums) + 5);
+  }
+
+  getSleepLinePoints(): string {
+    return this.buildLinePoints(this.healthMetrics.map(m => m.sleepScore), 0, 100);
+  }
+
+  getSleepDots(): { x: number; y: number }[] {
+    return this.buildDots(this.healthMetrics.map(m => m.sleepScore), 0, 100);
+  }
+
+  getBodyBatteryLinePoints(): string {
+    return this.buildLinePoints(this.healthMetrics.map(m => m.bodyBatteryMax), 0, 100);
+  }
+
+  getBodyBatteryDots(): { x: number; y: number }[] {
+    return this.buildDots(this.healthMetrics.map(m => m.bodyBatteryMax), 0, 100);
   }
 
   buildThisWeek(): void {

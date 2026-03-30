@@ -1,6 +1,5 @@
 package com.runhub.auth.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.github.scribejava.apis.GarminApi;
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.model.OAuth1AccessToken;
@@ -21,6 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -59,8 +60,15 @@ public class GarminOAuthService {
             throw new IllegalStateException("Unknown or expired OAuth request token");
         }
 
-        OAuth10aService service = buildService();
-        OAuth1AccessToken accessToken = service.getAccessToken(requestToken, oauthVerifier);
+        OAuth10aService service;
+        OAuth1AccessToken accessToken;
+        try {
+            service = buildService();
+            accessToken = service.getAccessToken(requestToken, oauthVerifier);
+        } catch (Exception e) {
+            log.error("ScribeJava token exchange failed: {}", e.getMessage());
+            throw new IllegalStateException("Failed to exchange Garmin OAuth token: " + e.getMessage(), e);
+        }
 
         String garminUserId = fetchGarminUserId(service, accessToken);
 
@@ -106,6 +114,25 @@ public class GarminOAuthService {
 
     public OAuth10aService getService() {
         return buildService();
+    }
+
+    @Transactional
+    public void disconnectGarmin(User user) {
+        user.setProviderAccessToken(null);
+        user.setProviderTokenSecret(null);
+        user.setAuthProvider(AuthProvider.LOCAL);
+        userRepository.save(user);
+        log.info("Garmin disconnected for user {}", user.getId());
+    }
+
+    public Map<String, Object> getGarminStatus(User user) {
+        Map<String, Object> status = new HashMap<>();
+        boolean connected = user.getAuthProvider() == AuthProvider.GARMIN
+                && user.getProviderAccessToken() != null
+                && !user.getProviderAccessToken().isBlank();
+        status.put("connected", connected);
+        status.put("garminUserId", connected ? user.getProviderId() : null);
+        return status;
     }
 
     private String fetchGarminUserId(OAuth10aService service, OAuth1AccessToken token) throws Exception {

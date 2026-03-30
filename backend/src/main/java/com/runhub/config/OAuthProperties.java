@@ -25,5 +25,6 @@ public class OAuthProperties {
         private String consumerKey;
         private String consumerSecret;
         private String redirectUri;
+        private String webhookSecret = "";
     }
 }

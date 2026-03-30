@@ -1,0 +1,479 @@
+<div class="max-w-6xl mx-auto space-y-6 animate-fade-in">
+
+  <!-- Header -->
+  <div class="flex items-center gap-4">
+    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/20 to-primary/20 border border-blue-500/30 flex items-center justify-center">
+      <span class="material-icons text-blue-400 text-2xl">sports</span>
+    </div>
+    <div>
+      <h1 class="text-2xl font-black text-foreground">Coach Hub</h1>
+      <p class="text-muted-foreground text-sm">Manage your athletes, track team readiness, and push workouts</p>
+    </div>
+    <div class="ml-auto">
+      <span class="badge bg-blue-500/15 border border-blue-500/30 text-blue-400">
+        {{ athletes.length }} athlete{{ athletes.length !== 1 ? 's' : '' }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="flex gap-1 bg-secondary border border-border rounded-2xl p-1 overflow-x-auto">
+    @for (tab of [
+      {id: 'feed', icon: 'dynamic_feed', label: 'Feed'},
+      {id: 'readiness', icon: 'favorite', label: 'Readiness'},
+      {id: 'analytics', icon: 'show_chart', label: 'Analytics'},
+      {id: 'bulk', icon: 'send', label: 'Bulk Push'},
+      {id: 'team', icon: 'group', label: 'Team'}
+    ]; track tab.id) {
+      <button
+        (click)="switchTab(tab.id as any)"
+        [class]="activeTab === tab.id
+          ? 'flex-1 min-w-max flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-card border border-border text-foreground font-semibold text-sm transition-all'
+          : 'flex-1 min-w-max flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all'">
+        <span class="material-icons text-lg">{{ tab.icon }}</span>
+        <span class="hidden sm:inline">{{ tab.label }}</span>
+      </button>
+    }
+  </div>
+
+  <!-- ── FEED TAB ── -->
+  @if (activeTab === 'feed') {
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-foreground font-bold">Team Activity Feed</h2>
+        <button (click)="loadTeamFeed()" class="btn-secondary text-sm flex items-center gap-2">
+          <span class="material-icons text-base">refresh</span>
+          Refresh
+        </button>
+      </div>
+
+      @if (loadingFeed) {
+        <div class="flex justify-center py-16">
+          <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
+        </div>
+      } @else if (teamFeed.length === 0) {
+        <div class="card text-center py-16">
+          <span class="material-icons text-muted-foreground/30 text-5xl">directions_run</span>
+          <p class="text-muted-foreground mt-3">No activities yet. Invite athletes to get started.</p>
+        </div>
+      } @else {
+        <div class="space-y-3">
+          @for (activity of teamFeed; track activity.activityId) {
+            <div class="card flex items-center gap-4 hover:border-primary/30 transition-colors">
+              <!-- Avatar -->
+              <div class="flex-shrink-0">
+                @if (activity.athleteProfileImageUrl) {
+                  <img [src]="activity.athleteProfileImageUrl" class="w-10 h-10 rounded-xl object-cover" />
+                } @else {
+                  <div class="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary font-bold text-sm">
+                    {{ activity.athleteUsername?.substring(0,2)?.toUpperCase() }}
+                  </div>
+                }
+              </div>
+
+              <!-- Info -->
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-foreground font-semibold text-sm">{{ activity.athleteUsername }}</span>
+                  <span class="text-muted-foreground text-xs">·</span>
+                  <span class="text-muted-foreground text-xs">{{ formatDate(activity.activityDate) }}</span>
+                  @if (activity.source !== 'MANUAL') {
+                    <span class="badge bg-blue-500/15 border border-blue-500/30 text-blue-400 text-xs">{{ activity.source }}</span>
+                  }
+                </div>
+                <p class="text-foreground text-sm font-medium truncate">{{ activity.title }}</p>
+              </div>
+
+              <!-- Stats -->
+              <div class="flex items-center gap-4 text-sm flex-shrink-0">
+                <div class="text-center hidden sm:block">
+                  <p class="text-foreground font-bold">{{ activity.distanceKm?.toFixed(1) }}<span class="text-xs text-muted-foreground"> km</span></p>
+                </div>
+                <div class="text-center hidden md:block">
+                  <p class="text-muted-foreground text-xs">{{ formatPace(activity.paceMinPerKm) }}</p>
+                </div>
+                @if (activity.avgHeartRate) {
+                  <div class="text-center hidden lg:block">
+                    <p class="text-red-400 text-xs flex items-center gap-1">
+                      <span class="material-icons text-xs">favorite</span>
+                      {{ activity.avgHeartRate }} bpm
+                    </p>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ── READINESS TAB ── -->
+  @if (activeTab === 'readiness') {
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-foreground font-bold">Team Readiness</h2>
+          <p class="text-muted-foreground text-sm">Latest health metrics from each athlete</p>
+        </div>
+        <button (click)="loadReadiness()" class="btn-secondary text-sm flex items-center gap-2">
+          <span class="material-icons text-base">refresh</span>
+          Refresh
+        </button>
+      </div>
+
+      @if (loadingReadiness) {
+        <div class="flex justify-center py-16">
+          <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
+        </div>
+      } @else if (readiness.length === 0) {
+        <div class="card text-center py-16">
+          <span class="material-icons text-muted-foreground/30 text-5xl">favorite</span>
+          <p class="text-muted-foreground mt-3">No readiness data available yet.</p>
+        </div>
+      } @else {
+        <div class="card overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-border">
+                <th class="text-left py-3 px-4 text-muted-foreground font-medium">Athlete</th>
+                <th class="text-center py-3 px-4 text-muted-foreground font-medium">Sleep</th>
+                <th class="text-center py-3 px-4 text-muted-foreground font-medium">Body Battery</th>
+                <th class="text-center py-3 px-4 text-muted-foreground font-medium">RHR</th>
+                <th class="text-center py-3 px-4 text-muted-foreground font-medium">HRV</th>
+                <th class="text-center py-3 px-4 text-muted-foreground font-medium">Risk</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of readiness; track row.athleteId) {
+                <tr class="border-b border-border/50 hover:bg-secondary/50 transition-colors">
+                  <td class="py-3 px-4">
+                    <div class="flex items-center gap-3">
+                      @if (row.profileImageUrl) {
+                        <img [src]="row.profileImageUrl" class="w-8 h-8 rounded-lg object-cover" />
+                      } @else {
+                        <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary text-xs font-bold">
+                          {{ row.username?.substring(0,2)?.toUpperCase() }}
+                        </div>
+                      }
+                      <span class="text-foreground font-medium">{{ row.username }}</span>
+                    </div>
+                  </td>
+                  <td class="py-3 px-4 text-center">
+                    @if (row.sleepScore != null) {
+                      <span [class]="row.sleepScore >= 75 ? 'text-green-400 font-bold' : row.sleepScore >= 50 ? 'text-yellow-400 font-bold' : 'text-red-400 font-bold'">
+                        {{ row.sleepScore }}
+                      </span>
+                    } @else {
+                      <span class="text-muted-foreground">—</span>
+                    }
+                  </td>
+                  <td class="py-3 px-4 text-center">
+                    @if (row.bodyBatteryMax != null) {
+                      <span [class]="row.bodyBatteryMax >= 70 ? 'text-green-400 font-bold' : row.bodyBatteryMax >= 40 ? 'text-yellow-400 font-bold' : 'text-red-400 font-bold'">
+                        {{ row.bodyBatteryMax }}
+                      </span>
+                    } @else {
+                      <span class="text-muted-foreground">—</span>
+                    }
+                  </td>
+                  <td class="py-3 px-4 text-center">
+                    <span class="text-foreground">{{ row.restingHeartRate ?? '—' }}</span>
+                    @if (row.restingHeartRate) {
+                      <span class="text-muted-foreground text-xs"> bpm</span>
+                    }
+                  </td>
+                  <td class="py-3 px-4 text-center">
+                    <span [class]="row.hrvStatus === 'BALANCED' ? 'text-green-400' : row.hrvStatus ? 'text-yellow-400' : 'text-muted-foreground'">
+                      {{ row.hrvStatus ?? '—' }}
+                    </span>
+                  </td>
+                  <td class="py-3 px-4 text-center">
+                    <span [class]="getRiskColor(row.risk)" class="text-lg font-bold flex items-center justify-center gap-1">
+                      {{ getRiskIcon(row.risk) }}
+                      <span class="text-xs">{{ row.risk }}</span>
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ── ANALYTICS TAB ── -->
+  @if (activeTab === 'analytics') {
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-foreground font-bold">Team Load Analytics</h2>
+          <p class="text-muted-foreground text-sm">CTL (fitness), ATL (fatigue), TSB (form) per athlete</p>
+        </div>
+        <button (click)="loadAnalytics()" class="btn-secondary text-sm flex items-center gap-2">
+          <span class="material-icons text-base">refresh</span>
+          Refresh
+        </button>
+      </div>
+
+      @if (loadingAnalytics) {
+        <div class="flex justify-center py-16">
+          <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
+        </div>
+      } @else if (analytics.length === 0) {
+        <div class="card text-center py-16">
+          <span class="material-icons text-muted-foreground/30 text-5xl">show_chart</span>
+          <p class="text-muted-foreground mt-3">No analytics data yet.</p>
+        </div>
+      } @else {
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          @for (athlete of analytics; track athlete.userId) {
+            <div class="card space-y-4">
+              <!-- Header -->
+              <div class="flex items-center gap-3">
+                @if (athlete.profileImageUrl) {
+                  <img [src]="athlete.profileImageUrl" class="w-9 h-9 rounded-xl object-cover" />
+                } @else {
+                  <div class="w-9 h-9 rounded-xl bg-primary/20 flex items-center justify-center text-primary text-sm font-bold">
+                    {{ athlete.username?.substring(0,2)?.toUpperCase() }}
+                  </div>
+                }
+                <div>
+                  <p class="text-foreground font-semibold text-sm">{{ athlete.username }}</p>
+                  <p class="text-muted-foreground text-xs">Last 30 days</p>
+                </div>
+              </div>
+
+              <!-- CTL / ATL / TSB pills -->
+              <div class="grid grid-cols-3 gap-2">
+                <div class="bg-secondary border border-border rounded-xl p-3 text-center">
+                  <p class="text-blue-400 font-black text-xl">{{ athlete.ctl }}</p>
+                  <p class="text-muted-foreground text-xs mt-0.5">CTL</p>
+                  <p class="text-muted-foreground text-xs">Fitness</p>
+                </div>
+                <div class="bg-secondary border border-border rounded-xl p-3 text-center">
+                  <p class="text-orange-400 font-black text-xl">{{ athlete.atl }}</p>
+                  <p class="text-muted-foreground text-xs mt-0.5">ATL</p>
+                  <p class="text-muted-foreground text-xs">Fatigue</p>
+                </div>
+                <div class="bg-secondary border border-border rounded-xl p-3 text-center">
+                  <p [class]="athlete.tsb >= 0 ? 'text-green-400 font-black text-xl' : 'text-red-400 font-black text-xl'">
+                    {{ athlete.tsb > 0 ? '+' : '' }}{{ athlete.tsb }}
+                  </p>
+                  <p class="text-muted-foreground text-xs mt-0.5">TSB</p>
+                  <p class="text-muted-foreground text-xs">Form</p>
+                </div>
+              </div>
+
+              <!-- Trend SVG (simple line chart) -->
+              @if (athlete.trend && athlete.trend.length > 1) {
+                <div class="overflow-x-auto">
+                  <svg viewBox="0 0 300 80" class="w-full h-16" style="min-width: 200px;">
+                    <!-- CTL line (blue) -->
+                    <polyline
+                      [attr.points]="getTrendPoints(athlete.trend, 'ctl', 300, 80)"
+                      fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <!-- ATL line (orange) -->
+                    <polyline
+                      [attr.points]="getTrendPoints(athlete.trend, 'atl', 300, 80)"
+                      fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                  <div class="flex items-center gap-4 mt-1 justify-center">
+                    <span class="text-xs text-blue-400 flex items-center gap-1"><span class="inline-block w-3 h-0.5 bg-blue-400"></span>CTL</span>
+                    <span class="text-xs text-orange-400 flex items-center gap-1"><span class="inline-block w-3 h-0.5 bg-orange-400"></span>ATL</span>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ── BULK PUSH TAB ── -->
+  @if (activeTab === 'bulk') {
+    <div class="space-y-6">
+      <div>
+        <h2 class="text-foreground font-bold">Bulk Workout Push</h2>
+        <p class="text-muted-foreground text-sm">Push a training session to multiple athletes' Garmin calendars at once</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- Config Panel -->
+        <div class="card space-y-5">
+          <h3 class="text-foreground font-semibold">Configure Push</h3>
+
+          <div>
+            <label class="label">Session ID</label>
+            <input
+              type="number"
+              [(ngModel)]="bulkSessionId"
+              placeholder="Enter program session ID"
+              class="input-field" />
+            <p class="text-muted-foreground text-xs mt-1">Find session IDs in the Programs section</p>
+          </div>
+
+          <div>
+            <label class="label">Select Athletes</label>
+            @if (athletes.length === 0) {
+              <p class="text-muted-foreground text-sm py-4 text-center">No connected athletes yet. Use the Team tab to invite athletes.</p>
+            } @else {
+              <div class="space-y-2">
+                @for (athlete of athletes; track athlete.athleteId) {
+                  <label class="flex items-center gap-3 p-3 rounded-xl bg-secondary border border-border hover:border-primary/30 cursor-pointer transition-colors">
+                    <input
+                      type="checkbox"
+                      [checked]="isAthleteSelected(athlete.athleteId)"
+                      (change)="toggleAthleteSelection(athlete.athleteId)"
+                      class="w-4 h-4 accent-primary rounded" />
+                    @if (athlete.athleteProfileImageUrl) {
+                      <img [src]="athlete.athleteProfileImageUrl" class="w-7 h-7 rounded-lg object-cover" />
+                    } @else {
+                      <div class="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center text-primary text-xs font-bold">
+                        {{ athlete.athleteUsername?.substring(0,2)?.toUpperCase() }}
+                      </div>
+                    }
+                    <span class="text-foreground text-sm font-medium">{{ athlete.athleteUsername }}</span>
+                    <span class="ml-auto badge bg-secondary border border-border text-muted-foreground text-xs">{{ athlete.garminAccessLevel }}</span>
+                  </label>
+                }
+              </div>
+            }
+          </div>
+
+          <button
+            (click)="bulkPush()"
+            [disabled]="!bulkSessionId || selectedAthletes.length === 0 || bulkPushing"
+            class="btn-primary w-full flex items-center justify-center gap-2">
+            @if (bulkPushing) {
+              <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+              Pushing...
+            } @else {
+              <span class="material-icons text-lg">send</span>
+              Push to {{ selectedAthletes.length }} Selected
+            }
+          </button>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="card">
+          <h3 class="text-foreground font-semibold mb-4">Push Results</h3>
+          @if (!bulkPushResult) {
+            <div class="text-center py-12">
+              <span class="material-icons text-muted-foreground/30 text-5xl">schedule_send</span>
+              <p class="text-muted-foreground text-sm mt-3">Results will appear here after pushing</p>
+            </div>
+          } @else {
+            <div class="space-y-3">
+              <div class="flex items-center gap-2 pb-3 border-b border-border">
+                <span class="material-icons text-primary">info</span>
+                <p class="text-foreground text-sm font-medium">Session #{{ bulkPushResult.sessionId }}</p>
+              </div>
+              @for (result of bulkPushResult.results; track result.athleteId) {
+                <div class="flex items-center gap-3 p-3 rounded-xl" [class]="result.success ? 'bg-green-500/10 border border-green-500/20' : 'bg-red-500/10 border border-red-500/20'">
+                  <span class="material-icons text-lg" [class]="result.success ? 'text-green-400' : 'text-red-400'">
+                    {{ result.success ? 'check_circle' : 'error' }}
+                  </span>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-foreground text-sm font-medium">{{ result.username }}</p>
+                    @if (result.success && result.garminWorkoutId) {
+                      <p class="text-muted-foreground text-xs truncate">Garmin ID: {{ result.garminWorkoutId }}</p>
+                    }
+                    @if (!result.success && result.error) {
+                      <p class="text-red-400 text-xs truncate">{{ result.error }}</p>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ── TEAM TAB ── -->
+  @if (activeTab === 'team') {
+    <div class="space-y-6">
+
+      <!-- Invite Form -->
+      <div class="card">
+        <h3 class="text-foreground font-semibold mb-4 flex items-center gap-2">
+          <span class="material-icons text-primary text-lg">person_add</span>
+          Invite Athlete
+        </h3>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <input
+            type="text"
+            [(ngModel)]="inviteUsername"
+            placeholder="Username or email"
+            class="input-field flex-1"
+            (keydown.enter)="inviteAthlete()" />
+          <select [(ngModel)]="inviteAccessLevel" class="input-field sm:w-36">
+            <option value="BASIC">BASIC</option>
+            <option value="FULL">FULL</option>
+          </select>
+          <button
+            (click)="inviteAthlete()"
+            [disabled]="!inviteUsername.trim() || inviting"
+            class="btn-primary flex items-center gap-2 whitespace-nowrap">
+            @if (inviting) {
+              <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+            } @else {
+              <span class="material-icons text-base">send</span>
+            }
+            Invite
+          </button>
+        </div>
+        @if (inviteMessage) {
+          <p [class]="inviteMessage.includes('sent') ? 'text-green-400 text-sm mt-3' : 'text-red-400 text-sm mt-3'">
+            {{ inviteMessage }}
+          </p>
+        }
+        <p class="text-muted-foreground text-xs mt-2">
+          BASIC access: activity feed only. FULL access: full Garmin health metrics.
+        </p>
+      </div>
+
+      <!-- Athlete List -->
+      <div class="space-y-3">
+        <h3 class="text-foreground font-semibold">Connected Athletes ({{ athletes.length }})</h3>
+        @if (athletes.length === 0) {
+          <div class="card text-center py-12">
+            <span class="material-icons text-muted-foreground/30 text-5xl">group</span>
+            <p class="text-muted-foreground mt-3">No connected athletes yet. Send an invite above.</p>
+          </div>
+        } @else {
+          @for (athlete of athletes; track athlete.id) {
+            <div class="card flex items-center gap-4">
+              @if (athlete.athleteProfileImageUrl) {
+                <img [src]="athlete.athleteProfileImageUrl" class="w-11 h-11 rounded-xl object-cover flex-shrink-0" />
+              } @else {
+                <div class="w-11 h-11 rounded-xl bg-primary/20 flex items-center justify-center text-primary font-bold flex-shrink-0">
+                  {{ athlete.athleteUsername?.substring(0,2)?.toUpperCase() }}
+                </div>
+              }
+              <div class="flex-1 min-w-0">
+                <p class="text-foreground font-semibold">{{ athlete.athleteUsername }}</p>
+                <div class="flex items-center gap-2 mt-0.5">
+                  <span class="badge bg-green-500/15 border border-green-500/30 text-green-400 text-xs">ACTIVE</span>
+                  <span class="badge bg-secondary border border-border text-muted-foreground text-xs">{{ athlete.garminAccessLevel }}</span>
+                </div>
+              </div>
+              <button
+                (click)="revokeConnection(athlete.id)"
+                class="text-sm text-muted-foreground hover:text-red-400 transition-colors flex items-center gap-1">
+                <span class="material-icons text-base">link_off</span>
+                Revoke
+              </button>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  }
+
+</div>

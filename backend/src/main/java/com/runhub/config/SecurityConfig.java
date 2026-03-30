@@ -34,8 +34,10 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/oauth/**").permitAll()
+                .requestMatchers("/api/oauth/strava/**").permitAll()
+                .requestMatchers("/api/oauth/garmin/connect", "/api/oauth/garmin/callback").permitAll()
                 .requestMatchers("/api/stripe-webhook").permitAll()
+                .requestMatchers("/api/webhooks/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/live-tracking/view/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/rankings/**").permitAll()

@@ -22,7 +22,8 @@
       "Bash(npx:*)",
       "Bash(/Users/macbook/.stitch-mcp/google-cloud-sdk/bin/gcloud auth:*)",
       "Bash(find /Users/macbook/Documents/CODE/urunner/runhub/frontend/src -name *ai* -o -name *coach*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(java --version)"
     ]
   }
 }

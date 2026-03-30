@@ -38,7 +38,8 @@ export class LayoutComponent implements OnInit {
     { path: '/notifications', icon: 'notifications', label: 'Notifications' },
     { path: '/profile', icon: 'person', label: 'Profile' },
     { path: '/chat', icon: 'chat', label: 'Chat' },
-    { path: '/export-studio', icon: 'photo_camera', label: 'Export Studio' }
+    { path: '/export-studio', icon: 'photo_camera', label: 'Export Studio' },
+    { path: '/coach', icon: 'sports', label: 'Coach Hub' }
   ];
 
   mobileNavItems = [
