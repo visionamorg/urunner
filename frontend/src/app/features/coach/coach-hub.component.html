@@ -26,7 +26,7 @@
       {id: 'team', icon: 'group', label: 'Team'}
     ]; track tab.id) {
       <button
-        (click)="switchTab(tab.id as any)"
+        (click)="switchTab(tab.id)"
         [class]="activeTab === tab.id
           ? 'flex-1 min-w-max flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-card border border-border text-foreground font-semibold text-sm transition-all'
           : 'flex-1 min-w-max flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-muted-foreground hover:text-foreground font-medium text-sm transition-all'">

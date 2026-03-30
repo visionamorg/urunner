@@ -71,8 +71,8 @@ export class CoachHubComponent implements OnInit {
     });
   }
 
-  switchTab(tab: 'feed' | 'readiness' | 'analytics' | 'team' | 'bulk'): void {
-    this.activeTab = tab;
+  switchTab(tab: string): void {
+    this.activeTab = tab as 'feed' | 'readiness' | 'analytics' | 'team' | 'bulk';
     if (tab === 'readiness' && this.readiness.length === 0) this.loadReadiness();
     if (tab === 'analytics' && this.analytics.length === 0) this.loadAnalytics();
   }

@@ -350,7 +350,7 @@
       } @else {
         <div class="space-y-3">
           @for (comment of coachingComments; track comment.id) {
-            <div class="bg-secondary border border-border rounded-xl p-4 space-y-2" [class.border-blue-500/30]="comment.pinnedToAthleteDashboard">
+            <div class="bg-secondary border border-border rounded-xl p-4 space-y-2" [ngClass]="{'border-blue-500/30': comment.pinnedToAthleteDashboard}">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                   <span class="material-icons text-blue-400 text-base">sports</span>
