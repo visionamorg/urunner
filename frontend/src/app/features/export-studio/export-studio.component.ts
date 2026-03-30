@@ -165,6 +165,9 @@ export class ExportStudioComponent implements OnInit {
   // Dark/Light mode for template elements
   templateColorMode: 'dark' | 'light' = 'dark';
 
+  // Transparent background for IG stories
+  transparentBackground = false;
+
   // Marketplace / Explore
   showMarketplace = false;
   communityTemplates: ExportTemplateDto[] = [];
@@ -471,7 +474,14 @@ export class ExportStudioComponent implements OnInit {
       clone.style.transformOrigin = 'top left';
       // Prevent app global navy (#050a18) from bleeding through the
       // canvas-frame, which has no explicit background-color of its own.
-      clone.style.background = '#0a0a0a';
+      clone.style.background = this.transparentBackground ? 'transparent' : '#0a0a0a';
+
+      // Hide background structural elements for transparent export
+      if (this.transparentBackground) {
+        clone.querySelectorAll('.canvas-bg, .canvas-photo-bg, .canvas-vignette, .canvas-collage').forEach(el => {
+          (el as HTMLElement).style.display = 'none';
+        });
+      }
 
       // Kill all CSS animations/transitions — they restart from frame 0
       // in the html2canvas clone iframe, causing elements (canvas-photo-bg,
@@ -536,7 +546,7 @@ export class ExportStudioComponent implements OnInit {
         height: this.canvasHeight,
         scale: 1,
         useCORS: true,
-        backgroundColor: '#0a0a0a',
+        backgroundColor: null,
         logging: false,
         onclone: (_d: Document, clone: HTMLElement) => {
           fixCloneBase(clone);
@@ -571,7 +581,7 @@ export class ExportStudioComponent implements OnInit {
       height: this.canvasHeight,
       scale: 1,
       useCORS: true,
-      backgroundColor: '#0a0a0a',
+      backgroundColor: null,
       logging: false,
       onclone: (_d: Document, clone: HTMLElement) => {
         fixCloneBase(clone);

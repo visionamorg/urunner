@@ -186,10 +186,11 @@
   <div class="studio-layout">
 
     <!-- Canvas Preview Area -->
-    <div class="canvas-wrapper">
+    <div class="canvas-wrapper" [class.is-transparent]="transparentBackground">
       <div class="canvas-frame" #canvasContainer [style.--accent-color]="accentColor"
         [style.--accent-rgb]="accentColorRgb" [style.--secondary-accent]="secondaryAccent"
         [style.width.px]="canvasWidth" [style.height.px]="canvasHeight" [class.format-square]="cardFormat === '1:1'"
+        [style.background]="transparentBackground ? 'transparent' : null"
         [class.format-landscape]="cardFormat === '16:9'">
 
         <!-- Default gradient background -->
@@ -198,12 +199,12 @@
         } @else if (selectedPattern) {
         <div class="canvas-bg canvas-pattern" [attr.data-pattern]="selectedPattern"></div>
         } @else {
-        <div class="canvas-bg"></div>
+        <div class="canvas-bg" [style.display]="transparentBackground ? 'none' : 'block'"></div>
         }
 
         <!-- User-uploaded background photo(s) -->
         @if (backgroundImages.length === 1) {
-        <div class="canvas-photo-bg" [style.background-image]="'url(' + backgroundImages[0] + ')'"
+        <div class="canvas-photo-bg" [style.display]="transparentBackground ? 'none' : 'block'" [style.background-image]="'url(' + backgroundImages[0] + ')'"
           [style.opacity]="backgroundOpacity / 100" [style.filter]="backgroundFilter">
         </div>
         <div class="canvas-vignette"></div>
@@ -1201,7 +1202,13 @@
         @if (sidebarTab === 'design') {
         <!-- Background -->
         <div class="control-section">
-          <h3 class="control-label">Background</h3>
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="control-label mb-0">Background</h3>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-bold uppercase text-muted-foreground opacity-60">Transparent</span>
+              <input type="checkbox" [(ngModel)]="transparentBackground" class="toggle-switch scale-75 origin-right">
+            </div>
+          </div>
           @if (backgroundImages.length === 0 && !selectedGradient && !selectedPattern) {
           <label class="bg-upload-btn">
             <span class="material-icons">add_photo_alternate</span>
