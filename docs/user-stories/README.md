@@ -19,3 +19,4 @@ Each story lives in its own file named `US-XXX-short-title.md`.
 | US-003 | [Home Page Clickable Cards & Community Gallery](US-003-home-page-clickable-gallery.md) | [x] Done |
 | US-004 | [Export Studio: Avatar in Export & Custom Branding](US-004-export-studio-branding-and-avatar-fix.md) | [x] Done |
 | US-005 | [Export Studio: Story Global Template](US-005-export-story-global-template.md) | [x] Done |
+| US-006 | [Garmin Workout Builder & Clipboard](US-006-garmin-workout-builder-and-clipboard.md) | [x] Done |

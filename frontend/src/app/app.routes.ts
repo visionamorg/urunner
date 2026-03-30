@@ -95,6 +95,10 @@ export const routes: Routes = [
       {
         path: 'coach',
         loadComponent: () => import('./features/coach/coach-hub.component').then(m => m.CoachHubComponent)
+      },
+      {
+        path: 'garmin-clipboard',
+        loadComponent: () => import('./features/garmin-clipboard/garmin-clipboard.component').then(m => m.GarminClipboardComponent)
       }
     ]
   },

@@ -11,6 +11,8 @@ import com.github.scribejava.core.oauth.OAuth10aService;
 import com.runhub.auth.service.GarminOAuthService;
 import com.runhub.programs.model.ProgramSession;
 import com.runhub.programs.model.UserProgramProgress;
+import com.runhub.running.model.GarminWorkout;
+import com.runhub.running.model.WorkoutStep;
 import com.runhub.programs.repository.ProgramSessionRepository;
 import com.runhub.programs.repository.UserProgramProgressRepository;
 import com.runhub.users.model.User;
@@ -154,6 +156,102 @@ public class GarminTrainingService {
         }
 
         return summary;
+    }
+
+    // ── G006: Push a structured GarminWorkout ────────────────────────────────
+
+    public Map<String, Object> pushStructuredWorkout(User user, GarminWorkout workout, String scheduledDate) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        try {
+            String workoutJson = buildStructuredWorkoutJson(workout);
+            String response = executePost(user, GARMIN_WORKOUT_URL, workoutJson);
+
+            JsonNode responseNode = objectMapper.readTree(response);
+            String garminWorkoutId = responseNode.has("workoutId")
+                    ? responseNode.get("workoutId").asText()
+                    : (responseNode.has("id") ? responseNode.get("id").asText() : null);
+
+            // Schedule to calendar date if provided
+            if (garminWorkoutId != null && !garminWorkoutId.isBlank() && scheduledDate != null && !scheduledDate.isBlank()) {
+                String scheduleJson = objectMapper.writeValueAsString(Map.of(
+                        "workoutId", garminWorkoutId,
+                        "date", scheduledDate
+                ));
+                executePost(user, GARMIN_SCHEDULE_URL, scheduleJson);
+            }
+
+            result.put("success", true);
+            result.put("garminWorkoutId", garminWorkoutId);
+            result.put("workoutId", workout.getId());
+            result.put("title", workout.getTitle());
+        } catch (Exception e) {
+            log.error("Failed to push structured workout {} for user {}", workout.getId(), user.getId(), e);
+            result.put("success", false);
+            result.put("error", e.getMessage());
+            result.put("workoutId", workout.getId());
+        }
+        return result;
+    }
+
+    private String buildStructuredWorkoutJson(GarminWorkout workout) throws Exception {
+        ObjectNode root = objectMapper.createObjectNode();
+        root.put("workoutName", workout.getTitle());
+        root.put("description", workout.getDescription() != null ? workout.getDescription() : "");
+        root.put("sport", workout.getSport() != null ? workout.getSport() : "RUNNING");
+
+        ArrayNode stepsNode = objectMapper.createArrayNode();
+        for (WorkoutStep step : workout.getSteps()) {
+            stepsNode.add(serializeStep(step));
+        }
+        root.set("steps", stepsNode);
+        return objectMapper.writeValueAsString(root);
+    }
+
+    private ObjectNode serializeStep(WorkoutStep step) {
+        ObjectNode node = objectMapper.createObjectNode();
+        node.put("type", step.getStepType() != null ? step.getStepType() : "INTERVAL");
+        node.put("notes", step.getNotes() != null ? step.getNotes() : "");
+
+        // Duration
+        ObjectNode duration = objectMapper.createObjectNode();
+        String durationUnit = step.getDurationUnit();
+        if (durationUnit == null || durationUnit.equals("OPEN") || durationUnit.equals("LAP_BUTTON")) {
+            duration.put("type", durationUnit != null ? durationUnit : "OPEN");
+        } else {
+            duration.put("type", durationUnit);
+            duration.put("value", step.getDurationValue() != null ? step.getDurationValue() : 0L);
+        }
+        node.set("duration", duration);
+
+        // Target
+        ObjectNode target = objectMapper.createObjectNode();
+        String targetType = step.getTargetType() != null ? step.getTargetType() : "NO_TARGET";
+        target.put("type", targetType);
+        if (step.getTargetLow() != null && !"NO_TARGET".equals(targetType)) {
+            if ("PACE".equals(targetType)) {
+                // Frontend stores sec/km; Garmin API expects sec/meter
+                target.put("targetLow", step.getTargetLow() / 1000.0);
+                target.put("targetHigh", step.getTargetHigh() != null ? step.getTargetHigh() / 1000.0 : step.getTargetLow() / 1000.0);
+            } else {
+                target.put("targetLow", step.getTargetLow());
+                target.put("targetHigh", step.getTargetHigh() != null ? step.getTargetHigh() : step.getTargetLow());
+            }
+        }
+        node.set("target", target);
+
+        // REPEAT step with nested children
+        if ("REPEAT".equals(step.getStepType())) {
+            node.put("repeatCount", step.getRepeatCount() != null ? step.getRepeatCount() : 1);
+            if (step.getChildren() != null && !step.getChildren().isEmpty()) {
+                ArrayNode childNodes = objectMapper.createArrayNode();
+                for (WorkoutStep child : step.getChildren()) {
+                    childNodes.add(serializeStep(child));
+                }
+                node.set("steps", childNodes);
+            }
+        }
+
+        return node;
     }
 
     // ── Helper: build Garmin workout JSON from ProgramSession ───────────────
