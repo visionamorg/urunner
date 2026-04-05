@@ -1,6 +1,7 @@
 package com.runhub.users.service;
 
 import com.runhub.config.ResourceNotFoundException;
+import com.runhub.users.dto.NotificationPreferenceDto;
 import com.runhub.users.dto.UpdateUserRequest;
 import com.runhub.users.dto.UserDto;
 import com.runhub.users.mapper.UserMapper;
@@ -55,6 +56,28 @@ public class UserService {
     public User getUserEntityByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
+    }
+
+    @Transactional
+    public NotificationPreferenceDto getNotificationPreferences(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        NotificationPreferenceDto dto = new NotificationPreferenceDto();
+        dto.setEmailInvites(user.getEmailInvites());
+        return dto;
+    }
+
+    @Transactional
+    public NotificationPreferenceDto updateNotificationPreferences(String email, NotificationPreferenceDto request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        if (request.getEmailInvites() != null) {
+            user.setEmailInvites(request.getEmailInvites());
+        }
+        userRepository.save(user);
+        NotificationPreferenceDto dto = new NotificationPreferenceDto();
+        dto.setEmailInvites(user.getEmailInvites());
+        return dto;
     }
 
     @Transactional

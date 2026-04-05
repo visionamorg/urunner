@@ -46,6 +46,7 @@ CREATE TABLE users (
     pb_half_marathon VARCHAR(20),
     pb_marathon VARCHAR(20),
     instagram_handle VARCHAR(100),
+    email_invites BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );

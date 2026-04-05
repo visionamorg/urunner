@@ -1,1 +1,12 @@
-// Tailwind only
+/* Chat tab: ensure input area never gets obscured by mobile browser chrome */
+.chat-container {
+  /* Use dvh for dynamic viewport height on iOS/Android browsers */
+  height: calc(100dvh - 320px);
+  min-height: 360px;
+}
+
+@media (min-width: 640px) {
+  .chat-container {
+    height: 600px;
+  }
+}

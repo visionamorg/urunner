@@ -26,6 +26,8 @@ public class CommunityMapper {
             dto.setCreatorUsername(community.getCreator().getDisplayUsername());
         }
 
+        dto.setLeaderboardMetric(community.getLeaderboardMetric() != null ? community.getLeaderboardMetric() : "DISTANCE");
+
         return dto;
     }
 
@@ -48,6 +50,8 @@ public class CommunityMapper {
             if (lastName != null && !lastName.isEmpty()) initials += lastName.charAt(0);
             dto.setInitials(initials.toUpperCase());
         }
+
+        dto.setLeaderboardOptOut(member.getLeaderboardOptOut() != null && member.getLeaderboardOptOut());
 
         return dto;
     }

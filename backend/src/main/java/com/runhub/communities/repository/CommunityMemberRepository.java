@@ -22,4 +22,7 @@ public interface CommunityMemberRepository extends JpaRepository<CommunityMember
 
     @Query("SELECT cm FROM CommunityMember cm WHERE cm.community.id = :communityId AND cm.user.id = :userId")
     Optional<CommunityMember> findByCommunityIdAndUserId(@Param("communityId") Long communityId, @Param("userId") Long userId);
+
+    @Query("SELECT cm.user.id FROM CommunityMember cm WHERE cm.community.id = :communityId AND (cm.leaderboardOptOut IS NULL OR cm.leaderboardOptOut = false)")
+    List<Long> findOptInUserIdsByCommunityId(@Param("communityId") Long communityId);
 }

@@ -7,6 +7,7 @@ import { CommunityMember } from '../../../core/models/community.model';
 import { CommunityService } from '../../../core/services/community.service';
 import { ChatService } from '../../../core/services/chat.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-community-rooms',
@@ -45,7 +46,8 @@ export class CommunityRoomsComponent implements OnInit {
   constructor(
     private communityService: CommunityService,
     private chatService: ChatService,
-    private authService: AuthService
+    private authService: AuthService,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -57,7 +59,7 @@ export class CommunityRoomsComponent implements OnInit {
     this.loadingRooms = true;
     this.communityService.getRooms(this.communityId).subscribe({
       next: (rooms) => { this.rooms = rooms; this.loadingRooms = false; },
-      error: () => { this.loadingRooms = false; }
+      error: () => { this.loadingRooms = false; this.toast.error('Failed to load rooms'); }
     });
   }
 
@@ -74,7 +76,7 @@ export class CommunityRoomsComponent implements OnInit {
     this.loadingMessages = true;
     this.chatService.getMessages(undefined, undefined, roomId).subscribe({
       next: (msgs) => { this.roomMessages = msgs; this.loadingMessages = false; },
-      error: () => { this.loadingMessages = false; }
+      error: () => { this.loadingMessages = false; this.toast.error('Failed to load messages'); }
     });
   }
 
@@ -95,7 +97,7 @@ export class CommunityRoomsComponent implements OnInit {
         this.messageInput = '';
         this.sendingMessage = false;
       },
-      error: () => { this.sendingMessage = false; }
+      error: () => { this.sendingMessage = false; this.toast.error('Message failed to send'); }
     });
   }
 
@@ -137,7 +139,7 @@ export class CommunityRoomsComponent implements OnInit {
           this.roomMessages = [];
         }
       },
-      error: (err) => alert(err.error?.message || 'Failed to delete room')
+      error: (err) => this.toast.error(err.error?.message || 'Failed to delete room')
     });
   }
 
@@ -161,7 +163,7 @@ export class CommunityRoomsComponent implements OnInit {
         this.roomMembers = this.roomMembers.filter(m => m.userId !== userId);
         if (this.selectedRoom) this.selectedRoom.memberCount = Math.max(0, this.selectedRoom.memberCount - 1);
       },
-      error: (err) => alert(err.error?.message || 'Failed to remove member')
+      error: (err) => this.toast.error(err.error?.message || 'Failed to remove member')
     });
   }
 

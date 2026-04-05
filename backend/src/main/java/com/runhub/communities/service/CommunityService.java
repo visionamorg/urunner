@@ -10,6 +10,7 @@ import com.runhub.communities.model.CommunityMemberId;
 import com.runhub.communities.model.CommunityTag;
 import com.runhub.communities.model.MemberTag;
 import com.runhub.communities.repository.*;
+import com.runhub.notifications.service.EmailService;
 import com.runhub.notifications.service.NotificationService;
 import com.runhub.config.BadRequestException;
 import com.runhub.config.ResourceNotFoundException;
@@ -45,6 +46,7 @@ public class CommunityService {
     private final FeedService feedService;
     private final PostRepository postRepository;
     private final NotificationService notificationService;
+    private final EmailService emailService;
     private final CommunityTagRepository tagRepository;
     private final MemberTagRepository memberTagRepository;
     private final ActivityRepository activityRepository;
@@ -241,7 +243,16 @@ public class CommunityService {
         notificationService.create(target, "INVITE",
                 "Community Invite",
                 admin.getDisplayUsername() + " invited you to join " + community.getName(),
-                "/notifications");
+                "/invites?token=" + invite.getToken());
+
+        if (Boolean.TRUE.equals(target.getEmailInvites())) {
+            emailService.sendCommunityInviteEmail(
+                    target.getEmail(),
+                    target.getDisplayUsername(),
+                    admin.getDisplayUsername(),
+                    community.getName(),
+                    invite.getToken());
+        }
 
         return toInviteDto(invite);
     }

@@ -384,12 +384,12 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
     if (this.community.joined) {
       this.communityService.leave(this.communityId).subscribe({
         next: () => this.loadCommunity(),
-        error: (err) => console.error(err)
+        error: () => this.toast.error('Failed to leave community')
       });
     } else {
       this.communityService.join(this.communityId).subscribe({
         next: () => this.loadCommunity(),
-        error: (err) => console.error(err)
+        error: () => this.toast.error('Failed to join community')
       });
     }
   }
@@ -404,7 +404,7 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
         this.posts.unshift(post);
         this.postContent = '';
       },
-      error: (err) => console.error(err)
+      error: () => this.toast.error('Failed to create post')
     });
   }
 
@@ -455,7 +455,7 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
         }
         this.commentInput[postId] = '';
       },
-      error: (err) => console.error(err)
+      error: () => this.toast.error('Failed to post comment')
     });
   }
 
@@ -607,8 +607,8 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
         this.settingsSuccess = true;
         setTimeout(() => { this.settingsSuccess = false; }, 3000);
       },
-      error: (err) => {
-        console.error(err);
+      error: () => {
+        this.toast.error('Failed to save settings');
         this.settingsSaving = false;
       }
     });

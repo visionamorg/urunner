@@ -14,6 +14,8 @@ import com.runhub.feed.service.FeedService;
 import com.runhub.programs.dto.*;
 import com.runhub.programs.service.ProgramService;
 import com.runhub.users.model.User;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/communities")
 @RequiredArgsConstructor
+@Tag(name = "Communities", description = "Create and manage running communities, members, feed, events, and programs")
 public class CommunityController {
 
     private final CommunityService communityService;
@@ -38,22 +41,26 @@ public class CommunityController {
     // ── Community CRUD ────────────────────────────────────────────────────────
 
     @GetMapping
+    @Operation(summary = "List communities", description = "Returns all communities; private communities are hidden unless the user is a member")
     public List<CommunityDto> getAll(@AuthenticationPrincipal User user) {
         return communityService.getAllCommunities(user);
     }
 
     @PostMapping
+    @Operation(summary = "Create a community", description = "Creates a new running community with the authenticated user as admin")
     public CommunityDto create(@RequestBody CreateCommunityRequest req,
                                @AuthenticationPrincipal User user) {
         return communityService.createCommunity(req, user);
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get community", description = "Returns full details for a single community including member count and cover photo")
     public CommunityDto getOne(@PathVariable Long id, @AuthenticationPrincipal User user) {
         return communityService.getCommunity(id, user);
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update community", description = "Updates community settings; requires ADMIN role within the community")
     public CommunityDto update(@PathVariable Long id,
                                @RequestBody UpdateCommunityRequest req,
                                @AuthenticationPrincipal User user) {
@@ -63,12 +70,14 @@ public class CommunityController {
     // ── Join / Leave ──────────────────────────────────────────────────────────
 
     @PostMapping("/{id}/join")
+    @Operation(summary = "Join community", description = "Adds the authenticated user as a MEMBER of the community")
     public ResponseEntity<Void> join(@PathVariable Long id, @AuthenticationPrincipal User user) {
         communityService.joinCommunity(id, user);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}/leave")
+    @Operation(summary = "Leave community", description = "Removes the authenticated user from the community")
     public ResponseEntity<Void> leave(@PathVariable Long id, @AuthenticationPrincipal User user) {
         communityService.leaveCommunity(id, user);
         return ResponseEntity.ok().build();

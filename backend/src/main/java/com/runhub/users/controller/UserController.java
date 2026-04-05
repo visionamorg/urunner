@@ -1,5 +1,6 @@
 package com.runhub.users.controller;
 
+import com.runhub.users.dto.NotificationPreferenceDto;
 import com.runhub.users.dto.UpdateUserRequest;
 import com.runhub.users.dto.UserDto;
 import com.runhub.users.service.UserService;
@@ -29,5 +30,17 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    @GetMapping("/me/notification-preferences")
+    public ResponseEntity<NotificationPreferenceDto> getNotificationPreferences(Principal principal) {
+        return ResponseEntity.ok(userService.getNotificationPreferences(principal.getName()));
+    }
+
+    @PatchMapping("/me/notification-preferences")
+    public ResponseEntity<NotificationPreferenceDto> updateNotificationPreferences(
+            Principal principal,
+            @RequestBody NotificationPreferenceDto request) {
+        return ResponseEntity.ok(userService.updateNotificationPreferences(principal.getName(), request));
     }
 }

@@ -7,6 +7,8 @@ import com.runhub.events.dto.GalleryPhotoDto;
 import com.runhub.events.service.EventService;
 import com.runhub.events.service.EventGalleryService;
 import com.runhub.events.service.GpxService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -25,6 +27,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/events")
 @RequiredArgsConstructor
+@Tag(name = "Events", description = "Browse and register for running events; manage GPX routes and photo galleries")
 public class EventController {
 
     private final EventService eventService;
@@ -32,37 +35,44 @@ public class EventController {
     private final GpxService gpxService;
 
     @GetMapping
+    @Operation(summary = "List all events", description = "Returns all upcoming and past running events")
     public ResponseEntity<List<EventDto>> getAllEvents() {
         return ResponseEntity.ok(eventService.getAllEvents());
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get event by ID", description = "Returns full details for a single event")
     public ResponseEntity<EventDto> getEventById(@PathVariable Long id) {
         return ResponseEntity.ok(eventService.getEventById(id));
     }
 
     @PostMapping
+    @Operation(summary = "Create an event", description = "Creates a standalone event (not tied to a community)")
     public ResponseEntity<EventDto> createEvent(Principal principal, @RequestBody CreateEventRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(eventService.createEvent(principal.getName(), request));
     }
 
     @PostMapping("/{id}/register")
+    @Operation(summary = "Register as participant", description = "Registers the authenticated user as a runner for the event")
     public ResponseEntity<EventParticipantDto> registerForEvent(@PathVariable Long id, Principal principal) {
         return ResponseEntity.ok(eventService.registerForEvent(id, principal.getName()));
     }
 
     @PostMapping("/{id}/register/volunteer")
+    @Operation(summary = "Register as volunteer", description = "Registers the authenticated user as a volunteer for the event")
     public ResponseEntity<EventParticipantDto> registerVolunteer(@PathVariable Long id, Principal principal) {
         return ResponseEntity.ok(eventService.registerVolunteer(id, principal.getName()));
     }
 
     @PostMapping("/{id}/cancel")
+    @Operation(summary = "Cancel registration", description = "Cancels the authenticated user's registration for the event")
     public ResponseEntity<Void> cancelRegistration(@PathVariable Long id, Principal principal) {
         eventService.cancelRegistration(id, principal.getName());
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{id}/participants")
+    @Operation(summary = "Get participants", description = "Lists participants filtered by role (RUNNER/VOLUNTEER) and status (REGISTERED/CANCELLED)")
     public ResponseEntity<List<EventParticipantDto>> getParticipants(
             @PathVariable Long id,
             @RequestParam(required = false) String role,

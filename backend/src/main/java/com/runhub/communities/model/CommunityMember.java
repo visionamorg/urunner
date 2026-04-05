@@ -35,4 +35,8 @@ public class CommunityMember {
     @Column(name = "joined_at", nullable = false, updatable = false)
     @Builder.Default
     private LocalDateTime joinedAt = LocalDateTime.now();
+
+    @Column(name = "leaderboard_opt_out", nullable = false)
+    @Builder.Default
+    private Boolean leaderboardOptOut = false;
 }

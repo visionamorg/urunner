@@ -1,5 +1,7 @@
 # User Story: US-S001 - The Ultimate Strava Sync (Fix & Auto) 🚴‍♂️⚡️
 
+### Status: DONE
+
 **As a** runner using Strava,
 **I want** to connect my account once and have my activities sync automatically without duplicates,
 **So that** my Runhub dashboard is always up-to-date and reliable without any manual maintenance.

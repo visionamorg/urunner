@@ -36,7 +36,8 @@
       "WebFetch(domain:conyxit.com)",
       "mcp__ide__getDiagnostics",
       "Bash(pip3 install:*)",
-      "Bash(python3 -c \":*)"
+      "Bash(python3 -c \":*)",
+      "Bash(DOCKER_HOST=unix:///var/run/docker.sock docker compose -f /Users/macbook/Documents/CODE/urunner/runhub/docker-compose.yml exec -T postgres psql -U runhub -d runhub -c \"ALTER TABLE users ADD COLUMN IF NOT EXISTS email_invites BOOLEAN NOT NULL DEFAULT TRUE;\")"
     ]
   }
 }

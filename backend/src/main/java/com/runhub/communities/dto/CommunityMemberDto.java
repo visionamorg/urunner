@@ -19,4 +19,5 @@ public class CommunityMemberDto {
     private List<CommunityTagDto> tags = new ArrayList<>();
     private LocalDateTime lastRunDate;
     private Long messageCount30d;
+    private Boolean leaderboardOptOut;
 }

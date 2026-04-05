@@ -43,18 +43,18 @@
             class="relative aspect-square flex flex-col items-center justify-start pt-1 rounded-xl text-sm transition-all"
             [class]="[
               !day.isCurrentMonth ? 'opacity-30' : '',
-              day.isToday ? 'bg-primary/20 border border-primary/50 text-primary font-bold' :
+              day.isToday ? 'bg-gradient-to-br from-amber-500 to-orange-500 text-white font-bold shadow-lg shadow-orange-500/30' :
                 selectedDay && selectedDay.date.toDateString() === day.date.toDateString()
-                  ? 'bg-secondary border border-border text-foreground'
+                  ? 'bg-primary/15 border border-primary/40 text-primary font-semibold'
                   : 'hover:bg-secondary text-foreground',
-              day.events.length > 0 ? 'font-semibold' : ''
+              day.events.length > 0 && !day.isToday ? 'ring-1 ring-primary/30' : ''
             ].join(' ')">
             <span class="text-xs leading-tight">{{ day.date.getDate() }}</span>
             @if (day.events.length > 0) {
               <div class="flex gap-0.5 mt-0.5 flex-wrap justify-center">
                 @for (ev of day.events.slice(0, 3); track ev.id) {
                   <div class="w-1.5 h-1.5 rounded-full"
-                    [class]="ev.isCancelled ? 'bg-red-400' : 'bg-primary'"></div>
+                    [class]="ev.isCancelled ? 'bg-red-400' : (day.isToday ? 'bg-white/80' : 'bg-amber-500')"></div>
                 }
               </div>
             }
@@ -71,14 +71,14 @@
             <div class="text-center pb-1 border-b border-border">
               <div class="text-xs text-muted-foreground font-medium">{{ wd.date | date:'EEE' }}</div>
               <div class="w-7 h-7 rounded-full mx-auto flex items-center justify-center text-sm font-bold mt-0.5"
-                [class]="isToday(wd.date) ? 'bg-primary text-foreground' : isSelectedDate(wd.date) ? 'bg-secondary text-foreground border border-border' : 'text-muted-foreground'">
+                [class]="isToday(wd.date) ? 'bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-sm shadow-orange-500/40' : isSelectedDate(wd.date) ? 'bg-primary/15 text-primary border border-primary/40' : 'text-muted-foreground'">
                 {{ wd.date | date:'d' }}
               </div>
             </div>
             <div class="space-y-1 px-0.5">
               @for (ev of wd.events; track ev.id) {
                 <div class="rounded-lg px-1.5 py-1 text-xs truncate"
-                  [class]="ev.isCancelled ? 'bg-destructive/20 text-destructive' : 'bg-primary/20 text-primary'">
+                  [class]="ev.isCancelled ? 'bg-destructive/20 text-destructive' : 'bg-amber-500/20 text-amber-400 border border-amber-500/20'">
                   {{ ev.name }}
                 </div>
               }
@@ -107,8 +107,8 @@
             <div class="flex items-start gap-3 p-3 bg-secondary rounded-xl border border-border"
               [class]="event.isCancelled ? 'opacity-60' : ''">
               <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                [class]="event.isCancelled ? 'bg-destructive/20' : 'bg-primary/20'">
-                <span class="material-icons text-base" [class]="event.isCancelled ? 'text-destructive' : 'text-primary'">
+                [class]="event.isCancelled ? 'bg-destructive/20' : 'bg-gradient-to-br from-amber-500/20 to-orange-500/20'">
+                <span class="material-icons text-base" [class]="event.isCancelled ? 'text-destructive' : 'text-amber-500'">
                   {{ event.isCancelled ? 'event_busy' : 'directions_run' }}
                 </span>
               </div>
@@ -143,8 +143,8 @@
             <div class="flex items-start gap-3 p-3 bg-secondary rounded-xl border border-border"
               [class]="event.isCancelled ? 'opacity-60' : ''">
               <div class="flex-shrink-0 w-12 h-12 rounded-xl flex flex-col items-center justify-center text-center"
-                [class]="event.isCancelled ? 'bg-destructive/20' : 'bg-primary/20'">
-                <span class="text-xs font-bold leading-none" [class]="event.isCancelled ? 'text-destructive' : 'text-primary'">{{ event.eventDate | date:'MMM' }}</span>
+                [class]="event.isCancelled ? 'bg-destructive/20' : 'bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/20'">
+                <span class="text-xs font-bold leading-none" [class]="event.isCancelled ? 'text-destructive' : 'text-amber-500'">{{ event.eventDate | date:'MMM' }}</span>
                 <span class="text-lg font-black text-foreground leading-tight">{{ event.eventDate | date:'d' }}</span>
               </div>
               <div class="flex-1 min-w-0">
@@ -195,10 +195,10 @@
         <div class="space-y-3">
           @for (event of selectedDay.events; track event.id) {
             <div class="flex items-start gap-3 p-3 bg-secondary rounded-xl border border-border"
-              [class]="event.isCancelled ? 'opacity-60' : ''">
+              [class]="event.isCancelled ? 'opacity-60' : 'hover:border-amber-500/30 transition-colors'">
               <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                [class]="event.isCancelled ? 'bg-destructive/20' : 'bg-primary/20'">
-                <span class="material-icons text-base" [class]="event.isCancelled ? 'text-destructive' : 'text-primary'">
+                [class]="event.isCancelled ? 'bg-destructive/20' : 'bg-gradient-to-br from-amber-500/20 to-orange-500/20'">
+                <span class="material-icons text-base" [class]="event.isCancelled ? 'text-destructive' : 'text-amber-500'">
                   {{ event.isCancelled ? 'event_busy' : 'directions_run' }}
                 </span>
               </div>

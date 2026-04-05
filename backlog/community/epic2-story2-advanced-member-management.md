@@ -10,11 +10,13 @@ As communities grow from 10 members to 1,000 members, the basic "Admin" and "Mem
 Furthermore, admins need an "Analytics/Activity" dashboard inside the Members Tab to see who hasn't logged a run in the last 30 days, or who is the most vocal in chat, empowering them to moderate or engage effectively.
 
 ### Acceptance Criteria
-- [ ] Admins can create custom "Roles" or "Tags" (e.g., Pacer, Coach) with custom hex colors.
-- [ ] Admins can assign these custom roles to members via the "Members" tab.
-- [ ] Member tags are rendered prominently as badges next to their username in the Community Feed, Chat Rooms, and Leaderboards.
-- [ ] Admins have an "Activity" view in the Members tab that shows "Last Run Logged Date" and "Messages Sent (30d)" for every member.
-- [ ] Admins can batch-select inactive members (e.g., no run in 60 days) and send them a re-engagement notification or remove them.
+- [x] Admins can create custom "Roles" or "Tags" (e.g., Pacer, Coach) with custom hex colors.
+- [x] Admins can assign these custom roles to members via the "Members" tab.
+- [x] Member tags are rendered prominently as badges next to their username in the Community Feed, Chat Rooms, and Leaderboards.
+- [x] Admins have an "Activity" view in the Members tab that shows "Last Run Logged Date" and "Messages Sent (30d)" for every member.
+- [x] Admins can batch-select inactive members (e.g., no run in 60 days) and send them a re-engagement notification or remove them.
+
+### Status: DONE (2026-04-05)
 
 ### Technical Notes for Claude
 - Update `CommunityMember.java` to support multiple roles, or create a new `CommunityTag` entity mapping to members.

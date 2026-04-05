@@ -90,6 +90,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- JavaMailSender -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
         <!-- ScribeJava for OAuth 1.0a (Garmin) -->
         <dependency>
             <groupId>com.github.scribejava</groupId>

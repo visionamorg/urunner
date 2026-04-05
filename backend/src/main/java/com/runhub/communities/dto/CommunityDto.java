@@ -27,4 +27,5 @@ public class CommunityDto {
     private Boolean isPremium;
     private String stripePaymentUrl;
     private List<SponsorDto> sponsors;
+    private String leaderboardMetric;
 }

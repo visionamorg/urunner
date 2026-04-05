@@ -121,6 +121,12 @@ public class User implements UserDetails {
     @Builder.Default
     private Role role = Role.USER;
 
+    // ── Notification Preferences ────────────────────────────────────────────
+
+    @Column(name = "email_invites", nullable = false)
+    @Builder.Default
+    private Boolean emailInvites = true;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
