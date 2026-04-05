@@ -1,5 +1,7 @@
 # User Story: US-G007 - LiveTrack Integration & Mirroring
 
+### Status: DONE
+
 **As a** runner training in remote areas,
 **I want** my friends on Runhub to see my live location via my Garmin LiveTrack,
 **So that** they can cheer for me and ensure I am safe.

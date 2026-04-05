@@ -1,5 +1,7 @@
 # User Story: US-G001 - Garmin OAuth 1.0a Stabilization
 
+### Status: DONE
+
 **As a** runner,
 **I want** to securely and reliably connect my Garmin account to Runhub,
 **So that** I don't experience synchronization interruptions or login failures.

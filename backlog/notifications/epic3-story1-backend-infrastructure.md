@@ -1,6 +1,8 @@
 # Epic 3: Global Notification System
 ## Story 1: Core Backend Notification Infrastructure
 
+### Status: DONE
+
 **As a** System Architect / Backend Developer
 **I want** a unified, scalable Notification infrastructure
 **So that** any microservice or module (Community, Feed, Users) can easily trigger real-time alerts.

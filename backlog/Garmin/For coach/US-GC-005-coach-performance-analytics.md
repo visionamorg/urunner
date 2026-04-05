@@ -1,5 +1,7 @@
 # User Story: US-GC-005 - Coach Performance Analysis (Team CTL/ATL)
 
+### Status: DONE
+
 **As a** coach,
 **I want** to see an overlaid chart of my team's Fitness (CTL) and Fatigue (ATL) over any date range,
 **So that** I can detect which athlete is peaking at the right time and who needs an extra recovery week.

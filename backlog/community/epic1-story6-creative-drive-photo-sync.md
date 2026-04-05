@@ -1,6 +1,8 @@
 # Epic: Community Growth & Engagement
 ## Story: Creative - Smart Event Galleries & Google Drive Sync
 
+### Status: DONE
+
 **As a** Community Member or Admin
 **I want** a smart way to sync and view photos from Google Drive for specific events
 **So that** I don't have to scroll through a single feed post, and I can easily find photos of myself using AI recognition.

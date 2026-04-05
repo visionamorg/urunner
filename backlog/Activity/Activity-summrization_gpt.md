@@ -1,6 +1,8 @@
 # Epic: AI-Driven Activity Intelligence
 ## Story: Personalized Activity Summarization, Insights & Conversational Coaching
 
+### Status: DONE
+
 **As a** runner tracking my training in the application,
 **I want** to access a deep, AI-powered analysis of my individual running sessions,
 **So that** I can understand not just the numbers (distance, pace, duration), but the *meaning* behind them, get actionable advice for my next run, and have a conversational AI partner to discuss my performance and progress.

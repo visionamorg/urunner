@@ -1,6 +1,8 @@
 # Epic 3: Global Notification System
 ## Story 4: Hooking Up Application Triggers (Social & Community)
 
+### Status: DONE
+
 **As a** System Architect
 **I want** all major user interactions in Community and Feed to trigger the Notification Service
 **So that** the entire notification system is actively populated with real data.

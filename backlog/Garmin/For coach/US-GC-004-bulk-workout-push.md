@@ -1,5 +1,7 @@
 # User Story: US-GC-004 - Bulk Workout Push to Garmin Calendars (Coach Tool)
 
+### Status: DONE
+
 **As a** coach,
 **I want** to push a training session to an entire group of athletes' Garmin calendars at once,
 **So that** I don't have to manually update each individual training schedule.

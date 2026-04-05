@@ -1,6 +1,6 @@
 # US-005 — Export Studio: Story Global Template
 
-## Status: [~] In Progress
+## Status: [x] Done
 
 ## Description
 Add a new export template called **Story Global** — an editorial, magazine-quality story card inspired by modern running community aesthetics (Strava shares, run club posters).

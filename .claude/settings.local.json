@@ -26,7 +26,17 @@
       "Bash(java --version)",
       "Bash(grep:*)",
       "Bash(find /Users/macbook/Documents/CODE/urunner/runhub/backend/src/main/resources/db/migration -name *.sql)",
-      "Bash(find /Users/macbook/Documents/CODE/urunner/runhub -path *migration* -name *.sql)"
+      "Bash(find /Users/macbook/Documents/CODE/urunner/runhub -path *migration* -name *.sql)",
+      "Read(//Users/macbook/Documents/CODE/**)",
+      "WebSearch",
+      "WebFetch(domain:www.servicenow.com)",
+      "WebFetch(domain:serviceportal.io)",
+      "WebFetch(domain:www.dylanlindgren.com)",
+      "WebFetch(domain:codecreative.io)",
+      "WebFetch(domain:conyxit.com)",
+      "mcp__ide__getDiagnostics",
+      "Bash(pip3 install:*)",
+      "Bash(python3 -c \":*)"
     ]
   }
 }

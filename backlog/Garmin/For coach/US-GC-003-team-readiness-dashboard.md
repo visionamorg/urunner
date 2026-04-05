@@ -1,5 +1,7 @@
 # User Story: US-GC-003 - Team Readiness Dashboard (HRV, Sleep, Stress)
 
+### Status: DONE
+
 **As a** coach,
 **I want** to see an overview of my team's morning readiness and recovery metrics from their Garmin devices,
 **So that** I can adjust or cancel hard training sessions for an athlete showing signs of overtraining or illness.

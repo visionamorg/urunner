@@ -1,6 +1,8 @@
 # Epic: Community MVP & Enhancements
 ## Story: MVP3 - Make Community Chat & Rooms Functional
 
+### Status: DONE
+
 **As a** Community Member or Admin
 **I want** the Chat and Rooms tabs to be fully functional
 **So that** I can engage with other members and communicate in private groups.

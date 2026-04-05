@@ -1,5 +1,7 @@
 # Story: Streak Safeguard (Motivation & Consistency)
 
+### Status: DONE
+
 ## 🎯 Goal
 Protect the user's "Running Streak" from being broken by unforeseen circumstances (illness, travel, injury), maintaining long-term psychological motivation.
 

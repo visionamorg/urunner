@@ -1,5 +1,7 @@
 # User Story: US-G002 - Real-time Webhook Activity Sync
 
+### Status: DONE
+
 **As a** runner,
 **I want** my Garmin runs to appear on Runhub immediately after I save them on my watch,
 **So that** I can see my stats and share my achievements without manual refreshing.

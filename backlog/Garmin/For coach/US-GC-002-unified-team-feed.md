@@ -1,5 +1,7 @@
 # User Story: US-GC-002 - The Unified Team Performance Feed
 
+### Status: DONE
+
 **As a** coach,
 **I want** to see a single activity feed of all my connected athletes,
 **So that** I don't have to check each member's profile individually to see their morning run.

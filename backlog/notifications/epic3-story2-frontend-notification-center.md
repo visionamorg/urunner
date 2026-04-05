@@ -1,6 +1,8 @@
 # Epic 3: Global Notification System
 ## Story 2: In-App Notification Center (Frontend UI)
 
+### Status: DONE
+
 **As a** User of the RunHub platform
 **I want to** see a "Bell" icon with an unread badge that opens a dropdown of my latest alerts
 **So that** I know exactly when I've been tagged, invited, or replied to without checking every page.

@@ -1,5 +1,7 @@
 # Story: Shoe Lifecycle Tracker (Injury Prevention)
 
+### Status: DONE
+
 ## 🎯 Goal
 Protect runners by tracking the mileage of their gear and providing timely reminders to replace shoes before they lose their cushioning.
 

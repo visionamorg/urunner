@@ -1,5 +1,7 @@
 # User Story: US-G004 - Push Structured Workouts to Garmin Connect
 
+### Status: DONE
+
 **As a** runner following a training plan,
 **I want** to see my today's workout directly on my Garmin watch,
 **So that** I can follow the prescribed intervals and segments without memorizing them.

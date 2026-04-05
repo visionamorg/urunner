@@ -1,6 +1,8 @@
 # Epic: Community Management & Growth
 ## Story: Feature - Seed Demo Data for "UR Urban Runners Casablanca"
 
+### Status: DONE
+
 **As a** Presenter / System Admin
 **I want to** have a database seeder that automatically provisions a fully populated demonstration community
 **So that** I can reliably showcase the platform's capabilities with realistic, localized data without manual setup.

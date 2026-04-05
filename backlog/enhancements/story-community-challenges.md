@@ -1,5 +1,7 @@
 # Story: Community Challenges & Rewards
 
+### Status: DONE
+
 ## 🎯 Goal
 Drive user engagement and retention by allowing communities to set collective goals and reward their members for achieving them.
 

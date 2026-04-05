@@ -1,5 +1,7 @@
 # User Story: US-G006 - Sync Core Health & Readiness Metrics
 
+### Status: DONE
+
 **As a** serious runner,
 **I want** Runhub to track my daily recovery and health stats (HRV, Sleep, VO2 Max),
 **So that** I can receive better AI coaching advice based on my physical readiness.

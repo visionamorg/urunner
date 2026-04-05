@@ -1,6 +1,8 @@
 # Epic 6: Activity Telemetry & Strava/Garmin Sync
 ## Story 1: Feature - Deep Dive Activity Stats & Interactive Map
 
+### Status: DONE
+
 **As a** Dedicated Runner
 **I want to** see detailed telemetry data (Heart Rate, Cadence, Elevation) and an interactive map for my runs synced from Strava or Garmin
 **So that** my Activity Details page isn't just basic text, but rather a rich dashboard displaying my true performance alongside my AI insights.

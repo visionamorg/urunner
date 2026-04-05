@@ -1,5 +1,7 @@
 # User Story: US-GC-006 - Coach-Athlete Garmin Feedback Hub
 
+### Status: DONE
+
 **As a** coach,
 **I want** to provide comments and direct feedback on my athletes' Garmin activity laps and data summaries,
 **So that** I can suggest adjustments to their pacing, form, or heart rate zones directly where the data is.

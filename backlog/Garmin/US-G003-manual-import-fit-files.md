@@ -1,5 +1,7 @@
 # User Story: US-G003 - Manual .FIT File Import
 
+### Status: DONE
+
 **As a** runner using an unsupported device or experiencing sync issues,
 **I want** to manually upload my `.FIT` activity files,
 **So that** I don't lose my training data on the Runhub platform.
