@@ -28,7 +28,7 @@ The backend notification infrastructure and in-app notification center are alrea
 
 ---
 
-## US-N02 — Community Feed Notification Triggers
+## ✅ US-N02 — Community Feed Notification Triggers — **DONE 2026-04-10**
 
 **Priority:** 🟡 Medium
 **From:** `backlog/notifications/epic3-story4-community-feed-triggers.md`
@@ -44,7 +44,7 @@ The backend notification infrastructure and in-app notification center are alrea
 
 ---
 
-## US-N03 — 24h Event Reminder
+## ✅ US-N03 — 24h Event Reminder — **DONE 2026-04-10**
 
 **Priority:** 🟢 Low
 

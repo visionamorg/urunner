@@ -12,7 +12,7 @@ Deeper analysis of individual activities beyond the current total stats.
 
 ---
 
-## US-A01 — AI Activity Summary & Insights
+## ✅ US-A01 — AI Activity Summary & Insights — **DONE 2026-04-10** (async trigger wired)
 
 **Priority:** 🟡 Medium
 **From:** `backlog/Activity/Activity-summrization_gpt.md`

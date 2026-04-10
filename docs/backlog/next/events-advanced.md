@@ -10,7 +10,7 @@ Extensions beyond basic event listing and registration.
 
 ---
 
-## US-EV01 — Event Ticketing & QR Check-In
+## ✅ US-EV01 — Event Ticketing & QR Check-In — **DONE 2026-04-10**
 
 **Priority:** 🟡 Medium
 **From:** `backlog/payments/epic5-story2` + `backlog/events/epic4-story2-ticketing-and-volunteers.md`

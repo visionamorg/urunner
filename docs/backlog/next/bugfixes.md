@@ -14,7 +14,7 @@ Actionable bugs identified across the codebase. Fix before or alongside new feat
 | B-004 | `StravaSyncService.java` | Magic number: 0.1km minimum distance blocks syncing short intervals/sprints |
 | B-005 | `StravaSyncService.java` | Silent failure: `parseDate` falls back to `LocalDate.now()` — corrupts activity timeline |
 | B-006 | `StravaSyncService.java` | Magic string: `"strava_"` prefix hardcoded — use an ID strategy class |
-| B-007 | `GlobalExceptionHandler.java` | No handler for `DataIntegrityViolationException` — users get 500 instead of 409 |
+| ~~B-007~~ | `GlobalExceptionHandler.java` | No handler for `DataIntegrityViolationException` — users get 500 instead of 409  ✅ **Fixed 2026-04-10** |
 | B-008 | `StravaSyncService.java` | `catch (Exception e)` swallows critical errors in the auto-sync loop |
 | B-009 | `StravaSyncService.java` | `@Scheduled` task is sequential — one hung user blocks all others. Use TaskExecutor |
 | B-010 | `RunningActivityController.java` | DTOs not annotated `@Valid` — allows negative distance or null dates |
@@ -23,10 +23,10 @@ Actionable bugs identified across the codebase. Fix before or alongside new feat
 | B-013 | `RunningActivity.java` | Pace = minutes / distance — if distance near-zero, pace becomes infinite (divide-by-zero) |
 | B-014 | `User.java` | `LocalDateTime.now()` uses server local time — use `Instant` for global consistency |
 | B-015 | `Event.java` | `updated_at` may not auto-update if `@PreUpdate` / `@EntityListeners` missing |
-| B-016 | `JwtService.java` | Fallback JWT secret hardcoded in code — must fail fast if env var missing |
+| ~~B-016~~ | `JwtService.java` | Fallback JWT secret hardcoded in code — must fail fast if env var missing  ✅ **Fixed 2026-04-10** |
 | B-017 | `SecurityConfig.java` | `allowedOrigins("*")` may be active in dev profiles — CSRF risk |
 | B-018 | `AuthController.java` | No rate limiting on login/register — brute force vulnerability |
-| B-019 | `PostRepository.java` | N+1 query: feed fetch doesn't join `author` or `likes` — causes N+1 on every scroll |
+| ~~B-019~~ | `PostRepository.java` | N+1 query: feed fetch doesn't join `author` or `likes` — causes N+1 on every scroll  ✅ **Fixed 2026-04-10** |
 | B-020 | `RankingController.java` | Full leaderboard returned without pagination — will break at scale |
 
 ---
@@ -39,15 +39,15 @@ Actionable bugs identified across the codebase. Fix before or alongside new feat
 | B-022 | `ActivityDetailComponent.ts` | RxJS observables not unsubscribed `OnDestroy` — memory leak |
 | B-023 | `LoginComponent.html` | Validation errors not shown — user sees button pulse but no error message |
 | B-024 | `environment.ts` | `/api/` hardcoded in some services instead of a configurable constant |
-| B-025 | `LayoutComponent.css` | Bottom nav covers last list item on iPhone — safe-area inset missing |
+| ~~B-025~~ | `LayoutComponent.css` | Bottom nav covers last list item on iPhone — safe-area inset missing  ✅ **Fixed 2026-04-10** |
 | B-026 | `ActivityCardComponent.html` | Dates show as `2024-03-28` not localized (`Mar 28`) |
-| B-027 | `ActivityDetailComponent.ts` | Delete button has no confirmation dialog — immediate destructive action |
-| B-028 | `AuthInterceptor.ts` | 401 on JWT expiry not handled → loop of failed requests |
+| ~~B-027~~ | `ActivityDetailComponent.ts` | Delete button has no confirmation dialog — immediate destructive action  ✅ **Fixed 2026-04-10** |
+| ~~B-028~~ | `AuthInterceptor.ts` | 401 on JWT expiry not handled → loop of failed requests  ✅ **Fixed 2026-04-10** |
 | B-029 | `index.html` | White flash on startup before dark theme JS loads |
 | B-030 | `src/assets` | Default Angular favicon, not RunHub branded |
 | B-031 | `MapComponent.ts` | Marathon-length polyline crashes low-end devices — needs point simplification |
-| B-032 | `CommunitiesComponent.html` | No "empty state" when user has no communities — blank screen shown |
-| B-033 | `AvatarComponent.html` | Broken profile images show 404 icon instead of initials placeholder |
+| ~~B-032~~ | `CommunitiesComponent.html` | No "empty state" when user has no communities — blank screen shown  ✅ **Fixed 2026-04-10** |
+| ~~B-033~~ | `AvatarComponent.html` | Broken profile images show 404 icon instead of initials placeholder  ✅ **Fixed 2026-04-10** |
 | B-034 | `CommunitySearch.ts` | Every keystroke fires an API call — needs `debounceTime(300)` |
 | B-035 | `ExportStudioComponent.html` | Some buttons have hardcoded English strings (not i18n-ready) |
 | B-036 | `RegisterComponent.ts` | No password strength validation — allows `123456` |
