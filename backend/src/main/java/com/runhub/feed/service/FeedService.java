@@ -16,9 +16,11 @@ import com.runhub.feed.repository.CommentRepository;
 import com.runhub.feed.repository.LikeRepository;
 import com.runhub.feed.repository.PostReactionRepository;
 import com.runhub.feed.repository.PostRepository;
+import com.runhub.notifications.service.NotificationService;
 import com.runhub.running.model.RunningActivity;
 import com.runhub.running.repository.ActivityRepository;
 import com.runhub.users.model.User;
+import com.runhub.users.repository.UserRepository;
 import com.runhub.users.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,9 +29,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +47,8 @@ public class FeedService {
     private final UserService userService;
     private final CommunityRepository communityRepository;
     private final ActivityRepository activityRepository;
+    private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     public Page<PostDto> getPosts(int page, int size, String email) {
         User currentUser = userService.getUserEntityByEmail(email);
@@ -143,7 +149,29 @@ public class FeedService {
         post.setCommentsCount(post.getCommentsCount() + 1);
         postRepository.save(post);
 
+        detectAndNotifyMentions(content, user, post);
+
         return feedMapper.toCommentDto(saved);
+    }
+
+    private void detectAndNotifyMentions(String content, User author, Post post) {
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile("@(\\w+)");
+        java.util.regex.Matcher m = p.matcher(content);
+        Set<String> seen = new HashSet<>();
+        while (m.find()) {
+            String uname = m.group(1);
+            if (seen.contains(uname) || uname.equalsIgnoreCase(author.getUsername())) continue;
+            seen.add(uname);
+            userRepository.findByUsername(uname).ifPresent(target ->
+                notificationService.create(
+                    target,
+                    "MENTION",
+                    "You were mentioned",
+                    author.getUsername() + " mentioned you in a comment",
+                    "/feed"
+                )
+            );
+        }
     }
 
     @Transactional

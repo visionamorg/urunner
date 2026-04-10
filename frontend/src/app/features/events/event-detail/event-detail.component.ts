@@ -14,7 +14,7 @@ import { MapComponent } from '../../../shared/components/map/map.component';
 @Component({
   selector: 'app-event-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, MatSnackBarModule, GpxRouteMapComponent, MapComponent],
+  imports: [CommonModule, FormsModule, RouterModule, MatSnackBarModule, GpxRouteMapComponent, MapComponent, CommonModule],
   templateUrl: './event-detail.component.html',
   styleUrl: './event-detail.component.scss'
 })
@@ -29,6 +29,7 @@ export class EventDetailComponent implements OnInit {
   registered = false;
   currentUsername = '';
   myRegistration: any = null;
+  myTicket: any = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -72,9 +73,17 @@ export class EventDetailComponent implements OnInit {
         const mine = p.find((x: any) => x.username === this.currentUsername && x.status !== 'CANCELLED');
         this.myRegistration = mine || null;
         this.registered = !!mine;
+        if (mine) this.loadMyTicket(id);
         this.cdr.detectChanges();
       },
       error: () => {}
+    });
+  }
+
+  loadMyTicket(eventId: number): void {
+    this.eventService.getMyTicket(eventId).subscribe({
+      next: t => { this.myTicket = t; this.cdr.detectChanges(); },
+      error: () => { this.myTicket = null; }
     });
   }
 
@@ -184,5 +193,11 @@ export class EventDetailComponent implements OnInit {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
       hour: '2-digit', minute: '2-digit'
     });
+  }
+
+  handleImgError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23334155'/%3E%3Ccircle cx='20' cy='16' r='7' fill='%2394a3b8'/%3E%3Cellipse cx='20' cy='34' rx='11' ry='8' fill='%2394a3b8'/%3E%3C/svg%3E";
+    img.onerror = null;
   }
 }

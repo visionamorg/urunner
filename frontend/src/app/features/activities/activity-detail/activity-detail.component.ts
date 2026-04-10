@@ -28,6 +28,9 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
   showChat = false;
   copiedCaption = false;
 
+  showDeleteConfirm = false;
+  deleting = false;
+
   // Coaching feedback
   coachingComments: any[] = [];
   newComment: { content: string; rating: number | null; lapNumber: number | null } = { content: '', rating: null, lapNumber: null };
@@ -298,5 +301,16 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
   getRatingStars(rating: number | null): string {
     if (!rating) return '';
     return '★'.repeat(rating) + '☆'.repeat(10 - rating);
+  }
+
+  confirmDelete() { this.showDeleteConfirm = true; }
+  cancelDelete() { this.showDeleteConfirm = false; }
+  executeDelete() {
+    if (!this.activity || this.deleting) return;
+    this.deleting = true;
+    this.activityService.deleteActivity(this.activity.id).subscribe({
+      next: () => this.router.navigate(['/activities']),
+      error: () => { this.deleting = false; this.showDeleteConfirm = false; }
+    });
   }
 }

@@ -9,6 +9,8 @@ import com.runhub.running.repository.ActivityRepository;
 import com.runhub.users.model.User;
 import com.runhub.users.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,10 @@ public class ActivityService {
     private final ActivityRepository activityRepository;
     private final ActivityMapper activityMapper;
     private final UserService userService;
+
+    @Lazy
+    @Autowired
+    private ActivityPostProcessingService postProcessingService;
 
     public List<ActivityDto> getAllActivities() {
         return activityRepository.findAllByOrderByActivityDateDesc()
@@ -56,7 +62,8 @@ public class ActivityService {
                 .location(request.getLocation())
                 .notes(request.getNotes())
                 .build();
-        ActivityDto saved = activityMapper.toDto(activityRepository.save(activity));
+        RunningActivity savedActivity = activityRepository.save(activity);
+        ActivityDto saved = activityMapper.toDto(savedActivity);
 
         // Award RunPoints: 10 pts/km — anti-cheat: skip if pace < 1.5 min/km (superhuman)
         if (request.getDistanceKm() > 0 && request.getDurationMinutes() > 0) {
@@ -66,6 +73,10 @@ public class ActivityService {
                 userService.awardRunPoints(user, points);
             }
         }
+
+        // Async AI summary
+        postProcessingService.runAiSummary(savedActivity.getId(), email);
+
         return saved;
     }
 
@@ -95,6 +106,16 @@ public class ActivityService {
                 .weeklyDistanceKm(weeklyDist)
                 .monthlyDistanceKm(monthlyDist)
                 .build();
+    }
+
+    @Transactional
+    public void deleteActivity(Long id, String email) {
+        RunningActivity activity = activityRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Activity not found"));
+        if (!activity.getUser().getEmail().equals(email)) {
+            throw new RuntimeException("Not authorized");
+        }
+        activityRepository.deleteById(id);
     }
 
     @Transactional

@@ -8,9 +8,11 @@ import com.runhub.communities.repository.CommunityMemberRepository;
 import com.runhub.communities.repository.CommunityRepository;
 import com.runhub.config.BadRequestException;
 import com.runhub.config.ResourceNotFoundException;
+import com.runhub.events.dto.AttendanceDto;
 import com.runhub.events.dto.CreateEventRequest;
 import com.runhub.events.dto.EventDto;
 import com.runhub.events.dto.EventParticipantDto;
+import com.runhub.events.dto.TicketDto;
 import com.runhub.events.dto.UpdateEventRequest;
 import com.runhub.events.mapper.EventMapper;
 import com.runhub.events.model.Event;
@@ -19,12 +21,14 @@ import com.runhub.events.repository.EventGalleryRepository;
 import com.runhub.events.repository.EventRegistrationRepository;
 import com.runhub.events.repository.EventRepository;
 import com.runhub.users.model.User;
+import com.runhub.users.repository.UserRepository;
 import com.runhub.users.service.UserService;
 import com.runhub.notifications.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,6 +44,7 @@ public class EventService {
     private final CommunityRepository communityRepository;
     private final CommunityMemberRepository communityMemberRepository;
     private final NotificationService notificationService;
+    private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
 
     private List<String> parsePhotoUrls(String json) {
@@ -112,6 +117,7 @@ public class EventService {
                 .user(user)
                 .status(status)
                 .role("RUNNER")
+                .qrToken(java.util.UUID.randomUUID().toString().replace("-", ""))
                 .build();
         registration = registrationRepository.save(registration);
 
@@ -201,6 +207,62 @@ public class EventService {
             regs = registrationRepository.findByEventId(eventId);
         }
         return regs.stream().map(eventMapper::toParticipantDto).toList();
+    }
+
+    // ── QR Check-In ───────────────────────────────────────────────────────────
+
+    public TicketDto getMyTicket(Long eventId, String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        EventRegistration reg = registrationRepository.findByEventIdAndUserId(eventId, user.getId())
+                .orElseThrow(() -> new RuntimeException("No registration found"));
+        Event event = reg.getEvent();
+        return TicketDto.builder()
+                .eventId(event.getId())
+                .eventName(event.getName())
+                .userId(user.getId())
+                .username(user.getUsername())
+                .status(reg.getStatus() != null ? reg.getStatus() : "CONFIRMED")
+                .qrToken(reg.getQrToken())
+                .checkedIn(reg.getCheckedIn())
+                .checkedInAt(reg.getCheckedInAt())
+                .registeredAt(reg.getRegisteredAt())
+                .build();
+    }
+
+    @Transactional
+    public TicketDto checkIn(Long eventId, String token) {
+        EventRegistration reg = registrationRepository.findByQrToken(token)
+                .orElseThrow(() -> new RuntimeException("Invalid QR token"));
+        if (!reg.getEvent().getId().equals(eventId))
+            throw new RuntimeException("Token does not belong to this event");
+        if (Boolean.TRUE.equals(reg.getCheckedIn()))
+            throw new RuntimeException("Already checked in");
+        reg.setCheckedIn(true);
+        reg.setCheckedInAt(LocalDateTime.now());
+        registrationRepository.save(reg);
+        Event event = reg.getEvent();
+        User user = reg.getUser();
+        return TicketDto.builder()
+                .eventId(event.getId())
+                .eventName(event.getName())
+                .userId(user.getId())
+                .username(user.getUsername())
+                .status("CHECKED_IN")
+                .qrToken(reg.getQrToken())
+                .checkedIn(true)
+                .checkedInAt(reg.getCheckedInAt())
+                .build();
+    }
+
+    public AttendanceDto getAttendance(Long eventId) {
+        long registered = registrationRepository.countByEventId(eventId);
+        long checkedIn  = registrationRepository.countCheckedInByEventId(eventId);
+        return AttendanceDto.builder()
+                .eventId(eventId)
+                .registeredCount(registered)
+                .checkedInCount(checkedIn)
+                .build();
     }
 
     // ── Community-scoped Event Methods ────────────────────────────────────────

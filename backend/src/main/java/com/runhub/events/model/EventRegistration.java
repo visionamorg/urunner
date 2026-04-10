@@ -40,4 +40,14 @@ public class EventRegistration {
     @Column(name = "registered_at", nullable = false, updatable = false)
     @Builder.Default
     private LocalDateTime registeredAt = LocalDateTime.now();
+
+    @Column(name = "qr_token", length = 64)
+    private String qrToken;
+
+    @Column(name = "checked_in", nullable = false)
+    @Builder.Default
+    private Boolean checkedIn = false;
+
+    @Column(name = "checked_in_at")
+    private LocalDateTime checkedInAt;
 }

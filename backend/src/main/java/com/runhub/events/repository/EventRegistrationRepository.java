@@ -35,4 +35,12 @@ public interface EventRegistrationRepository extends JpaRepository<EventRegistra
     List<EventRegistration> findByEventIdAndStatus(Long eventId, String status);
 
     List<EventRegistration> findByEventIdAndRoleAndStatus(Long eventId, String role, String status);
+
+    Optional<EventRegistration> findByQrToken(String qrToken);
+
+    @Query("SELECT COUNT(r) FROM EventRegistration r WHERE r.event.id = :eventId AND r.status != 'CANCELLED'")
+    long countByEventId(@Param("eventId") Long eventId);
+
+    @Query("SELECT COUNT(r) FROM EventRegistration r WHERE r.event.id = :eventId AND r.checkedIn = true")
+    long countCheckedInByEventId(@Param("eventId") Long eventId);
 }

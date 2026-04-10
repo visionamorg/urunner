@@ -113,6 +113,10 @@ export class CommunitiesComponent implements OnInit {
     });
   }
 
+  get myJoinedCommunities() {
+    return this.communities.filter(c => c.joined);
+  }
+
   getInitials(name: string): string {
     return name.substring(0, 2).toUpperCase();
   }

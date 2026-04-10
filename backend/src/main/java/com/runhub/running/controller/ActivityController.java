@@ -63,6 +63,13 @@ public class ActivityController {
         return ResponseEntity.ok(streakService.getStreak(principal.getName()));
     }
 
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete activity", description = "Deletes an activity owned by the authenticated user")
+    public ResponseEntity<Void> deleteActivity(@PathVariable Long id, Principal principal) {
+        activityService.deleteActivity(id, principal.getName());
+        return ResponseEntity.noContent().build();
+    }
+
     @PutMapping("/{id}/nutrition")
     @Operation(summary = "Update nutrition for activity", description = "Attaches nutrition data (calories, hydration, etc.) to a specific activity")
     public ResponseEntity<ActivityDto> updateNutrition(

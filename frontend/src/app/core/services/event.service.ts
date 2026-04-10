@@ -65,4 +65,16 @@ export class EventService {
   deleteGpx(eventId: number): Observable<void> {
     return this.http.delete<void>(`/api/events/${eventId}/gpx`);
   }
+
+  getMyTicket(eventId: number): Observable<any> {
+    return this.http.get<any>(`/api/events/${eventId}/my-ticket`);
+  }
+
+  checkIn(eventId: number, token: string): Observable<any> {
+    return this.http.post<any>(`/api/events/${eventId}/check-in?token=${encodeURIComponent(token)}`, {});
+  }
+
+  getAttendance(eventId: number): Observable<any> {
+    return this.http.get<any>(`/api/events/${eventId}/attendance`);
+  }
 }

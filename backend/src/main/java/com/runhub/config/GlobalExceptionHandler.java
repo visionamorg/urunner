@@ -2,6 +2,7 @@ package com.runhub.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -35,6 +36,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Map<String, Object>> handleBadCredentials(BadCredentialsException ex, HttpServletRequest req) {
         return buildError(HttpStatus.UNAUTHORIZED, "Invalid credentials", req.getRequestURI());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, Object>> handleDataIntegrity(
+            DataIntegrityViolationException ex, HttpServletRequest request) {
+        String msg = ex.getRootCause() != null ? ex.getRootCause().getMessage() : ex.getMessage();
+        return buildError(HttpStatus.CONFLICT, "Data integrity violation: " + msg, request.getRequestURI());
     }
 
     @ExceptionHandler(Exception.class)

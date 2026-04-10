@@ -1,9 +1,11 @@
 package com.runhub.events.controller;
 
+import com.runhub.events.dto.AttendanceDto;
 import com.runhub.events.dto.CreateEventRequest;
 import com.runhub.events.dto.EventDto;
 import com.runhub.events.dto.EventParticipantDto;
 import com.runhub.events.dto.GalleryPhotoDto;
+import com.runhub.events.dto.TicketDto;
 import com.runhub.events.service.EventService;
 import com.runhub.events.service.EventGalleryService;
 import com.runhub.events.service.GpxService;
@@ -78,6 +80,23 @@ public class EventController {
             @RequestParam(required = false) String role,
             @RequestParam(required = false) String status) {
         return ResponseEntity.ok(eventService.getEventParticipants(id, role, status));
+    }
+
+    // ── QR Check-In ────────────────────────────────────────────────────────────
+
+    @GetMapping("/{id}/my-ticket")
+    public ResponseEntity<TicketDto> getMyTicket(@PathVariable Long id, Principal principal) {
+        return ResponseEntity.ok(eventService.getMyTicket(id, principal.getName()));
+    }
+
+    @PostMapping("/{id}/check-in")
+    public ResponseEntity<TicketDto> checkIn(@PathVariable Long id, @RequestParam String token) {
+        return ResponseEntity.ok(eventService.checkIn(id, token));
+    }
+
+    @GetMapping("/{id}/attendance")
+    public ResponseEntity<AttendanceDto> attendance(@PathVariable Long id) {
+        return ResponseEntity.ok(eventService.getAttendance(id));
     }
 
     // ── Gallery ────────────────────────────────────────────────────────────────

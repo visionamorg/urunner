@@ -87,4 +87,8 @@ export class ActivityService {
   activateStreakFreeze(): Observable<StreakInfo> {
     return this.http.post<StreakInfo>('/api/streak/freeze', {});
   }
+
+  deleteActivity(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/activities/${id}`);
+  }
 }

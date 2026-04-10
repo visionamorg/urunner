@@ -217,8 +217,23 @@ public class CommunityService {
         postRepository.findById(postId).ifPresent(post -> {
             if (!communityId.equals(post.getCommunityId()))
                 throw new BadRequestException("Post does not belong to this community");
-            post.setPinned(!post.isPinned());
+            boolean nowPinned = !post.isPinned();
+            post.setPinned(nowPinned);
             postRepository.save(post);
+            if (nowPinned) {
+                List<CommunityMember> members = communityMemberRepository.findByCommunityId(communityId);
+                for (CommunityMember m : members) {
+                    if (!m.getUser().getId().equals(admin.getId())) {
+                        notificationService.create(
+                            m.getUser(),
+                            "COMMUNITY_POST",
+                            "Pinned post in " + community.getName(),
+                            admin.getUsername() + " pinned an important post in " + community.getName(),
+                            "/communities/" + communityId
+                        );
+                    }
+                }
+            }
         });
     }
 

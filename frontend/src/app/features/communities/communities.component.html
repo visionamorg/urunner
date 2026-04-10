@@ -76,6 +76,15 @@
     </div>
   }
 
+  <!-- My Joined Communities Empty State -->
+  @if (!loading && myJoinedCommunities.length === 0) {
+    <div class="bg-[#0d1b2e] border border-white/10 rounded-xl p-8 flex flex-col items-center gap-3 text-center">
+      <span class="material-icons text-4xl text-white/30">group_add</span>
+      <p class="text-white font-semibold">You haven't joined any communities yet</p>
+      <p class="text-white/50 text-sm">Browse the communities below and click Join to connect with other runners.</p>
+    </div>
+  }
+
   <!-- Loading -->
   @if (loading) {
     <div class="flex justify-center py-16">

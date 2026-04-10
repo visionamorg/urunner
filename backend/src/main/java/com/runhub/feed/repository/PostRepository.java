@@ -11,12 +11,15 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    @Query("SELECT p FROM Post p WHERE p.deleted = false ORDER BY p.createdAt DESC")
+    @Query(value = "SELECT p FROM Post p JOIN FETCH p.author WHERE p.deleted = false ORDER BY p.createdAt DESC",
+           countQuery = "SELECT COUNT(p) FROM Post p WHERE p.deleted = false")
     Page<Post> findAllByDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
 
-    @Query("SELECT p FROM Post p WHERE p.community IS NULL AND p.deleted = false ORDER BY p.createdAt DESC")
+    @Query(value = "SELECT p FROM Post p JOIN FETCH p.author WHERE p.community IS NULL AND p.deleted = false ORDER BY p.createdAt DESC",
+           countQuery = "SELECT COUNT(p) FROM Post p WHERE p.community IS NULL AND p.deleted = false")
     Page<Post> findByCommunityIsNullAndDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
 
-    @Query("SELECT p FROM Post p WHERE p.community.id = :communityId AND p.deleted = false ORDER BY p.pinned DESC, p.createdAt DESC")
+    @Query(value = "SELECT p FROM Post p JOIN FETCH p.author WHERE p.community.id = :communityId AND p.deleted = false ORDER BY p.pinned DESC, p.createdAt DESC",
+           countQuery = "SELECT COUNT(p) FROM Post p WHERE p.community.id = :communityId AND p.deleted = false")
     Page<Post> findCommunityFeed(@Param("communityId") Long communityId, Pageable pageable);
 }

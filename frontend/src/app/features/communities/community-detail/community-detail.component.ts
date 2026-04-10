@@ -1422,4 +1422,10 @@ export class CommunityDetailComponent implements OnInit, OnDestroy {
       error: () => { this.sendingChat = false; this.toast.error('Message failed to send'); }
     });
   }
+
+  handleImgError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23334155'/%3E%3Ccircle cx='20' cy='16' r='7' fill='%2394a3b8'/%3E%3Cellipse cx='20' cy='34' rx='11' ry='8' fill='%2394a3b8'/%3E%3C/svg%3E";
+    img.onerror = null;
+  }
 }
