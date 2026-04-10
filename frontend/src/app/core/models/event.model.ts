@@ -32,6 +32,9 @@ export interface RunEvent {
   maxVolunteers?: number;
   volunteersCount?: number;
   waitlistCount?: number;
+  locationName?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface CreateEventRequest {

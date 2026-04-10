@@ -1,5 +1,6 @@
 package com.runhub.feed.controller;
 
+import com.runhub.feed.dto.ActivityShareRequest;
 import com.runhub.feed.dto.AddCommentRequest;
 import com.runhub.feed.dto.CommentDto;
 import com.runhub.feed.dto.CreatePostRequest;
@@ -105,5 +106,12 @@ public class FeedController {
             @PathVariable Long id,
             Principal principal) {
         return ResponseEntity.ok(feedService.toggleLike(id, principal.getName()));
+    }
+
+    @PostMapping("/feed/share-activity")
+    public ResponseEntity<PostDto> shareActivity(
+            @RequestBody ActivityShareRequest request,
+            @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(feedService.createActivityPost(request, user));
     }
 }

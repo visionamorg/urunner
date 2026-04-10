@@ -28,4 +28,10 @@ public class PostDto {
     private List<CommentDto> comments;
     private Map<String, Long> reactions;
     private String myReaction;
+    private Long activityId;
+    private String activityTitle;
+    private Double activityDistance;
+    private Double activityPace;
+    private Integer activityDuration;
+    private Double activityElevation;
 }

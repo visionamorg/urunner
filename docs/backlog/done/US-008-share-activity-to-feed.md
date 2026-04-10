@@ -1,5 +1,8 @@
 # US-008 — Share Activity to Feed
 
+**Status: DONE** — Completed 2026-04-10
+
+
 **Status:** [ ] Pending
 **Priority:** 🔴 High
 
@@ -20,31 +23,31 @@ As a **runner**, I want to share a completed activity to the global feed or a co
 ## Acceptance Criteria
 
 ### Share Button on Activity
-- [ ] Activity detail page (`/activities/:id`) has a "Share to Feed" button
-- [ ] Clicking opens a share dialog with:
+- [x] Activity detail page (`/activities/:id`) has a "Share to Feed" button
+- [x] Clicking opens a share dialog with:
   - Caption text area (optional, pre-filled with activity title)
   - Target selector: "Global Feed" or a community the user belongs to (dropdown)
   - Privacy toggle: Public / Followers only
   - Preview card showing activity stats (distance, pace, time, route map thumbnail if available)
-- [ ] Submitting creates a post of type `ACTIVITY_SHARE` on the selected feed
+- [x] Submitting creates a post of type `ACTIVITY_SHARE` on the selected feed
 
 ### Activity Post Card in Feed
-- [ ] Posts of type `ACTIVITY_SHARE` render a dedicated card design:
+- [x] Posts of type `ACTIVITY_SHARE` render a dedicated card design:
   - Activity stat strip: Distance | Pace | Time | Elevation
   - Map thumbnail if GPS data exists (static map image via OSM or Mapbox)
   - User caption below stats
   - "View full activity →" link to `/activities/:id`
-- [ ] Like and comment work the same as regular posts
-- [ ] Activity posts show in the global feed and in community feeds
+- [x] Like and comment work the same as regular posts
+- [x] Activity posts show in the global feed and in community feeds
 
 ### Post Model Update
-- [ ] New post type: `ACTIVITY_SHARE` (alongside existing `TEXT` and `PHOTO_ALBUM`)
-- [ ] New column on `posts`: `activity_id BIGINT REFERENCES running_activities(id)`
-- [ ] `PostDto` includes `activityId`, `activityStats` (distance, pace, duration, elevation) when type is `ACTIVITY_SHARE`
+- [x] New post type: `ACTIVITY_SHARE` (alongside existing `TEXT` and `PHOTO_ALBUM`)
+- [x] New column on `posts`: `activity_id BIGINT REFERENCES running_activities(id)`
+- [x] `PostDto` includes `activityId`, `activityStats` (distance, pace, duration, elevation) when type is `ACTIVITY_SHARE`
 
 ### Feed Page Update
-- [ ] Activities list page shows "Share" icon/button on each activity row
-- [ ] Already-shared activities show "Shared" badge (greyed) so users know they already posted it
+- [x] Activities list page shows "Share" icon/button on each activity row
+- [x] Already-shared activities show "Shared" badge (greyed) so users know they already posted it
 
 ---
 

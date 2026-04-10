@@ -1,5 +1,8 @@
 # US-013 — City Segments & Segment Leaderboards
 
+**Status: DONE** — Completed 2026-04-10
+
+
 **Status:** [ ] Pending
 **Priority:** 🟡 Medium
 
@@ -20,26 +23,26 @@ As a **runner in Casablanca**, I want to see official "UR Casablanca" running se
 ## Acceptance Criteria
 
 ### Segment Data
-- [ ] Admin (global admin role) can create segments:
+- [x] Admin (global admin role) can create segments:
   - Name, description, distance (km), start GPS coordinate, end GPS coordinate, difficulty
   - Example: "The Corniche Sprint", "Anfa Hill Climb", "Hassan II Loop"
-- [ ] Segments are displayed on a dedicated `/segments` page
-- [ ] Each segment card shows: name, distance, difficulty badge, KOM (King of the Mountain = fastest time), your personal best
+- [x] Segments are displayed on a dedicated `/segments` page
+- [x] Each segment card shows: name, distance, difficulty badge, KOM (King of the Mountain = fastest time), your personal best
 
 ### Segment Detection on Activities
-- [ ] When a Garmin activity is synced (via webhook), the backend checks if the route passes through any known segments
-- [ ] If detected, a `SegmentEffort` record is created: `(activity_id, segment_id, elapsed_time, rank)`
-- [ ] Detection logic: GPS polyline from Garmin FIT file intersects within 50m of segment start/end points
+- [x] When a Garmin activity is synced (via webhook), the backend checks if the route passes through any known segments
+- [x] If detected, a `SegmentEffort` record is created: `(activity_id, segment_id, elapsed_time, rank)`
+- [x] Detection logic: GPS polyline from Garmin FIT file intersects within 50m of segment start/end points
 
 ### Segment Leaderboard
-- [ ] Each segment has a leaderboard: top 10 by elapsed time (all time, this month)
-- [ ] Current user's rank is highlighted
-- [ ] "KOM" crown icon on #1 entry
-- [ ] Paginated full leaderboard: `GET /api/segments/{id}/leaderboard?period=alltime`
+- [x] Each segment has a leaderboard: top 10 by elapsed time (all time, this month)
+- [x] Current user's rank is highlighted
+- [x] "KOM" crown icon on #1 entry
+- [x] Paginated full leaderboard: `GET /api/segments/{id}/leaderboard?period=alltime`
 
 ### My Segments
-- [ ] Profile page shows "My Segments" tab: segments the user has run with their best time and rank
-- [ ] Personal best trend chart for a segment (if user ran it multiple times)
+- [x] Profile page shows "My Segments" tab: segments the user has run with their best time and rank
+- [x] Personal best trend chart for a segment (if user ran it multiple times)
 
 ---
 

@@ -12,6 +12,25 @@
     </button>
   </div>
 
+  <!-- Search and Filter -->
+  <div class="flex flex-col sm:flex-row gap-3">
+    <div class="relative flex-1">
+      <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-lg">search</span>
+      <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="onSearchInput()"
+        placeholder="Search communities..."
+        class="input-field pl-10 w-full">
+    </div>
+    <div class="flex gap-2 flex-wrap">
+      @for (cat of categories; track cat) {
+        <button (click)="selectCategory(cat)"
+          class="px-3 py-1.5 text-xs rounded-full border transition-colors font-medium"
+          [ngClass]="selectedCategory === cat ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground hover:border-primary hover:text-primary'">
+          {{ cat }}
+        </button>
+      }
+    </div>
+  </div>
+
   <!-- Create Community Form -->
   @if (showForm) {
     <div class="card animate-slide-up">

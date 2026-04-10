@@ -28,4 +28,6 @@ public class CommunityDto {
     private String stripePaymentUrl;
     private List<SponsorDto> sponsors;
     private String leaderboardMetric;
+    private String category;
+    private Integer recentPostCount;
 }

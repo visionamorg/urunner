@@ -9,6 +9,7 @@ import com.runhub.communities.model.CommunityMember;
 import com.runhub.communities.model.CommunityMemberId;
 import com.runhub.communities.model.CommunityTag;
 import com.runhub.communities.model.MemberTag;
+import com.runhub.communities.model.CommunityJoinRequest;
 import com.runhub.communities.repository.*;
 import com.runhub.notifications.service.EmailService;
 import com.runhub.notifications.service.NotificationService;
@@ -52,6 +53,7 @@ public class CommunityService {
     private final ActivityRepository activityRepository;
     private final MessageRepository messageRepository;
     private final CommunitySponsorRepository sponsorRepository;
+    private final CommunityJoinRequestRepository joinRequestRepository;
 
     // ── List / Get ──────────────────────────────────────────────────────────
 
@@ -534,5 +536,46 @@ public class CommunityService {
     private Community findById(Long id) {
         return communityRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Community not found: " + id));
+    }
+
+    @Transactional
+    public void requestJoin(Long communityId, User user) {
+        Community community = findById(communityId);
+        if (joinRequestRepository.existsByCommunityIdAndUserIdAndStatus(communityId, user.getId(), "PENDING")) {
+            throw new BadRequestException("Request already pending");
+        }
+        CommunityJoinRequest req = CommunityJoinRequest.builder()
+            .community(community).user(user).status("PENDING").build();
+        joinRequestRepository.save(req);
+    }
+
+    @Transactional
+    public void approveJoinRequest(Long communityId, Long requestId, User admin) {
+        CommunityJoinRequest req = joinRequestRepository.findById(requestId)
+            .orElseThrow(() -> new ResourceNotFoundException("Request not found"));
+        req.setStatus("APPROVED");
+        joinRequestRepository.save(req);
+        joinCommunity(communityId, req.getUser());
+    }
+
+    @Transactional
+    public void declineJoinRequest(Long communityId, Long requestId, User admin) {
+        CommunityJoinRequest req = joinRequestRepository.findById(requestId)
+            .orElseThrow(() -> new ResourceNotFoundException("Request not found"));
+        req.setStatus("DECLINED");
+        joinRequestRepository.save(req);
+    }
+
+    public List<com.runhub.communities.dto.JoinRequestDto> getJoinRequests(Long communityId) {
+        return joinRequestRepository.findByCommunityIdAndStatus(communityId, "PENDING").stream()
+            .map(r -> com.runhub.communities.dto.JoinRequestDto.builder()
+                .id(r.getId())
+                .userId(r.getUser().getId())
+                .username(r.getUser().getUsername())
+                .profileImageUrl(r.getUser().getProfileImageUrl())
+                .status(r.getStatus())
+                .createdAt(r.getCreatedAt())
+                .build())
+            .toList();
     }
 }

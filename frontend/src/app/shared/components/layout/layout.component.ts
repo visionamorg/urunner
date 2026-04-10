@@ -40,7 +40,9 @@ export class LayoutComponent implements OnInit {
     { path: '/chat', icon: 'chat', label: 'Chat' },
     { path: '/export-studio', icon: 'photo_camera', label: 'Export Studio' },
     { path: '/coach', icon: 'sports', label: 'Coach Hub' },
-    { path: '/garmin-clipboard', icon: 'watch', label: 'Garmin' }
+    { path: '/garmin-clipboard', icon: 'watch', label: 'Garmin' },
+    { path: '/ai-coach', icon: 'psychology', label: 'AI Coach' },
+    { path: '/segments', icon: 'straighten', label: 'Segments' }
   ];
 
   mobileNavItems = [

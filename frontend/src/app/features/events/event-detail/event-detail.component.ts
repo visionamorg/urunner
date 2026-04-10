@@ -9,11 +9,12 @@ import { RunEvent } from '../../../core/models/event.model';
 import { Message } from '../../../core/models/message.model';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { GpxRouteMapComponent } from '../../../shared/components/gpx-route-map/gpx-route-map.component';
+import { MapComponent } from '../../../shared/components/map/map.component';
 
 @Component({
   selector: 'app-event-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, MatSnackBarModule, GpxRouteMapComponent],
+  imports: [CommonModule, FormsModule, RouterModule, MatSnackBarModule, GpxRouteMapComponent, MapComponent],
   templateUrl: './event-detail.component.html',
   styleUrl: './event-detail.component.scss'
 })

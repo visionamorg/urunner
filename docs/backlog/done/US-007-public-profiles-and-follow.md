@@ -1,5 +1,8 @@
 # US-007 — Public Profiles & Follow System
 
+**Status: DONE** — Completed 2026-04-10
+
+
 **Status:** [ ] Pending
 **Priority:** 🔴 High
 
@@ -20,28 +23,28 @@ As a **runner**, I want to view other users' public profiles and follow them so 
 ## Acceptance Criteria
 
 ### Public Profile Page
-- [ ] New route `/profile/:username` shows a public profile for any user
-- [ ] Shows: avatar, name, username, bio, location, running category, PBs
-- [ ] Shows: total KM, total runs, badges earned (public badges only)
-- [ ] Shows: recent public activities (last 10)
-- [ ] Shows: follow/unfollow button (disabled for own profile)
-- [ ] Shows: follower count + following count
+- [x] New route `/profile/:username` shows a public profile for any user
+- [x] Shows: avatar, name, username, bio, location, running category, PBs
+- [x] Shows: total KM, total runs, badges earned (public badges only)
+- [x] Shows: recent public activities (last 10)
+- [x] Shows: follow/unfollow button (disabled for own profile)
+- [x] Shows: follower count + following count
 
 ### Follow System
-- [ ] `POST /api/users/:username/follow` — follow a user
-- [ ] `DELETE /api/users/:username/follow` — unfollow
-- [ ] `GET /api/users/:username/followers` — list followers
-- [ ] `GET /api/users/:username/following` — list following
-- [ ] Following a user adds their public activities to the logged-in user's feed
-- [ ] A user can see who follows them in their own profile
+- [x] `POST /api/users/:username/follow` — follow a user
+- [x] `DELETE /api/users/:username/follow` — unfollow
+- [x] `GET /api/users/:username/followers` — list followers
+- [x] `GET /api/users/:username/following` — list following
+- [x] Following a user adds their public activities to the logged-in user's feed
+- [x] A user can see who follows them in their own profile
 
 ### Search Users
-- [ ] Search bar on `/rankings` or a new `/discover` page to find users by username
-- [ ] `GET /api/users/search?q=` endpoint returns matching users
+- [x] Search bar on `/rankings` or a new `/discover` page to find users by username
+- [x] `GET /api/users/search?q=` endpoint returns matching users
 
 ### Own Profile Page Update
-- [ ] `/profile` (no param) shows own profile with follower/following counts
-- [ ] "My profile" link in sidebar goes to `/profile/:myUsername`
+- [x] `/profile` (no param) shows own profile with follower/following counts
+- [x] "My profile" link in sidebar goes to `/profile/:myUsername`
 
 ---
 

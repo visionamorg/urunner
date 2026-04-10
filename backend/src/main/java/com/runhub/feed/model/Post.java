@@ -1,6 +1,7 @@
 package com.runhub.feed.model;
 
 import com.runhub.communities.model.Community;
+import com.runhub.running.model.RunningActivity;
 import com.runhub.users.model.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -56,6 +57,10 @@ public class Post {
     @Column(name = "pinned", nullable = false)
     @Builder.Default
     private boolean pinned = false;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "activity_id")
+    private RunningActivity activity;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @Builder.Default

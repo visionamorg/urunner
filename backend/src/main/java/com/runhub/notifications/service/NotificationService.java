@@ -5,6 +5,7 @@ import com.runhub.notifications.model.Notification;
 import com.runhub.notifications.repository.NotificationRepository;
 import com.runhub.users.model.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,15 +16,21 @@ import java.util.List;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public void create(User user, String type, String title, String message, String link) {
-        notificationRepository.save(Notification.builder()
+        Notification saved = notificationRepository.save(Notification.builder()
                 .user(user)
                 .type(type)
                 .title(title)
                 .message(message)
                 .link(link)
                 .build());
+        try {
+            messagingTemplate.convertAndSendToUser(user.getEmail(), "/queue/notifications", toDto(saved));
+        } catch (Exception e) {
+            // WebSocket push is best-effort
+        }
     }
 
     public List<NotificationDto> getUserNotifications(Long userId) {

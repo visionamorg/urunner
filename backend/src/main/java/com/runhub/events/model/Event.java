@@ -70,6 +70,15 @@ public class Event {
     @Column(name = "elevation_gain_meters")
     private Double elevationGainMeters;
 
+    @Column(name = "location_name", length = 255)
+    private String locationName;
+
+    @Column(precision = 10, scale = 7)
+    private BigDecimal latitude;
+
+    @Column(precision = 10, scale = 7)
+    private BigDecimal longitude;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();

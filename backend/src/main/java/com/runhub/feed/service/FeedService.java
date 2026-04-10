@@ -3,6 +3,7 @@ package com.runhub.feed.service;
 import com.runhub.communities.model.Community;
 import com.runhub.communities.repository.CommunityRepository;
 import com.runhub.config.ResourceNotFoundException;
+import com.runhub.feed.dto.ActivityShareRequest;
 import com.runhub.feed.dto.CommentDto;
 import com.runhub.feed.dto.CreatePostRequest;
 import com.runhub.feed.dto.PostDto;
@@ -15,6 +16,8 @@ import com.runhub.feed.repository.CommentRepository;
 import com.runhub.feed.repository.LikeRepository;
 import com.runhub.feed.repository.PostReactionRepository;
 import com.runhub.feed.repository.PostRepository;
+import com.runhub.running.model.RunningActivity;
+import com.runhub.running.repository.ActivityRepository;
 import com.runhub.users.model.User;
 import com.runhub.users.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +42,7 @@ public class FeedService {
     private final FeedMapper feedMapper;
     private final UserService userService;
     private final CommunityRepository communityRepository;
+    private final ActivityRepository activityRepository;
 
     public Page<PostDto> getPosts(int page, int size, String email) {
         User currentUser = userService.getUserEntityByEmail(email);
@@ -202,6 +206,32 @@ public class FeedService {
         );
 
         return toPostDtoWithLike(post, user);
+    }
+
+    @Transactional
+    public PostDto createActivityPost(ActivityShareRequest request, User user) {
+        RunningActivity activity = activityRepository.findById(request.getActivityId())
+            .orElseThrow(() -> new RuntimeException("Activity not found"));
+        if (!activity.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Not your activity");
+        }
+        Community community = null;
+        if (request.getCommunityId() != null) {
+            community = communityRepository.findById(request.getCommunityId()).orElse(null);
+        }
+        String caption = request.getCaption() != null ? request.getCaption() : activity.getTitle();
+        Post post = Post.builder()
+            .author(user)
+            .content(caption)
+            .community(community)
+            .postType("ACTIVITY_SHARE")
+            .activity(activity)
+            .build();
+        Post saved = postRepository.save(post);
+        PostDto dto = feedMapper.toPostDto(saved);
+        dto.setLiked(false);
+        dto.setLikedByCurrentUser(false);
+        return dto;
     }
 
     private PostDto toPostDtoWithLike(Post post, User user) {

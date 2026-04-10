@@ -16,4 +16,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByProviderIdAndAuthProvider(String providerId, AuthProvider authProvider);
 
     java.util.List<User> findAllByAuthProviderAndProviderAccessTokenIsNotNull(AuthProvider authProvider);
+
+    java.util.List<User> findByUsernameContainingIgnoreCaseOrFirstNameContainingIgnoreCase(String username, String firstName);
 }

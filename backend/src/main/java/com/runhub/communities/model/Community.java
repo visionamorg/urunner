@@ -57,6 +57,9 @@ public class Community {
     @Builder.Default
     private String leaderboardMetric = "DISTANCE";
 
+    @Column(name = "category", length = 20)
+    private String category;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();

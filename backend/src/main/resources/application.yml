@@ -19,7 +19,7 @@ spring:
   servlet:
     multipart:
       max-file-size: 10MB
-      max-request-size: 10MB
+      max-request-size: 50MB
   task:
     execution:
       pool:
@@ -39,6 +39,10 @@ spring:
     time-zone: UTC
     serialization:
       write-dates-as-timestamps: false
+
+app:
+  upload-dir: ${UPLOAD_DIR:/app/uploads}
+  base-url: ${APP_BASE_URL:http://localhost:8080}
 
 application:
   security:

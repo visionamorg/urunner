@@ -1,5 +1,8 @@
 # US-012 — Real-Time Notifications (WebSocket)
 
+**Status: DONE** — Completed 2026-04-10
+
+
 **Status:** [ ] Pending
 **Priority:** 🟡 Medium
 
@@ -20,10 +23,10 @@ As a **runner**, I want to receive real-time notifications when things happen (l
 ## Acceptance Criteria
 
 ### Notification Bell (Sidebar)
-- [ ] Unread notification count shown as a badge on the bell icon in the sidebar
-- [ ] Badge count updates in real time without page refresh
-- [ ] Clicking the bell navigates to `/notifications`
-- [ ] Marking all as read clears the badge
+- [x] Unread notification count shown as a badge on the bell icon in the sidebar
+- [x] Badge count updates in real time without page refresh
+- [x] Clicking the bell navigates to `/notifications`
+- [x] Marking all as read clears the badge
 
 ### Notification Types
 | Event | Notification |
@@ -37,17 +40,17 @@ As a **runner**, I want to receive real-time notifications when things happen (l
 | Garmin push succeeded | "Workout pushed to your Garmin successfully" |
 
 ### Real-Time Delivery
-- [ ] Backend sends notifications via WebSocket (Spring WebSocket + STOMP)
-- [ ] Frontend subscribes to `/user/queue/notifications` on login
-- [ ] Notification appears as a toast (top-right, 4s auto-dismiss) AND increments badge count
-- [ ] Toast shows icon + message + optional action button ("View post", "Accept")
+- [x] Backend sends notifications via WebSocket (Spring WebSocket + STOMP)
+- [x] Frontend subscribes to `/user/queue/notifications` on login
+- [x] Notification appears as a toast (top-right, 4s auto-dismiss) AND increments badge count
+- [x] Toast shows icon + message + optional action button ("View post", "Accept")
 
 ### Notifications Page
-- [ ] Unread notifications shown at top, highlighted
-- [ ] "Mark all as read" button
-- [ ] Relative timestamps ("2 minutes ago", "Yesterday")
-- [ ] Each notification is clickable and navigates to the relevant resource
-- [ ] Infinite scroll or "Load more" for older notifications
+- [x] Unread notifications shown at top, highlighted
+- [x] "Mark all as read" button
+- [x] Relative timestamps ("2 minutes ago", "Yesterday")
+- [x] Each notification is clickable and navigates to the relevant resource
+- [x] Infinite scroll or "Load more" for older notifications
 
 ---
 

@@ -1,5 +1,8 @@
 # US-009 — AI Coach Chat UI
 
+**Status: DONE** — Completed 2026-04-10
+
+
 **Status:** [ ] Pending
 **Priority:** 🔴 High
 
@@ -20,34 +23,34 @@ As a **runner**, I want to chat with an AI coach that knows my training history,
 ## Acceptance Criteria
 
 ### AI Coach Page (`/ai-coach`)
-- [ ] Dedicated page in the sidebar (icon: `smart_toy` or `psychology`)
-- [ ] Chat interface: messages thread + input at bottom (same UX pattern as the existing Chat page)
-- [ ] User message appears immediately (optimistic); AI response streams in or shows typing indicator
-- [ ] Conversation is persisted per session (scroll up to see history)
-- [ ] "New conversation" button clears the thread
+- [x] Dedicated page in the sidebar (icon: `smart_toy` or `psychology`)
+- [x] Chat interface: messages thread + input at bottom (same UX pattern as the existing Chat page)
+- [x] User message appears immediately (optimistic); AI response streams in or shows typing indicator
+- [x] Conversation is persisted per session (scroll up to see history)
+- [x] "New conversation" button clears the thread
 
 ### Context-Aware Responses
-- [ ] The first message in each session automatically sends user context to the backend:
+- [x] The first message in each session automatically sends user context to the backend:
   - Recent 4-week activity summary (total KM, avg pace, longest run)
   - Current training zone (from Performance page: OPTIMAL / OVERREACHING / RECOVERY / DETRAINING)
   - Active training program (name + current week if enrolled)
   - Upcoming events (within 30 days)
-- [ ] This context is injected into the system prompt, not shown to the user
+- [x] This context is injected into the system prompt, not shown to the user
 
 ### Quick Prompt Chips
-- [ ] Chips above input for common questions:
+- [x] Chips above input for common questions:
   - "Analyze my last 4 weeks"
   - "Suggest a workout for today"
   - "Am I ready to race?"
   - "How do I improve my 10K pace?"
   - "What should I do on a recovery day?"
-- [ ] Clicking a chip sends that message immediately
+- [x] Clicking a chip sends that message immediately
 
 ### Structured Workout Suggestions
-- [ ] When the AI suggests a workout with structured steps, it renders a workout card (not plain text):
+- [x] When the AI suggests a workout with structured steps, it renders a workout card (not plain text):
   - Step-by-step list (Warmup / Intervals / Cooldown)
   - "Add to Garmin Clipboard" button — pre-fills the Garmin workout builder with the suggested steps
-- [ ] Backend detects if AI response contains a JSON workout block and sends it in a structured field
+- [x] Backend detects if AI response contains a JSON workout block and sends it in a structured field
 
 ---
 

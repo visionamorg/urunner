@@ -1,5 +1,8 @@
 # US-010 — Direct Photo Upload in Posts
 
+**Status: DONE** — Completed 2026-04-10
+
+
 **Status:** [ ] Pending
 **Priority:** 🔴 High
 
@@ -20,31 +23,31 @@ As a **runner**, I want to upload photos directly from my device when creating a
 ## Acceptance Criteria
 
 ### Post Composer (Global Feed)
-- [ ] "Create post" area at the top of the feed shows a photo attachment icon
-- [ ] Clicking opens a file picker (accept `image/*`, max 5 files)
-- [ ] Selected images show as thumbnails in the composer before posting
-- [ ] Each thumbnail has an X to remove it
-- [ ] On submit, images are uploaded then post is created — loading state shown
+- [x] "Create post" area at the top of the feed shows a photo attachment icon
+- [x] Clicking opens a file picker (accept `image/*`, max 5 files)
+- [x] Selected images show as thumbnails in the composer before posting
+- [x] Each thumbnail has an X to remove it
+- [x] On submit, images are uploaded then post is created — loading state shown
 
 ### Post Composer (Community Feed)
-- [ ] Same photo upload available when creating a post in a community feed
+- [x] Same photo upload available when creating a post in a community feed
 
 ### Viewing Photo Posts
-- [ ] Photo posts render using the existing Facebook-style photo grid (1/2/3/4+ layout already built)
-- [ ] Photos are tap/click-able to open a lightbox (fullscreen view)
-- [ ] Lightbox: swipe/arrow navigation between photos, X to close
+- [x] Photo posts render using the existing Facebook-style photo grid (1/2/3/4+ layout already built)
+- [x] Photos are tap/click-able to open a lightbox (fullscreen view)
+- [x] Lightbox: swipe/arrow navigation between photos, X to close
 
 ### Backend — File Upload
-- [ ] `POST /api/uploads/images` — multipart file upload, returns list of URLs
-- [ ] Files stored either on local filesystem (Docker volume) or cloud (first: local `/uploads/`, served via Nginx)
-- [ ] Max file size: 10MB per file, max 5 files per request
-- [ ] Validate MIME type server-side (only images)
-- [ ] `FeedService.createPhotoPost()` already accepts `photoUrls` — reuse it
-- [ ] `CommunityService.createPost()` for community photo posts — same approach
+- [x] `POST /api/uploads/images` — multipart file upload, returns list of URLs
+- [x] Files stored either on local filesystem (Docker volume) or cloud (first: local `/uploads/`, served via Nginx)
+- [x] Max file size: 10MB per file, max 5 files per request
+- [x] Validate MIME type server-side (only images)
+- [x] `FeedService.createPhotoPost()` already accepts `photoUrls` — reuse it
+- [x] `CommunityService.createPost()` for community photo posts — same approach
 
 ### Security
-- [ ] Upload endpoint requires authentication
-- [ ] Sanitize filenames (UUID-based rename on server side)
+- [x] Upload endpoint requires authentication
+- [x] Sanitize filenames (UUID-based rename on server side)
 
 ---
 

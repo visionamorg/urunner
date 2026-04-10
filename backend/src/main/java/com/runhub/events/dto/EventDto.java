@@ -31,4 +31,7 @@ public class EventDto {
     private Integer maxVolunteers;
     private Long volunteersCount;
     private Long waitlistCount;
+    private String locationName;
+    private BigDecimal latitude;
+    private BigDecimal longitude;
 }

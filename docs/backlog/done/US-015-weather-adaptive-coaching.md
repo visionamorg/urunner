@@ -1,5 +1,8 @@
 # US-015 — Weather-Adaptive Training Suggestions
 
+**Status: DONE** — Completed 2026-04-10
+
+
 **Status:** [ ] Pending
 **Priority:** 🟢 Low
 
@@ -20,26 +23,26 @@ As a **runner training in Casablanca**, I want my training program sessions to s
 ## Acceptance Criteria
 
 ### Weather Widget on Dashboard
-- [ ] A small weather widget on the dashboard showing: Temperature, Humidity, Feels Like, Wind
-- [ ] Weather data for Casablanca (lat: 33.5731, lng: -7.5898)
-- [ ] Uses Open-Meteo API (free, no key required): `https://api.open-meteo.com/v1/forecast?latitude=33.57&longitude=-7.59&current=temperature_2m,relative_humidity_2m,windspeed_10m,apparent_temperature`
+- [x] A small weather widget on the dashboard showing: Temperature, Humidity, Feels Like, Wind
+- [x] Weather data for Casablanca (lat: 33.5731, lng: -7.5898)
+- [x] Uses Open-Meteo API (free, no key required): `https://api.open-meteo.com/v1/forecast?latitude=33.57&longitude=-7.59&current=temperature_2m,relative_humidity_2m,windspeed_10m,apparent_temperature`
 
 ### Heat-Adjusted Pace on Training Sessions
-- [ ] Training programs page: when viewing today's session, shows original target pace AND heat-adjusted pace
-- [ ] Heat adjustment formula:
+- [x] Training programs page: when viewing today's session, shows original target pace AND heat-adjusted pace
+- [x] Heat adjustment formula:
   - Base: each +5°C above 20°C adds ~5 seconds/km to target pace
   - Humidity modifier: if humidity > 70%, add 3 additional seconds/km
   - Example: 20°C = 4:30/km → 30°C = 4:40/km → 30°C + 80% humidity = 4:43/km
-- [ ] Displayed as: "Target pace: 4:30/km | Today's adjusted: 4:43/km (30°C, 80% humidity)"
-- [ ] Adjustment badge: green if no change, orange if adjusted, red if very hot (> 35°C)
+- [x] Displayed as: "Target pace: 4:30/km | Today's adjusted: 4:43/km (30°C, 80% humidity)"
+- [x] Adjustment badge: green if no change, orange if adjusted, red if very hot (> 35°C)
 
 ### AI Coach Integration
-- [ ] When current temperature > 28°C, AI coach context (US-009) automatically includes a weather note
-- [ ] AI responses factor in heat when suggesting workouts
+- [x] When current temperature > 28°C, AI coach context (US-009) automatically includes a weather note
+- [x] AI responses factor in heat when suggesting workouts
 
 ### Settings — Location
-- [ ] User can set their city in profile settings (default: Casablanca)
-- [ ] Weather API call uses the city's coordinates
+- [x] User can set their city in profile settings (default: Casablanca)
+- [x] Weather API call uses the city's coordinates
 
 ---
 

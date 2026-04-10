@@ -123,4 +123,17 @@ public class AiService {
                 ))
                 .build();
     }
+
+    public String chat(String message, String userEmail) {
+        if (message == null || message.isBlank()) {
+            return "Please ask me a running question!";
+        }
+        AiResponse response = ask(message);
+        StringBuilder sb = new StringBuilder(response.getAnswer());
+        if (response.getTips() != null && !response.getTips().isEmpty()) {
+            sb.append("\n\nTips:\n");
+            response.getTips().forEach(t -> sb.append("• ").append(t).append("\n"));
+        }
+        return sb.toString().trim();
+    }
 }

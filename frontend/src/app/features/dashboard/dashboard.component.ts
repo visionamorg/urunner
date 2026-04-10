@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
+import { WeatherWidgetComponent } from '../../shared/components/weather-widget/weather-widget.component';
 import { HttpClient } from '@angular/common/http';
 import { ActivityService, Streak, StreakInfo } from '../../core/services/activity.service';
 import { EventService } from '../../core/services/event.service';
@@ -38,7 +39,7 @@ export interface ScheduleItem {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, NgClass],
+  imports: [CommonModule, RouterModule, NgClass, WeatherWidgetComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })

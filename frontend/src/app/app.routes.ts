@@ -99,6 +99,18 @@ export const routes: Routes = [
       {
         path: 'garmin-clipboard',
         loadComponent: () => import('./features/garmin-clipboard/garmin-clipboard.component').then(m => m.GarminClipboardComponent)
+      },
+      {
+        path: 'profile/:username',
+        loadComponent: () => import('./features/profile/public-profile/public-profile.component').then(m => m.PublicProfileComponent)
+      },
+      {
+        path: 'segments',
+        loadComponent: () => import('./features/segments/segments.component').then(m => m.SegmentsComponent)
+      },
+      {
+        path: 'ai-coach',
+        loadComponent: () => import('./features/ai-coach/ai-coach.component').then(m => m.AiCoachComponent)
       }
     ]
   },

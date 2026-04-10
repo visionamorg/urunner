@@ -52,6 +52,17 @@ public class FeedMapper {
         // Parse photoUrls from JSON string
         dto.setPhotoUrls(parsePhotoUrls(post.getPhotoUrls()));
 
+        // Activity share fields
+        if (post.getActivity() != null) {
+            dto.setActivityId(post.getActivity().getId());
+            dto.setActivityTitle(post.getActivity().getTitle());
+            dto.setActivityDistance(post.getActivity().getDistanceKm());
+            dto.setActivityPace(post.getActivity().getPaceMinPerKm());
+            dto.setActivityDuration(post.getActivity().getDurationMinutes());
+            dto.setActivityElevation(post.getActivity().getElevationGainMeters() != null ?
+                post.getActivity().getElevationGainMeters().doubleValue() : null);
+        }
+
         return dto;
     }
 

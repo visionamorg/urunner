@@ -46,6 +46,12 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/communities/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/programs/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/badges/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
+                .requestMatchers("/ws/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/weather/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/segments/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/users/search").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/users/by-username/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

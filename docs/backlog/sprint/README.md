@@ -1,25 +1,26 @@
-# Sprint — Active Phase (MVP2)
+# Sprint — MVP2 Complete ✓
 
 **Goal:** Transform RunHub from solo tracker → social platform
 **Started:** 2026-04-10
-**Progress:** 0/10 stories done
+**Completed:** 2026-04-10
+**Progress:** 10/10 stories done — all moved to `../done/`
 
 ---
 
-## Story Index
+## Story Index — ALL SHIPPED
 
 | Priority | ID | Title | Status |
 |----------|----|-------|--------|
-| 🔴 High | [US-010](US-010-photo-upload-posts.md) | Direct Photo Upload in Posts | [ ] Pending |
-| 🔴 High | [US-007](US-007-public-profiles-and-follow.md) | Public Profiles & Follow System | [ ] Pending |
-| 🔴 High | [US-008](US-008-share-activity-to-feed.md) | Share Activity to Feed | [ ] Pending |
-| 🔴 High | [US-009](US-009-ai-coach-chat-ui.md) | AI Coach Chat UI | [ ] Pending |
-| 🟡 Medium | [US-011](US-011-community-discovery-search.md) | Community Discovery & Search | [ ] Pending |
-| 🟡 Medium | [US-012](US-012-real-time-notifications.md) | Real-Time Notifications (WebSocket) | [ ] Pending |
-| 🟡 Medium | [US-013](US-013-city-segments.md) | City Segments & Segment Leaderboards | [ ] Pending |
-| 🟢 Low | [US-014](US-014-shoe-mileage-alerts.md) | Shoe Mileage Alerts & Retirement | [ ] Pending |
-| 🟢 Low | [US-015](US-015-weather-adaptive-coaching.md) | Weather-Adaptive Training Suggestions | [ ] Pending |
-| 🟢 Low | [US-016](US-016-events-map-location.md) | Events Map & Route Integration | [ ] Pending |
+| 🔴 High | US-010 | Direct Photo Upload in Posts | ✅ Done |
+| 🔴 High | US-007 | Public Profiles & Follow System | ✅ Done |
+| 🔴 High | US-008 | Share Activity to Feed | ✅ Done |
+| 🔴 High | US-009 | AI Coach Chat UI | ✅ Done |
+| 🟡 Medium | US-011 | Community Discovery & Search | ✅ Done |
+| 🟡 Medium | US-012 | Real-Time Notifications (WebSocket) | ✅ Done |
+| 🟡 Medium | US-013 | City Segments & Segment Leaderboards | ✅ Done |
+| 🟢 Low | US-014 | Shoe Mileage Alerts & Retirement | ✅ Done |
+| 🟢 Low | US-015 | Weather-Adaptive Training Suggestions | ✅ Done |
+| 🟢 Low | US-016 | Events Map & Route Integration | ✅ Done |
 
 ---
 

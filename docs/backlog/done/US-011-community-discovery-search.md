@@ -1,5 +1,8 @@
 # US-011 — Community Discovery & Search
 
+**Status: DONE** — Completed 2026-04-10
+
+
 **Status:** [ ] Pending
 **Priority:** 🟡 Medium
 
@@ -20,27 +23,27 @@ As a **runner**, I want to search and browse communities so I can discover runni
 ## Acceptance Criteria
 
 ### Search & Filter Bar
-- [ ] Search input on the communities list page (`/communities`)
-- [ ] Filter chips: All | Road | Trail | Marathon | Ultra | Casual
-- [ ] Sort options: Most Members | Newest | Most Active (posts this week)
-- [ ] Search hits community name and description
-- [ ] `GET /api/communities?search=&category=&sort=` endpoint
+- [x] Search input on the communities list page (`/communities`)
+- [x] Filter chips: All | Road | Trail | Marathon | Ultra | Casual
+- [x] Sort options: Most Members | Newest | Most Active (posts this week)
+- [x] Search hits community name and description
+- [x] `GET /api/communities?search=&category=&sort=` endpoint
 
 ### Community Cards — Enriched
-- [ ] Card shows: cover photo, name, member count, category tag, recent activity count
-- [ ] "Private" lock icon for private communities
-- [ ] "Joined" badge if the user is already a member
-- [ ] For private communities the user isn't in: "Request to Join" button instead of "Join"
+- [x] Card shows: cover photo, name, member count, category tag, recent activity count
+- [x] "Private" lock icon for private communities
+- [x] "Joined" badge if the user is already a member
+- [x] For private communities the user isn't in: "Request to Join" button instead of "Join"
 
 ### Join Requests for Private Communities
-- [ ] `POST /api/communities/{id}/request-join` — creates a pending join request
-- [ ] Admin sees join requests in the existing Invites tab (new section: "Join Requests")
-- [ ] Admin can approve (`POST /api/communities/{id}/requests/{requestId}/approve`) or decline
-- [ ] User gets a notification when their request is approved/declined
+- [x] `POST /api/communities/{id}/request-join` — creates a pending join request
+- [x] Admin sees join requests in the existing Invites tab (new section: "Join Requests")
+- [x] Admin can approve (`POST /api/communities/{id}/requests/{requestId}/approve`) or decline
+- [x] User gets a notification when their request is approved/declined
 
 ### Featured / Trending Section
-- [ ] Top 3 most active communities shown in a featured row above the list
-- [ ] Activity = number of posts created in the last 7 days
+- [x] Top 3 most active communities shown in a featured row above the list
+- [x] Activity = number of posts created in the last 7 days
 
 ---
 

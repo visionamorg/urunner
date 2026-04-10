@@ -2,6 +2,7 @@ package com.runhub.communities.controller;
 
 import com.runhub.communities.dto.*;
 import com.runhub.communities.dto.DriveFolderDto;
+import com.runhub.communities.dto.JoinRequestDto;
 import com.runhub.communities.service.CommunityService;
 import com.runhub.communities.service.CommunityGoalService;
 import com.runhub.events.dto.CreateEventRequest;
@@ -358,6 +359,35 @@ public class CommunityController {
                                                @PathVariable Long pid,
                                                @AuthenticationPrincipal User user) {
         return programService.completeSession(pid, user.getEmail());
+    }
+
+    // ── Join Requests ─────────────────────────────────────────────────────────
+
+    @PostMapping("/{id}/request-join")
+    public ResponseEntity<Void> requestJoin(@PathVariable Long id,
+            @AuthenticationPrincipal User user) {
+        communityService.requestJoin(id, user);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/join-requests")
+    public ResponseEntity<List<JoinRequestDto>> getJoinRequests(@PathVariable Long id,
+            @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(communityService.getJoinRequests(id));
+    }
+
+    @PostMapping("/{id}/requests/{requestId}/approve")
+    public ResponseEntity<Void> approveRequest(@PathVariable Long id, @PathVariable Long requestId,
+            @AuthenticationPrincipal User user) {
+        communityService.approveJoinRequest(id, requestId, user);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/requests/{requestId}/decline")
+    public ResponseEntity<Void> declineRequest(@PathVariable Long id, @PathVariable Long requestId,
+            @AuthenticationPrincipal User user) {
+        communityService.declineJoinRequest(id, requestId, user);
+        return ResponseEntity.ok().build();
     }
 
     // ── Weekly Digest ──────────────────────────────────────────────────────────

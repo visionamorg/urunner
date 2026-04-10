@@ -19,6 +19,9 @@ public interface EventMapper {
     @Mapping(target = "waitlistCount", ignore = true)
     @Mapping(target = "photoUrls", ignore = true)
     @Mapping(target = "galleryCount", ignore = true)
+    @Mapping(source = "locationName", target = "locationName")
+    @Mapping(source = "latitude", target = "latitude")
+    @Mapping(source = "longitude", target = "longitude")
     EventDto toDto(Event event);
 
     @Mapping(source = "user.id", target = "userId")
