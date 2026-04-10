@@ -1,1 +1,0 @@
-# Epic: Mobile Application - User Profile & Settings\n## Story: Imperial vs Metric Toggle\n\n**As a** American runner,\n**I want to** switch the entire app from Kilometers to Miles,\n**So that** I understand my pace natively.\n\n### Acceptance Criteria:\n- *Given settings menu*, *Whenunits set to Imperial*, *Thenapply math conversion to all UI components globally*.\n

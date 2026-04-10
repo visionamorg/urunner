@@ -1,1 +1,0 @@
-# Epic: Mobile Application - Social Feed & Interaction\n## Story: Block & Report Content\n\n**As a** user,\n**I want to** report an inappropriate post or block a toxic user natively,\n**So that** my feed remains safe and positive.\n\n### Acceptance Criteria:\n- *Given 3-dot menu on post*, *Whenreport tapped*, *Thenflag post in DB and hide immediately from UI*.\n

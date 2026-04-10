@@ -1,1 +1,0 @@
-# Epic: Mobile Application - Leaderboards & Gamification\n## Story: Global Segment Leaderboards UI\n\n**As a** fast runner,\n**I want to** view the all-time top 10 list for a specific segment route,\n**So that** I see how far off the KOM I am.\n\n### Acceptance Criteria:\n- *Given segment view*, *Whenloaded*, *Thenrender top 10 list with pace and time*.\n

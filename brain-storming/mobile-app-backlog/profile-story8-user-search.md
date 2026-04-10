@@ -1,1 +1,0 @@
-# Epic: Mobile Application - User Profile & Settings\n## Story: Global User Search\n\n**As a** user,\n**I want to** type a name in a search bar to find my real-life friends,\n**So that** I can connect with them instantly.\n\n### Acceptance Criteria:\n- *Given search tab*, *Whentyping string*, *Thendebounce 300ms and return matching users*.\n

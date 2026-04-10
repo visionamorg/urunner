@@ -1,1 +1,0 @@
-# Epic: Mobile Application - Auth & Onboarding\n## Story: Silent JWT Token Refresh\n\n**As a** active user,\n**I want to** have my session sustained in the background,\n**So that** I don't randomly get logged out during a run.\n\n### Acceptance Criteria:\n- *Given expired access token*, *WhenAPI call made*, *Thenuse refresh token silently and retry request*.\n

@@ -1,1 +1,0 @@
-# Epic: Mobile Application - Auth & Onboarding\n## Story: Forgot Password Flow\n\n**As a** returning user,\n**I want to** reset my password via email link,\n**So that** I can recover my account.\n\n### Acceptance Criteria:\n- *Given login screen*, *When'Forgot Password' clicked*, *Thensend reset deep link to email*.\n

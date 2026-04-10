@@ -1,1 +1,0 @@
-# Epic: Mobile Application - Auth & Onboarding\n## Story: Initial Profile Setup\n\n**As a** new user,\n**I want to** set my display name and avatar,\n**So that** I don't look like a generic placeholder to others.\n\n### Acceptance Criteria:\n- *Given successful auth*, *Whenonboarding*, *Thenprompt for photo upload and username*.\n

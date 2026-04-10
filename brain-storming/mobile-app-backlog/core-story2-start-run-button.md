@@ -1,1 +1,0 @@
-# Epic: Mobile Application - Core Tracking & GPS\n## Story: Giant 'Start Run' Button\n\n**As a** runner,\n**I want to** have a massively prominent 'Start' button on the tracking tab,\n**So that** I can begin a workout without searching.\n\n### Acceptance Criteria:\n- *Given tracking tab*, *Whenviewed*, *Thencentral action button takes up 30% of screen height*.\n

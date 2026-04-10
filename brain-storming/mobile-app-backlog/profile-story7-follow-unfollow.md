@@ -1,1 +1,0 @@
-# Epic: Mobile Application - User Profile & Settings\n## Story: Follow/Unfollow Actions\n\n**As a** user,\n**I want to** tap a button on someone else's profile to follow them,\n**So that** I can curate my feed.\n\n### Acceptance Criteria:\n- *Given other user profile*, *WhenFollow tapped*, *Thenoptimistic UI update to 'Following' and call API*.\n

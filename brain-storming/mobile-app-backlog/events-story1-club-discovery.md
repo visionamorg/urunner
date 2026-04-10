@@ -1,1 +1,0 @@
-# Epic: Mobile Application - Communities & Events\n## Story: Club Discovery Page\n\n**As a** user,\n**I want to** browse local running clubs near my GPS location,\n**So that** I can find people to run with on Tuesdays.\n\n### Acceptance Criteria:\n- *Given clubs tab*, *Whenloaded*, *Thenshow horizontal scroll of popular local clubs*.\n

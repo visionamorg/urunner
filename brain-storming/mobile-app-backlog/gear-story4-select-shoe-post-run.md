@@ -1,1 +1,0 @@
-# Epic: Mobile Application - Gear & Wearables Integration\n## Story: Attach Shoe to Activity\n\n**As a** runner,\n**I want to** select which shoe I wore from a dropdown right before saving a run,\n**So that** the mileage gets tracked accurately.\n\n### Acceptance Criteria:\n- *Given save form*, *When'Shoe' field tapped*, *Thenopen bottom sheet to select from garage*.\n

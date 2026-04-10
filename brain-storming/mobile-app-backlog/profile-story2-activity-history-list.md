@@ -1,1 +1,0 @@
-# Epic: Mobile Application - User Profile & Settings\n## Story: Personal Activity History\n\n**As a** user,\n**I want to** scroll through a list of purely my own past activities on my profile,\n**So that** I can review my training log.\n\n### Acceptance Criteria:\n- *Given profile tab*, *Whenscrolling below header*, *Thenshow FlatList of user's own runs*.\n

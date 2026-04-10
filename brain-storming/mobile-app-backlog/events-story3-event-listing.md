@@ -1,1 +1,0 @@
-# Epic: Mobile Application - Communities & Events\n## Story: Upcoming Event Listings\n\n**As a** user,\n**I want to** view a calendar of upcoming 5k/10k races published by organizers,\n**So that** I can plan my race season.\n\n### Acceptance Criteria:\n- *Given Events tab*, *Whenviewed*, *Thenrender vertical list sorted by chronology*.\n

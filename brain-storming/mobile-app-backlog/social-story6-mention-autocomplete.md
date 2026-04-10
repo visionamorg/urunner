@@ -1,1 +1,0 @@
-# Epic: Mobile Application - Social Feed & Interaction\n## Story: Comment @Mention Autocomplete\n\n**As a** user,\n**I want to** type @ in a comment to see a dropdown of friends,\n**So that** I can ping specific people.\n\n### Acceptance Criteria:\n- *Given typing comment*, *When@ typed*, *Thenquery fuzzy search algorithm for friends list*.\n

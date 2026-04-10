@@ -1,1 +1,0 @@
-# Epic: Mobile Application - Core Tracking & GPS\n## Story: Rating Perceived Exertion (RPE)\n\n**As a** athlete,\n**I want to** rate how hard the run felt on a scale of 1-10,\n**So that** I can track my subjective fatigue over time.\n\n### Acceptance Criteria:\n- *Given save form*, *Whensubmitted*, *Thenselect a face icon (Easy to Max Effort)*.\n

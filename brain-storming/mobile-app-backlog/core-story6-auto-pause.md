@@ -1,1 +1,0 @@
-# Epic: Mobile Application - Core Tracking & GPS\n## Story: Auto-Pause at Traffic Lights\n\n**As a** city runner,\n**I want to** have the timer automatically pause when I stop moving,\n**So that** my average pace isn't ruined by red lights.\n\n### Acceptance Criteria:\n- *Given settings enabled*, *Whenmovement speed drops below 0.5m/s for 5 sec*, *Thentrigger Auto-Pause state*.\n

@@ -96,8 +96,15 @@ Schema file: `database/schema.sql` (source of truth for structure)
 - Badge system
 - AI coach endpoint
 
-## User stories
-All feature requests are tracked in `docs/user-stories/`. Each story is a file `US-XXX-short-title.md`. The index is in `docs/user-stories/README.md`.
+## Backlog & Stories
+All product work is tracked in `docs/backlog/`. One folder, four states:
+- `docs/backlog/done/` — shipped MVP1 work
+- `docs/backlog/sprint/` — active MVP2 stories (US-007 → US-016)
+- `docs/backlog/next/` — MVP3 planned work (bugs, garmin suite, payments, etc.)
+- `docs/backlog/ideas/` — future ideation pool (150+ consolidated ideas)
+
+Master index: `docs/backlog/README.md`
+Story template: `docs/backlog/_TEMPLATE.md`
 
 ## Dev rules
 - Changes to backend require `docker compose build backend && docker compose up -d`

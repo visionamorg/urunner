@@ -1,1 +1,0 @@
-# Epic: Mobile Application - Core Tracking & GPS\n## Story: 3-2-1 Start Countdown\n\n**As a** runner,\n**I want to** have a 3 second audible countdown before the timer actually starts,\n**So that** I can put my phone in my pocket before taking off.\n\n### Acceptance Criteria:\n- *Given start pressed*, *Wheninitiated*, *Thenplay 3 beeps and count down on screen*.\n

@@ -1,1 +1,0 @@
-# Epic: Mobile Application - Social Feed & Interaction\n## Story: Share Run to IG Stories\n\n**As a** user,\n**I want to** tap a share button that generates an image and pushes to Instagram,\n**So that** I can brag outside the app.\n\n### Acceptance Criteria:\n- *Given activity detail*, *Whenshare tapped*, *Theninvoke native share sheet with formatted canvas image*.\n

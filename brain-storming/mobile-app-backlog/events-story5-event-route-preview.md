@@ -1,1 +1,0 @@
-# Epic: Mobile Application - Communities & Events\n## Story: Event Route Map Preview\n\n**As a** runner,\n**I want to** view the exact GPX track of the race on a map before I run it,\n**So that** I know where the hills are.\n\n### Acceptance Criteria:\n- *Given Event details*, *Whenmap tapped*, *Thenexpand full screen map showing the predefined polyline*.\n

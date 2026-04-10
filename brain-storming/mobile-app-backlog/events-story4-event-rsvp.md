@@ -1,1 +1,0 @@
-# Epic: Mobile Application - Communities & Events\n## Story: Tap to RSVP\n\n**As a** runner,\n**I want to** tap 'Going' on an event to add myself to the participant list,\n**So that** organizers know I am showing up.\n\n### Acceptance Criteria:\n- *Given Event details*, *When'RSVP' tapped*, *Thenadd user avatar to 'Going' roster*.\n

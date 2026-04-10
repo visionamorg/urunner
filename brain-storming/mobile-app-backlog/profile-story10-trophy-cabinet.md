@@ -1,1 +1,0 @@
-# Epic: Mobile Application - User Profile & Settings\n## Story: Trophy Cabinet UI\n\n**As a** user,\n**I want to** see a visual grid of all the badges and medals I've unlocked,\n**So that** I feel proud of my accomplishments.\n\n### Acceptance Criteria:\n- *Given profile tab*, *Whenclicking 'Trophies'*, *Thenrender a 3-column grid of SVG badges*.\n

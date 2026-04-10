@@ -1,1 +1,0 @@
-# Epic: Mobile Application - Gear & Wearables Integration\n## Story: Mobile Shoe Garage View\n\n**As a** gear nerd,\n**I want to** add a new pair of shoes to my profile and see their mileage,\n**So that** I can manage my rotation.\n\n### Acceptance Criteria:\n- *Given profile*, *When'Shoes' tapped*, *Thenshow list of shoes with progress bars towards 600km limit*.\n
